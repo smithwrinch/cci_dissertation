@@ -2,22 +2,26 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+  menuScene.setup();
+  sceneManager.addScene(&menuScene);
+  trainingScene.setup();
+  sceneManager.addScene(&trainingScene);
+  sceneManager.changeSceneTo(SCENE_TYPE::MENU);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+  sceneManager.getCurrentScene()->update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+    sceneManager.getCurrentScene()->draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    // sceneManager.changeSceneTo(SCENE_TYPE::TRAIN);
 }
 
 //--------------------------------------------------------------
@@ -66,6 +70,12 @@ void ofApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
+
+// //--------------------------------------------------------------
+// void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
+//
+//     sceneManager.getCurrentScene()->onButtonEvent(e);
+// }

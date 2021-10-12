@@ -1,0 +1,31 @@
+#pragma once
+#ifndef SCENE_TYPES
+#define SCENE_TYPES
+namespace SCENE_TYPE
+{
+  enum ID {MENU,
+    MODEL_TYPE_SELECT,
+    DATASET_MENU,
+    DATASET_BUILDER,
+    DATASET_PROCESSESOR,
+    DATASET_LOADER,
+    MODEL_MENU,
+    MODEL_BUILDER,
+    MODEL_SELECT,
+    HYPERPARAMETER_SELECT,
+    TRAIN,
+    EVALUATE,
+    INTERACT
+    };
+}
+#endif
+
+
+#ifndef MODEL_TYPES
+#define MODEL_TYPES
+namespace MODEL_TYPE
+{
+  enum ID {GAN, PIX2PIX, CUSTOM
+    };
+}
+#endif

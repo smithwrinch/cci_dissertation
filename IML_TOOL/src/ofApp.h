@@ -1,6 +1,14 @@
 #pragma once
 
+#include "ofxDatGui.h"
+
 #include "ofMain.h"
+#include "baseScene.h"
+#include "sceneTypes.h"
+#include "sceneManager.h"
+#include "model.h"
+#include "scenes/trainingScene.h"
+#include "scenes/menuScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -20,5 +28,16 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+
+		SceneManager sceneManager = SceneManager::getInstance();
+		ModelManager modelManager = ModelManager::getInstance();
+
+		ofxDatGuiButton* button;
+
+	private:
+		MenuScene menuScene;
+		TrainingScene trainingScene;
+
+		void positionButtons();
+		void onButtonEvent(ofxDatGuiButtonEvent e);
 };
