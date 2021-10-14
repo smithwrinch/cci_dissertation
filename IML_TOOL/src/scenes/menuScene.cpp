@@ -9,27 +9,49 @@ void MenuScene::setup(){
   loadModelButton->setPosition(newModelButton->getX(), newModelButton->getY() + newModelButton->getHeight() + 20);
   loadModelButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
+
+  playButton = new ofxDatGuiButton("PLAY");
+  playButton->setPosition(loadModelButton->getX(), loadModelButton->getY() + loadModelButton->getHeight() + 50);
+  playButton->onButtonEvent(this, &MenuScene::onButtonEvent);
+
   // state 1
   modelNameInput = new ofxDatGuiTextInput("NAME MODEL:", "");
-  modelNameInput->setPosition(ofGetWidth()/2 - modelNameInput->getWidth()/2, ofGetHeight()/2 - modelNameInput->getHeight());
   modelNameInput->setWidth(400, 0.5);
+  modelNameInput->setPosition(ofGetWidth()/2 - modelNameInput->getWidth()/2, ofGetHeight()/2 - modelNameInput->getHeight());
+
   createModelButton = new ofxDatGuiButton("CONTINUE");
+  createModelButton->setWidth(400, 0.5);
   createModelButton->setPosition(modelNameInput->getX(), modelNameInput->getY() + modelNameInput->getHeight() + 20);
   createModelButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
-
   backButton = new ofxDatGuiButton("BACK<-");
-  backButton->setPosition(modelNameInput->getX(), ofGetHeight() - 100);
+  backButton->setPosition(200, ofGetHeight() - 100);
   backButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
   errorLabel = new ofxDatGuiLabel("");
+  errorLabel->setWidth(400, 0.5);
   errorLabel->setPosition(modelNameInput->getX(), modelNameInput->getY() - modelNameInput->getHeight());
-
   errorLabel->setLabelColor(ofColor(255, 0, 0));
 
   //state 2
-  modelScroll = new ofxDatGuiScrollView("Saved Models", 5);
+  modelScroll = new ofxDatGuiScrollView("Saved Models", 10);
+  modelScroll->setWidth(300, 0.5);
+  modelScroll->setPosition(ofGetWidth()/2 - modelScroll->getWidth()/2, ofGetHeight()/2 - modelScroll->getHeight());
 
+  modelScroll->onScrollViewEvent(this, &MenuScene::onScrollViewEvent);
+
+  scrollContinueButton = new ofxDatGuiButton("CONTINUE");
+  scrollContinueButton->setPosition(ofGetWidth()/2 - scrollContinueButton->getWidth()/2 + 200 , modelScroll->getY() + modelScroll->getHeight() + 50);
+  scrollContinueButton->onButtonEvent(this, &MenuScene::onButtonEvent);
+
+  scrollDeleteButton = new ofxDatGuiButton("DELETE");
+  scrollDeleteButton->setPosition(ofGetWidth()/2 - scrollContinueButton->getWidth()/2 - 200, modelScroll->getY() + modelScroll->getHeight() + 50);
+  scrollDeleteButton->onButtonEvent(this, &MenuScene::onButtonEvent);
+  scrollDeleteButton->setStripeColor(ofColor(255,0,0));
+
+  scrollDeleteButton->setVisible(false);
+  scrollContinueButton->setVisible(false);
+  populateScroll();
 
   // state 3
   modelTypeLabel = new ofxDatGuiLabel("I WANT TO BUILD A...");
@@ -40,6 +62,7 @@ void MenuScene::setup(){
   pix2pixButton->setWidth(ofGetWidth() - 100, 1);
   pix2pixButton->setPosition(ofGetWidth()/2 - pix2pixButton->getWidth()/2, ofGetHeight()/2 - pix2pixButton->getHeight()/2);
   pix2pixButton->onButtonEvent(this, &MenuScene::onButtonEvent);
+  pix2pixButton->setStripeColor(ofColor(2,132,30));
   pix2pixLabel = new ofxDatGuiLabel("develop a pix2pix network on labelled data");
   pix2pixLabel->setPosition(pix2pixButton->getX(), pix2pixButton->getY() + pix2pixButton->getHeight());
   pix2pixLabel->setWidth(pix2pixButton->getWidth());
@@ -50,6 +73,7 @@ void MenuScene::setup(){
   ganButton->setWidth(ofGetWidth() - 100, 1);
   ganButton->setPosition(ofGetWidth()/2 - ganButton->getWidth()/2, pix2pixButton->getY() - 150);
   ganButton->onButtonEvent(this, &MenuScene::onButtonEvent);
+  ganButton->setStripeColor(ofColor(253,106,2));
   ganLabel = new ofxDatGuiLabel("develop a generative adversarial network on unlabelled data");
   ganLabel->setPosition(ganButton->getX(), ganButton->getY() + ganButton->getHeight());
   ganLabel->setWidth(ganButton->getWidth());
@@ -59,12 +83,12 @@ void MenuScene::setup(){
   customButton->setWidth(ofGetWidth() - 100, 1);
   customButton->setPosition(ofGetWidth()/2 - customButton->getWidth()/2, pix2pixButton->getY() + 150 + customButton->getHeight());
   customButton->setEnabled(false);
+  customButton->setStripeColor(ofColor(100,100,100));
   customLabel = new ofxDatGuiLabel("A WIP...");
   customLabel->setPosition(customButton->getX(), customButton->getY() + customButton->getHeight());
   customLabel->setWidth(customButton->getWidth());
   customLabel->setLabelColor(ofColor(150, 150, 150));
 
-  populateScroll();
 }
 
 void MenuScene::update(){
@@ -72,6 +96,7 @@ void MenuScene::update(){
   if(state == 0){
     newModelButton->update();
     loadModelButton->update();
+    playButton->update();
   }
   if(state == 1){
     createModelButton->update();
@@ -83,6 +108,8 @@ void MenuScene::update(){
   if(state == 2){
     modelScroll->update();
     backButton->update();
+    scrollContinueButton->update();
+    scrollDeleteButton->update();
   }
 
   if(state == 3){
@@ -103,6 +130,7 @@ void MenuScene::draw(){
   if(state == 0){
     newModelButton->draw();
     loadModelButton->draw();
+    playButton->draw();
   }
   if(state == 1){
     createModelButton->draw();
@@ -114,6 +142,8 @@ void MenuScene::draw(){
   if(state == 2){
     modelScroll->draw();
     backButton->draw();
+    scrollContinueButton->draw();
+    scrollDeleteButton->draw();
   }
 
   if(state == 3){
@@ -138,6 +168,7 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
         // loadModelButton->setLabel("LOADING MODEL...");
         populateScroll();
         state = 2;
+        refreshScroll();
     }
   if (e.target == createModelButton){
         // createModelButton->setLabel("SAVING MODEL...");
@@ -148,6 +179,9 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     }
 
   if (e.target == backButton){
+
+      scrollDeleteButton->setVisible(false);
+      scrollContinueButton->setVisible(false);
       state = 0;
     }
   if(e.target == ganButton){
@@ -158,7 +192,52 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     createModel(MODEL_TYPE::PIX2PIX);
     state = 0;
   }
+
+  if(e.target == scrollContinueButton){
+    cout << "WE WILL NOW LOAD TO " << currentScroll << endl;
+  }
+  if(e.target == scrollDeleteButton){
+    cout << "WE WILL NOW DELETE " << currentScroll << endl;
+    deleteModel(currentScroll);
+    populateScroll();
+    refreshScroll();
+    currentScroll = "";
+    scrollDeleteButton->setVisible(false);
+    scrollContinueButton->setVisible(false);
+  }
+  if(e.target == playButton){
+
+    sceneManager->changeSceneTo(SCENE_TYPE::PLAY_MODEL_SELECT);
+
+    cout << sceneManager->getNumScenesAdded() << endl;
+    cout << "PLAYING" << endl;
+  }
 }
+
+void MenuScene::onScrollViewEvent(ofxDatGuiScrollViewEvent e)
+{
+    ofxDatGuiScrollView* parent = e.parent; // a pointer to the scrollview that dispatched the event //
+    ofxDatGuiButton* button = e.target; // a pointer to the button that was selected //
+
+    if(currentScroll == button->getLabel()){
+        currentScroll = "";
+        scrollDeleteButton->setVisible(false);
+        scrollContinueButton->setVisible(false);
+        refreshScroll();
+    }
+    else{
+
+
+    scrollDeleteButton->setVisible(true);
+    scrollContinueButton->setVisible(true);
+    refreshScroll();
+    button->setBorder(ofColor(255, 255, 255), 1);
+    button->setStripeColor(ofColor(255,255,255));
+    currentScroll = button->getLabel();
+
+  }
+}
+
 
 bool MenuScene::checkTextValid(){
   string name = modelNameInput->getText();
@@ -207,18 +286,19 @@ void MenuScene::createModel(MODEL_TYPE::ID type){
   dir4.create(true);
   dir5.create(true);
 
-  ModelManager::getInstance().setModelName(fname);
-  ModelManager::getInstance().setModelType(type);
+  ModelManager::getInstance()->setModelName(fname);
+  ModelManager::getInstance()->setModelType(type);
 
-  ModelManager::getInstance().save();
+  ModelManager::getInstance()->save();
 }
+
 
 void MenuScene::populateScroll(){
   ofDirectory dir = ofDirectory("saved_models");
-  dir.sortByDate();
   int size = dir.listDir();
+  dir.sortByDate();
   modelScroll->clear();
-  for (int i =0; i < size; i++){
+  for (int i =size-1; i >= 0; i--){
 
     if(dir.getFile(i).isDirectory()==1){
 
@@ -238,5 +318,28 @@ void MenuScene::populateScroll(){
         //     }
         // }
     }
+  }
+}
+
+void MenuScene::refreshScroll(){
+  currentScroll = "";
+  for (int i =0; i < modelScroll->getNumItems(); i++){
+    ofxDatGuiScrollViewItem * button = modelScroll->getItemAtIndex(i);
+    string label = button->getLabel();
+
+    // ofDirectory dir = ofDirectory(label);
+    ModelManager * mm = ModelManager::getInstance();
+    mm->load(label);
+    int type = mm->getModelType();
+    if(type == 0){
+      button->setStripeColor(ofColor(253,106,2));
+    }
+    else if(type == 1){
+        button->setStripeColor(ofColor(2,132,30));
+    }
+    else{
+      button->setStripeColor(ofColor(100,100,100));
+    }
+    button->setBorder(ofColor(200, 200, 200), 0);
   }
 }

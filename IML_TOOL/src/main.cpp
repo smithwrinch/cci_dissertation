@@ -1,9 +1,18 @@
 #include "ofMain.h"
 #include "ofApp.h"
+#include "sceneManager.h"
+#include "model.h"
 
+SceneManager * SceneManager::singleton = nullptr;
+ModelManager * ModelManager::singleton = nullptr;
+
+// ofColor ganColor = ofColor();
+// ofColor pix2pixColor = ofColor(2,132,30);
+// ofColor customColor = ofColor();
 
 //========================================================================
 int main( ){
+
 	ofGLFWWindowSettings settings;
 	settings.resizable = false;
 	settings.setSize(1024, 768);

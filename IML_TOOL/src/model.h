@@ -5,15 +5,20 @@
 #include "ofxXmlSettings.h"
 class ModelManager{
   public:
-    static ModelManager& getInstance(){
-        static ModelManager theInstance;
-        return theInstance;
+
+    static ModelManager * singleton;
+
+    static ModelManager *  getInstance(){
+      if(singleton == nullptr){
+        singleton = new ModelManager();
+      }
+      return singleton;
     }
     void save(){
       config.saveFile("saved_models/"+getModelName()+"/config.xml");
     }
     void load(string fname){
-      config.loadFile(fname);
+      config.loadFile("saved_models/"+fname+"/config.xml");
     }
     void setModelType(MODEL_TYPE::ID a){
       config.setValue("config:model_type", a);
@@ -33,7 +38,7 @@ class ModelManager{
 
 
     MODEL_TYPE::ID getModelType(){
-      int modelType = config.getValue("config:modelType", -1);
+      int modelType = config.getValue("config:model_type", -1);
       MODEL_TYPE::ID val = static_cast<MODEL_TYPE::ID>(modelType);
       return val;
     }

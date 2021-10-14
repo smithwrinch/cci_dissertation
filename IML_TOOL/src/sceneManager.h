@@ -4,10 +4,16 @@
 #include "baseScene.h"
 #include "sceneTypes.h"
 class SceneManager{
+
   public:
-    static SceneManager& getInstance(){
-        static SceneManager theInstance;
-        return theInstance;
+
+    static SceneManager * singleton;
+
+    static SceneManager *  getInstance(){
+      if(singleton == nullptr){
+        singleton = new SceneManager();
+      }
+      return singleton;
     }
     void addScene(BaseScene * scene){
         scenes.push_back(scene);
@@ -21,6 +27,9 @@ class SceneManager{
         }
       }
     }
+    int getNumScenesAdded(){
+      return scenes.size();
+    }
     BaseScene * getCurrentScene(){
       return currentScene;
     }
@@ -29,7 +38,7 @@ class SceneManager{
     }
   private:
     SceneManager(){
-
+      // as singleton
     };
     BaseScene * currentScene;
     vector<BaseScene*> scenes;

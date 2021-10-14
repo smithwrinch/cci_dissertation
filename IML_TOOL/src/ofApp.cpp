@@ -2,26 +2,35 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+  // sceneManager = SceneManager::getInstance();
   menuScene.setup();
-  sceneManager.addScene(&menuScene);
+  sceneManager->addScene(&menuScene);
   trainingScene.setup();
-  sceneManager.addScene(&trainingScene);
-  sceneManager.changeSceneTo(SCENE_TYPE::MENU);
+  sceneManager->addScene(&trainingScene);
+  playModelSelectorScene.setup();
+  sceneManager->addScene(&playModelSelectorScene);
+  inputPix2PixScene.setup();
+  sceneManager->addScene(&inputPix2PixScene);
+  inputGANScene.setup();
+  sceneManager->addScene(&inputGANScene);
+
+  sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-  sceneManager.getCurrentScene()->update();
+  sceneManager->getCurrentScene()->update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    sceneManager.getCurrentScene()->draw();
+    sceneManager->getCurrentScene()->draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     // sceneManager.changeSceneTo(SCENE_TYPE::TRAIN);
+    sceneManager->getCurrentScene()->keyPressed(key);
 }
 
 //--------------------------------------------------------------
@@ -36,17 +45,18 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+  sceneManager->getCurrentScene()->mouseDragged(x,y,button);
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
+  sceneManager->getCurrentScene()->mousePressed(x, y, button);
 
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+  sceneManager->getCurrentScene()->mouseReleased(x,y,button);
 }
 
 //--------------------------------------------------------------
@@ -71,7 +81,7 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
-
+  sceneManager->getCurrentScene()->dragEvent(dragInfo);
 }
 
 // //--------------------------------------------------------------

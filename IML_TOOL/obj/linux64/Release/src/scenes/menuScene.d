@@ -596,7 +596,8 @@ obj/linux64/Release/src/scenes/menuScene.o: \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneTypes.h \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/../model.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/src/ofxXmlSettings.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/libs/tinyxml.h
+ /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/libs/tinyxml.h \
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneManager.h
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/menuScene.h:
 
@@ -1825,3 +1826,5 @@ obj/linux64/Release/src/scenes/menuScene.o: \
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/src/ofxXmlSettings.h:
 
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/libs/tinyxml.h:
+
+/home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneManager.h:

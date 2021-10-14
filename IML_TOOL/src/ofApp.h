@@ -9,6 +9,10 @@
 #include "model.h"
 #include "scenes/trainingScene.h"
 #include "scenes/menuScene.h"
+#include "scenes/playModelSelectorScene.h"
+#include "scenes/inputPix2PixScene.h"
+#include "scenes/inputGANScene.h"
+
 
 class ofApp : public ofBaseApp{
 
@@ -29,14 +33,19 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-		SceneManager sceneManager = SceneManager::getInstance();
-		ModelManager modelManager = ModelManager::getInstance();
+
+		SceneManager * sceneManager = SceneManager::getInstance();
+		ModelManager * modelManager = ModelManager::getInstance();
 
 		ofxDatGuiButton* button;
 
 	private:
 		MenuScene menuScene;
 		TrainingScene trainingScene;
+		PlayModelSelectorScene playModelSelectorScene;
+		InputPix2PixScene inputPix2PixScene;
+		InputGANScene inputGANScene;
+
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);

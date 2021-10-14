@@ -1,5 +1,7 @@
 #include "../baseScene.h"
+#include <filesystem> // foe removing fules revursively
 
+#include "../sceneManager.h"
 class MenuScene : public BaseScene{
   public:
     void setup();
@@ -8,8 +10,10 @@ class MenuScene : public BaseScene{
     void onButtonEvent(ofxDatGuiButtonEvent e);
 
   private:
+    SceneManager * sceneManager = SceneManager::getInstance();
     ofxDatGuiButton* newModelButton;
     ofxDatGuiButton* loadModelButton;
+    ofxDatGuiButton* playButton;
 
     ofxDatGuiTextInput* modelNameInput;
     ofxDatGuiButton* createModelButton;
@@ -28,12 +32,23 @@ class MenuScene : public BaseScene{
     ofxDatGuiLabel* customLabel;
 
     ofxDatGuiScrollView* modelScroll;
+    ofxDatGuiButton* scrollDeleteButton;
+    ofxDatGuiButton* scrollContinueButton;
 
+    void onScrollViewEvent(ofxDatGuiScrollViewEvent e);
     void populateScroll();
+    void refreshScroll();
     void createModel(MODEL_TYPE::ID);
     bool checkFnameNew();
     bool checkTextValid();
 
+    void deleteModel(string name){
+      filesystem::remove_all("../bin/data/saved_models/"+name);
+      cout << "saved_models/"+name << endl;
+    };
     int state = 0; // 0 for start, 1 for save, 2 for load, 3 for model type selection
+
+    string currentScroll = "";
+
 
 };
