@@ -36,7 +36,7 @@ void MenuScene::setup(){
   //state 2
   modelScroll = new ofxDatGuiScrollView("Saved Models", 10);
   modelScroll->setWidth(300, 0.5);
-  modelScroll->setPosition(ofGetWidth()/2 - modelScroll->getWidth()/2, ofGetHeight()/2 - modelScroll->getHeight());
+  modelScroll->setPosition(ofGetWidth()/2 - modelScroll->getWidth()/2, ofGetHeight()/2 - modelScroll->getHeight()/2);
 
   modelScroll->onScrollViewEvent(this, &MenuScene::onScrollViewEvent);
 
