@@ -46,7 +46,7 @@ def Generator(img_width, img_height, input_channel, output_channel, kernel_size,
     inputs = tf.keras.layers.Input(shape=[img_width, img_height, input_channel])
 
     # 32x32 (untested)
-    down_stack64 = [
+    down_stack32 = [
         downsample(64, kernel_size, apply_batchnorm=False),  # (batch_size, 128, 128, 64)
         downsample(128, kernel_size),  # (batch_size, 64, 64, 128)
         downsample(256, kernel_size),  # (batch_size, 32, 32, 256)
@@ -282,19 +282,6 @@ def Generator(img_width, img_height, input_channel, output_channel, kernel_size,
     return tf.keras.Model(inputs=inputs, outputs=x)
 
 
-# def generator_loss(disc_generated_output, gen_output, target):
-#     loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-#     gan_loss = loss_object(tf.ones_like(disc_generated_output), disc_generated_output)
-#
-#     # Mean absolute error
-#     l1_loss = tf.reduce_mean(tf.abs(target - gen_output))
-#
-#     total_gen_loss = gan_loss + (LAMBDA * l1_loss)
-#
-#     return total_gen_loss, gan_loss, l1_loss
-
-# input: image size, image channel, loss
-
 class GeneratorTemplate():
     def __init__(self, img_width, img_height, input_channel, output_channel, kernel_size, num_layers):
         self.img_width = img_width
@@ -308,7 +295,7 @@ class GeneratorTemplate():
         print("Building Generator")
         self.generator = Generator(self.img_width, self.img_height,
             self.input_channel, self.output_channel, self.kernel_size, self.num_layers)
-
+        return self.generator
     def __str__(self):
         self.generator.summary()
         return ""
@@ -369,28 +356,20 @@ class DiscriminatorTemplate():
         print("Building Discriminator")
         self.discriminator = Discriminator(self.img_width, self.img_height,
             self.input_channel, self.output_channel, self.kernel_size, self.num_layers)
-
+        return self.discriminator
     def __str__(self):
         self.discriminator.summary()
         return ""
 if __name__ == '__main__':
-    img_width = 256
-    img_height = 256
-    input_channel = 3
-    output_channel = 3
-    kernel_size = 4
-    num_layers = 8
-    # gen = GeneratorTemplate(img_width, img_height, input_channel, output_channel, kernel_size, num_layers)
-    # gen.build()
-    # print(gen)
-    disc = DiscriminatorTemplate(img_width, img_height, input_channel, output_channel, kernel_size, num_layers)
-    disc.build()
-# def discriminator_loss(disc_real_output, disc_generated_output):
-#     loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-#     real_loss = loss_object(tf.ones_like(disc_real_output), disc_real_output)
-#
-#     generated_loss = loss_object(tf.zeros_like(disc_generated_output), disc_generated_output)
-#
-#     total_disc_loss = real_loss + generated_loss
-#
-#     return total_disc_loss
+    pass
+    # img_width = 256
+    # img_height = 256
+    # input_channel = 3
+    # output_channel = 3
+    # kernel_size = 4
+    # num_layers = 8
+    # # gen = GeneratorTemplate(img_width, img_height, input_channel, output_channel, kernel_size, num_layers)
+    # # gen.build()
+    # # print(gen)
+    # disc = DiscriminatorTemplate(img_width, img_height, input_channel, output_channel, kernel_size, num_layers)
+    # disc.build()

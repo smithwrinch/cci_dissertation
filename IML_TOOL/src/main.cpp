@@ -1,3 +1,5 @@
+#define MACRO_VARIABLE_TO_STRING(Variable) (void(Variable),#Variable)
+
 #include "ofMain.h"
 #include "ofApp.h"
 #include "sceneManager.h"

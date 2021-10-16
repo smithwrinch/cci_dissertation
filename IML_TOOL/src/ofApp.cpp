@@ -13,7 +13,13 @@ void ofApp::setup(){
   sceneManager->addScene(&inputPix2PixScene);
   inputGANScene.setup();
   sceneManager->addScene(&inputGANScene);
+  trainingScene.setup();
+  sceneManager->addScene(&trainingScene);
 
+  architectureSelectorScene.setup();
+  sceneManager->addScene(&architectureSelectorScene);
+  architectureBuilderScene.setup();
+  sceneManager->addScene(&architectureBuilderScene);
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }
 

@@ -186,15 +186,23 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     }
   if(e.target == ganButton){
     createModel(MODEL_TYPE::GAN);
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
+
     state = 0;
   }
   if(e.target == pix2pixButton){
     createModel(MODEL_TYPE::PIX2PIX);
+
     state = 0;
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }
 
   if(e.target == scrollContinueButton){
     cout << "WE WILL NOW LOAD TO " << currentScroll << endl;
+    state = 0;
+    ModelManager::getInstance()->load(currentScroll);
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
+
   }
   if(e.target == scrollDeleteButton){
     cout << "WE WILL NOW DELETE " << currentScroll << endl;
@@ -279,7 +287,7 @@ void MenuScene::createModel(MODEL_TYPE::ID type){
 
   ofDirectory dir2 = ofDirectory("saved_models/"+fname+"/images");
   ofDirectory dir3 = ofDirectory("saved_models/"+fname+"/outputs");
-  ofDirectory dir4 = ofDirectory("saved_models/"+fname+"/saved_networks");
+  ofDirectory dir4 = ofDirectory("saved_models/"+fname+"/checkpoints");
   ofDirectory dir5 = ofDirectory("saved_models/"+fname+"/python");
   dir2.create(true);
   dir3.create(true);

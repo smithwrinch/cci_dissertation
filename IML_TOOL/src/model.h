@@ -1,8 +1,13 @@
+// deals with config.xml
 #pragma once
-// reads config.xml
 #include "sceneTypes.h"
 
 #include "ofxXmlSettings.h"
+// singleton approach relies on robust scene switching
+// decided on singleton class so I wouldn't have to pass it into functions
+// probably a bad design decision but here we are
+
+// sorry
 class ModelManager{
   public:
 
@@ -14,6 +19,11 @@ class ModelManager{
       }
       return singleton;
     }
+
+    void reset(){
+      config.loadFile("_config.xml");
+    }
+
     void save(){
       config.saveFile("saved_models/"+getModelName()+"/config.xml");
     }
@@ -34,6 +44,45 @@ class ModelManager{
     }
     void setStatus(int i){
       config.setValue("config:status", i);
+    }
+    // architecture ----------------------------------------
+    void setImgWidth(int i){
+      config.setValue("config:image_width", i);
+    }
+    void setImgHeight(int i){
+      config.setValue("config:image_height", i);
+    }
+    void setInputChannel(int i){
+      config.setValue("config:input_channel", i);
+    }
+    void setOutputChannel(int i){
+      config.setValue("config:output_channel", i);
+    }
+    void setLearningRate(float f){
+      config.setValue("config:learning_rate", f);
+    }
+    void setMaxEpochs(int i){
+      config.setValue("config:max_epochs", i);
+    }
+    void setBatchSize(int i){
+      config.setValue("config:batch_size", i);
+    }
+    void setNumLayers(int i){
+      config.setValue("config:num_layers", i);
+    }
+    void setKernelSize(int i){
+      config.setValue("config:kernel_size", i);
+    }
+    void setBeta(float f){
+      config.setValue("config:beta", f);
+    }
+    void setLambda(int i){
+      config.setValue("config:lambda", i);
+    }
+    // all purpose set
+    // wrote everything else out as I thought it would be safer
+    void set(string key, string i){
+        config.setValue("config:"+key, i);
     }
 
 
@@ -58,6 +107,40 @@ class ModelManager{
 
     int getStatus(){
       return config.getValue("config:status", -1);
+    }
+
+    int getImgWidth(){
+      return config.getValue("config:image_width", -1);
+    }
+    int getImgHeight(){
+      return config.getValue("config:image_height", -1);
+    }
+    int getInputChannel(){
+      return config.getValue("config:input_channel", -1);
+    }
+    int getOutputChannel(){
+      return config.getValue("config:output_channel", -1);
+    }
+    float getLearningRate(){
+      return config.getValue("config:learning_rate", -1);
+    }
+    int getMaxEpochs(){
+      return config.getValue("config:max_epochs", -1);
+    }
+    int getBatchSize(){
+      return config.getValue("config:batch_size", -1);
+    }
+    int getNumLayers(){
+      return config.getValue("config:num_layers", -1);
+    }
+    int getKernelSize(){
+      return config.getValue("config:kernel_size", -1);
+    }
+    float getBeta(){
+      return config.getValue("config:beta", -1);
+    }
+    int getLambda(){
+      return config.getValue("config:lambda", -1);
     }
 
   private:

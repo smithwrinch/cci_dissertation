@@ -301,7 +301,7 @@ def generate_images(model, test_input, tar, step):
 TRAINING ---------------------------------------------------------------------------
 """
 @tf.function
-def train_step(input_image, target, step, generator_optimizer, discriminator_optimizer, generator, discriminator):
+def train_step(input_image, target, step, generator_optimizer, discriminator_optimizer, generator, discriminator, gen_pipe, disc_pipe):
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         gen_output = generator(input_image, training=True)
 
@@ -321,6 +321,13 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
         discriminator_optimizer.apply_gradients(zip(discriminator_gradients,
                                                   discriminator.trainable_variables))
 
+
+        val = tf.keras.backend.get_value(gen_total_loss)
+        precision = 8
+        if(val > 1):
+            precision = 9
+        val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
+        gen_pipe.send_message(str(val) + "\n")
     # with summary_writer.as_default():
     #     tf.summary.scalar('gen_total_loss', gen_total_loss, step=step//1000)
     #     tf.summary.scalar('gen_gan_loss', gen_gan_loss, step=step//1000)
@@ -328,6 +335,8 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
 def fit(train_ds, test_ds, steps, g_opt, d_opt, checkpoint, gen, disc):
+    gen_pipe = Piper("/tmp/gen")
+    disc_pipe = Piper("/tmp/disc")
     example_input, example_target = next(iter(test_ds.take(1)))
     start = time.time()
 
@@ -364,7 +373,7 @@ if __name__ == '__main__':
 
     try:
       test_dataset = tf.data.Dataset.list_files(str(PATH / 'test/*.jpg'))
-    except tf.errors.InvalidArgumentError:
+  except tf.python.framework.errors_impl.NotFoundError:
       test_dataset = tf.data.Dataset.list_files(str(PATH / 'val/*.jpg'))
     test_dataset = test_dataset.map(load_image_test)
     test_dataset = test_dataset.batch(BATCH_SIZE)
