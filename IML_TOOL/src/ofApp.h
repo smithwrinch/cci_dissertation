@@ -7,13 +7,13 @@
 #include "sceneTypes.h"
 #include "sceneManager.h"
 #include "model.h"
-#include "scenes/trainScene.h"
 #include "scenes/menuScene.h"
 #include "scenes/playModelSelectorScene.h"
 #include "scenes/inputPix2PixScene.h"
 #include "scenes/inputGANScene.h"
 #include "scenes/architectureBasicBuilderScene.h"
 #include "scenes/architectureTypeSelectorScene.h"
+#include "scenes/trainScene.h"
 
 
 class ofApp : public ofBaseApp{

@@ -142,6 +142,8 @@ void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == continueButton){
     // TODO change to dataset
     setModel();
+    TrainingScene * scene = (TrainingScene *) SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
+    scene->refresh();
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
   }
 }
@@ -149,6 +151,7 @@ void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
 // assigns values to models config
 void ArchitectureBasicBuilderScene::setModel(){
   ModelManager * model = model->getInstance();
+
   model->setImgWidth(imgWidthSlider->getValue());
   model->setImgHeight(imgHeightSlider->getValue());
   int channels = 3;

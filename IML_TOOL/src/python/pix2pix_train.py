@@ -9,6 +9,8 @@ import numpy as np
 from pix2pix_builder import GeneratorTemplate, DiscriminatorTemplate
 from piper import Piper
 
+
+
 """
 DATASET --------------------------------------------------------------------------------------
 """
@@ -151,64 +153,100 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def fit(train_ds, test_ds, steps, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, checkpoint, gen, disc):
+def fit(train_ds, test_ds, steps, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, checkpoint, checkpoint_prefix, manager, steps_per_epoch, gen, disc):
+
+    checkpoint.restore(manager.latest_checkpoint)
+    epochs = 0
+    if manager.latest_checkpoint:
+        print(manager.latest_checkpoint.split("/")[-1][1:])
+
+        epochs =int(manager.latest_checkpoint.split("/")[-1][1:])
+
+        print("Restored from {}".format(manager.latest_checkpoint))
+    else:
+        print("Initializing from scratch.")
+
+
 
     gen_pipe = Piper("/tmp/gen")
     disc_pipe = Piper("/tmp/disc")
+    epoch_pipe = Piper("/tmp/epoch")
 
     example_input, example_target = next(iter(test_ds.take(1)))
+    example_input2, example_target2 = next(iter(test_ds.take(1)))
+    example_input3, example_target3 = next(iter(test_ds.take(1)))
     start = time.time()
 
-    for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
-        if (step) % 1000 == 0:
-              clear_output(wait=True)
 
+    epoch_pipe.send_message(str(0) + "\n")
+    for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
+        if (step) % steps_per_epoch == 0:
+
+              clear_output(wait=True)
+              epochs += 1
               if step != 0:
-                  print(f'Time taken for 1000 steps: {time.time()-start:.2f} sec\n')
+                  print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
 
               start = time.time()
 
-              generate_images(gen, example_input, example_target, step, ROOT_IMG_SAVE)
-              print(f"Step: {step//1000}k")
+              generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
+
+              if not os.path.exists(ROOT_IMG_SAVE[:-1]):
+                  os.makedirs(ROOT_IMG_SAVE[:-1])
+              fig = plt.savefig(ROOT_IMG_SAVE+str(epochs)+".png")
+              plt.clf()
+              plt.close(fig)
+              epoch_pipe.send_message(str(epochs) + "\n")
+              # print(epochs)
+              # print("EPOCHS!!")
+              print(f"Step: {step//steps_per_epoch}")
+
+
 
         g_loss, d_loss = train_step(input_image, target, step, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
-        val = tf.keras.backend.get_value(g_loss)
-        print(val)
-        precision = 8
-        if(val > 1):
-            precision = 9
+        g_loss = g_loss.numpy()
+        d_loss = d_loss.numpy()
         # val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
-        print(str(val)[:5])
-        print("-------------------")
-        gen_pipe.send_message(str(val)[:5] + "\n")
+        # print(str(g_lossg_loss)[:5])
+        # print("-------------------")
+        gen_pipe.send_message(str(g_loss)[:5] + "\n")
+        disc_pipe.send_message(str(d_loss)[:5] + "\n")
         # Training step
-        if (step+1) % 10 == 0:
-            print('.', end='', flush=True)
+        # if (step+1) % 10 == 0:
+        #     print('.', end='', flush=True)
 
 
-        # Save (checkpoint) the model every 5k steps
-        if (step + 1) % 5000 == 0:
-            checkpoint.save(file_prefix=checkpoint_prefix)
+        # Save (checkpoint) the model every epoch
+        if int(step.numpy()) % steps_per_epoch == 0:
+            manager.save()
 
+def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
+    p1 = model(i1, training=True)
+    p2 = model(i2, training=True)
+    p3 = model(i3, training=True)
+    # plt.figure(figsize=(4, 4))
 
-
-
-def generate_images(model, test_input, tar, step, ROOT_IMG_SAVE):
-    prediction = model(test_input, training=True)
-    plt.figure(figsize=(15, 15))
-
-    display_list = [test_input[0], tar[0], prediction[0]]
+    display_list = [i1[0], t1[0], p1[0], i2[0], t2[0], p2[0], i3[0], t3[0], p3[0]]
     title = ['Input Image', 'Ground Truth', 'Predicted Image']
     plt.cla()
-    for i in range(3):
-        plt.subplot(1, 3, i+1)
-        plt.title(title[i])
-        # Getting the pixel values in the [0, 1] range to plot.
-        plt.imshow(display_list[i] * 0.5 + 0.5)
-        plt.axis('off')
-    plt.savefig(ROOT_IMG_SAVE+str(step)+".png")
+    fig, axs = plt.subplots(3, 3, figsize=(4, 4))
+    axs = axs.flatten()
+    plt.axis('off')
+    for img, ax in zip(display_list, axs):
+        ax.imshow(img *0.5 + 0.5)
+        ax.axis('off')
+    return fig
+    # for i in range(3):
+    #     plt.subplot(1, 3, i+1)
+    #     plt.title(title[i], fontsize=10)
+    #     # Getting the pixel values in the [0, 1] range to plot.
+    #     plt.imshow(display_list[i] * 0.5 + 0.5)
+
+
 
 if __name__ == '__main__':
+
+    NUM_IMGS = 10
     parser = argparse.ArgumentParser()
     parser.add_argument("--max_epochs", help="epochs to train for", type=int, default=10000, required=False)
     parser.add_argument("--batch_size", help="batch size", type=int, default=1, required=False)
@@ -221,19 +259,17 @@ if __name__ == '__main__':
     parser.add_argument("--kernel_size", help="[advanced] kernel size for convolutional layers", type=int, default=4, required=False)
     parser.add_argument("--beta", help="[advanced] momentum for ADAM optimiser", type=float, default=0.5, required=False)
     parser.add_argument("--lambda_", help="[advanced] variable to improve structural loss", type=int, default=100, required=False)
-    parser.add_argument("--img_save_dir", help="Directory to save images to", default="../../bin/data/default_save/", required=False)
-    parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="../../bin/data/default_save/", required=False)
+    parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
+    parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
 
 
 
 
-    #
     args = parser.parse_args()
     ROOT_IMG_SAVE = args.img_save_dir
     ROOT_CHECKPOINT_SAVE = args.checkpoint_save_dir
     # print(args.echo)
 
-    NUM_IMGS = 400
     MAX_EPOCHS = args.max_epochs
     BATCH_SIZE = args.batch_size
     LEARNING_RATE = args.learning_rate
@@ -283,7 +319,7 @@ if __name__ == '__main__':
     test_dataset = test_dataset.batch(BATCH_SIZE)
 
 
-
+    steps_per_epoch = NUM_IMGS // BATCH_SIZE
 
     """
     END TODO
@@ -299,5 +335,8 @@ if __name__ == '__main__':
     discriminator_optimizer=discriminator_optimizer,
     generator=generator,
     discriminator=discriminator)
+    manager = tf.train.CheckpointManager(checkpoint, checkpoint_prefix, checkpoint_name = "", max_to_keep=1)
 
-    fit(train_dataset, test_dataset, MAX_EPOCHS, generator_optimizer, discriminator_optimizer, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, checkpoint, generator, discriminator)
+
+
+    fit(train_dataset, test_dataset, MAX_EPOCHS, generator_optimizer, discriminator_optimizer, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, checkpoint, checkpoint_prefix, manager, steps_per_epoch, generator, discriminator)

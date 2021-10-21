@@ -36,6 +36,16 @@ class SceneManager{
     SCENE_TYPE::ID getCurrentSceneID(){
       return currentScene->getID();
     }
+    BaseScene * getScene(SCENE_TYPE::ID id){
+      for(int i = 0; i < scenes.size(); i++){
+        BaseScene * scene = scenes[i];
+        if(scene->getID() == id){
+          return scene;
+        }
+      }
+      // lol
+      return nullptr;
+    }
   private:
     SceneManager(){
       // as singleton

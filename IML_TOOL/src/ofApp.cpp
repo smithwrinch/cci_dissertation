@@ -5,8 +5,6 @@ void ofApp::setup(){
   // sceneManager = SceneManager::getInstance();
   menuScene.setup();
   sceneManager->addScene(&menuScene);
-  trainingScene.setup();
-  sceneManager->addScene(&trainingScene);
   playModelSelectorScene.setup();
   sceneManager->addScene(&playModelSelectorScene);
   inputPix2PixScene.setup();
