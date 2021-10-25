@@ -6,6 +6,7 @@ from IPython.display import display, clear_output # for outputting
 import matplotlib.pyplot as plt
 import argparse
 import numpy as np
+import glob
 from pix2pix_builder import GeneratorTemplate, DiscriminatorTemplate
 from piper import Piper
 
@@ -153,24 +154,42 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def fit(train_ds, test_ds, steps, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, checkpoint, checkpoint_prefix, manager, steps_per_epoch, gen, disc):
+def train(train_ds, test_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
 
-    checkpoint.restore(manager.latest_checkpoint)
+    # checkpoint.restore(manager.latest_checkpoint)
+    # epochs = 0
+    # if manager.latest_checkpoint:
+    #     print(manager.latest_checkpoint.split("/")[-1][1:])
+    #
+    #     epochs =int(manager.latest_checkpoint.split("/")[-1][1:])
+    #
+    #     print("Restored from {}".format(manager.latest_checkpoint))
+    # else:
+    #     print("Initializing from scratch.")
+
+    save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
     epochs = 0
-    if manager.latest_checkpoint:
-        print(manager.latest_checkpoint.split("/")[-1][1:])
-
-        epochs =int(manager.latest_checkpoint.split("/")[-1][1:])
-
-        print("Restored from {}".format(manager.latest_checkpoint))
+    if not os.path.exists(save_dir):
+        print("TRAINING FROM SCRATCH")
+        os.makedirs(save_dir)
     else:
-        print("Initializing from scratch.")
+        save = glob.glob(save_dir+"/*.h5")
+        if(len(save) == 2):
+            print("RESTORING FROM BACKUP")
+            save_ = save[0].split("/")[-1].split(".")[0][1:]
+            epochs = int(save_)
 
+
+            if("discriminator.h5" in save[0]):
+                disc = tf.keras.models.load_model(save[0])
+                gen = tf.keras.models.load_model(save[1])
+            else:
+                disc = tf.keras.models.load_model(save[1])
+                gen = tf.keras.models.load_model(save[0])
 
 
     gen_pipe = Piper("/tmp/gen")
     disc_pipe = Piper("/tmp/disc")
-    epoch_pipe = Piper("/tmp/epoch")
 
     example_input, example_target = next(iter(test_ds.take(1)))
     example_input2, example_target2 = next(iter(test_ds.take(1)))
@@ -178,25 +197,35 @@ def fit(train_ds, test_ds, steps, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, R
     start = time.time()
 
 
-    epoch_pipe.send_message(str(0) + "\n")
+
+    g_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
+    d_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
+
+
     for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
         if (step) % steps_per_epoch == 0:
 
               clear_output(wait=True)
               epochs += 1
+              generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
+
+              files = glob.glob(save_dir+"/*")
+              for f in files:
+                  os.remove(f)
+              gen.save(save_dir+"/-" +str(epochs)+".generator.h5")
+              disc.save(save_dir+"/-" +str(epochs)+".discriminator.h5")
+
               if step != 0:
                   print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
 
               start = time.time()
 
-              generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
 
               if not os.path.exists(ROOT_IMG_SAVE[:-1]):
                   os.makedirs(ROOT_IMG_SAVE[:-1])
               fig = plt.savefig(ROOT_IMG_SAVE+str(epochs)+".png")
               plt.clf()
               plt.close(fig)
-              epoch_pipe.send_message(str(epochs) + "\n")
               # print(epochs)
               # print("EPOCHS!!")
               print(f"Step: {step//steps_per_epoch}")
@@ -216,9 +245,8 @@ def fit(train_ds, test_ds, steps, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, R
         #     print('.', end='', flush=True)
 
 
-        # Save (checkpoint) the model every epoch
-        if int(step.numpy()) % steps_per_epoch == 0:
-            manager.save()
+        # # Save (checkpoint) the model every epoch
+        # if int(step.numpy()) % steps_per_epoch == 0:
 
 def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
     p1 = model(i1, training=True)
@@ -250,7 +278,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--max_epochs", help="epochs to train for", type=int, default=10000, required=False)
     parser.add_argument("--batch_size", help="batch size", type=int, default=1, required=False)
-    parser.add_argument("--learning_rate", help="learning rate for discriminator and generator", type=float, default=2e-4, required=False)
+    parser.add_argument("--learning_rateX", help="X: X^-Y learning rate for discriminator and generator", type=int, default=2, required=False)
+    parser.add_argument("--learning_rateY", help="Y: X^-Y learning rate for discriminator and generator", type=int, default=-6, required=False)
     parser.add_argument("--image_width", help="image width for input and output", type=int, default=256, required=False)
     parser.add_argument("--image_height", help="image height for input and output", type=int, default=256, required=False)
     parser.add_argument("--input_channel", help="number of channels for input image", type=int, default=3, required=False)
@@ -264,7 +293,6 @@ if __name__ == '__main__':
 
 
 
-
     args = parser.parse_args()
     ROOT_IMG_SAVE = args.img_save_dir
     ROOT_CHECKPOINT_SAVE = args.checkpoint_save_dir
@@ -272,7 +300,7 @@ if __name__ == '__main__':
 
     MAX_EPOCHS = args.max_epochs
     BATCH_SIZE = args.batch_size
-    LEARNING_RATE = args.learning_rate
+    LEARNING_RATE = args.learning_rateX * pow(10, args.learning_rateY)
     IMG_WIDTH = args.image_width
     IMG_HEIGHT = args.image_height
     INPUT_CHANNEL = args.input_channel
@@ -286,9 +314,6 @@ if __name__ == '__main__':
 
     GEN_LOSS = generator_loss
     DISC_LOSS = discriminator_loss
-    generator_optimizer = tf.keras.optimizers.Adam(LEARNING_RATE, beta_1=BETA)
-    discriminator_optimizer = tf.keras.optimizers.Adam(LEARNING_RATE, beta_1=BETA)
-
 
     """
     TODO: implement dataset selection
@@ -328,15 +353,15 @@ if __name__ == '__main__':
     disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
     generator = gen.build()
     discriminator = disc.build()
+    #
+    # checkpoint_dir = ROOT_CHECKPOINT_SAVE
+    # checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+    # checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
+    # discriminator_optimizer=discriminator_optimizer,
+    # generator=generator,
+    # discriminator=discriminator)
+    # manager = tf.train.CheckpointManager(checkpoint, checkpoint_prefix, checkpoint_name = "", max_to_keep=1)
+    #
 
-    checkpoint_dir = ROOT_CHECKPOINT_SAVE
-    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-    checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
-    discriminator_optimizer=discriminator_optimizer,
-    generator=generator,
-    discriminator=discriminator)
-    manager = tf.train.CheckpointManager(checkpoint, checkpoint_prefix, checkpoint_name = "", max_to_keep=1)
 
-
-
-    fit(train_dataset, test_dataset, MAX_EPOCHS, generator_optimizer, discriminator_optimizer, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, checkpoint, checkpoint_prefix, manager, steps_per_epoch, generator, discriminator)
+    train(train_dataset, test_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator)

@@ -4,7 +4,7 @@
 
 //
 void TrainingScene::refresh(){
-    lossLoader.setup("/tmp/gen", &graph);
+    lossLoader.setup(&graph);
 
     string img_dir = "saved_models/"+ModelManager::getInstance()->getModelName()+"/images";
     // num_images = DIR.listDir(img_dir);
@@ -24,7 +24,8 @@ void TrainingScene::refresh(){
     int img_height = model->getImgHeight();
     int input_channel = model->getInputChannel();
     int output_channel = model->getOutputChannel();
-    float learning_rate = model->getLearningRate();
+    int learning_rateX = model->getLearningRateX();
+    int learning_rateY = model->getLearningRateY();
     int max_epochs = model->getMaxEpochs();
     int batch_size = model->getBatchSize();
     int num_layers = model->getNumLayers();
@@ -32,19 +33,29 @@ void TrainingScene::refresh(){
     float beta = model->getBeta();
     int lambda = model->getLambda();
 
-    string pythonFile = "python ../src/python/pix2pix_train.py";
+    int latent_vector = model->getLatentVector();
+    string pythonFile;
+    if(model->getModelType() == MODEL_TYPE::PIX2PIX){
+      pythonFile = "python ../src/python/pix2pix_train.py ";
+    }
+    else if(model->getModelType() == MODEL_TYPE::GAN){
+      pythonFile = "python ../src/python/dcgan.py ";
+    }
+
     trainingThread.setup(pythonFile,
       img_width,
       img_height,
       input_channel,
       output_channel,
-      learning_rate,
+      learning_rateX,
+      learning_rateY,
       max_epochs,
       batch_size,
       num_layers,
       kernel_size,
       beta,
-      lambda);
+      lambda,
+      latent_vector);
 }
 
 void TrainingScene::setup(){
@@ -54,9 +65,13 @@ void TrainingScene::setup(){
   */
   setID(SCENE_TYPE::TRAIN);
 
+
+
   graph.setup("LIVE LOSSES");
   graph.setDx(-1.0); // which means delta of time
   graph.setColor(ofColor::white);  // ofColor(255,255,255)
+  graph.setLabel({"GENERATOR","DISCRIMINATOR"});
+
 
   startTrainingButton->setPosition(ofGetWidth() / 2 - startTrainingButton->getWidth()/2, ofGetHeight() - 200);
   startTrainingButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
@@ -95,7 +110,6 @@ void TrainingScene::setup(){
 void TrainingScene::update(){
   // cout << "LOL" <<"\n";
   /* open, read, and display the message from the FIFO */
-  // graph.add(current_loss);
   if(state != 2){
     backButton->update();
     playButton->update();
@@ -156,8 +170,8 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
   }
 
   if(e.target == stopTrainingButton){
-    trainingThread.stopThread();
     lossLoader.stopThread();
+    trainingThread.stopThread();
     imageLoader.stopThread();
     state = 0;
   }

@@ -28,6 +28,10 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     ofxDatGuiSlider* betaSlider;
     ofxDatGuiSlider* lambdaSlider;
 
+
+    ofxDatGuiSlider * imgSizeSlider;
+    ofxDatGuiSlider * latentDimSlider;
+
     ofxDatGuiButton* backButton;
     ofxDatGuiButton* continueButton;
 };

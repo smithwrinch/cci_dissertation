@@ -81,22 +81,25 @@ static pid_t system2(const char * command, int * infp, int * outfp)
 
 class LossLoader: public ofThread{
 		public:
-			int fd;
+			int fd_gen;
+			int fd_disc;
 			int MAX_BUF = 100;
-			char *myfifo;
+			char *genfifo = "/tmp/gen";
+			char * discfifo = "/tmp/disc";
 			ofxGraph * graph;
-			void setup(char* fifo_name, ofxGraph* graph){
-			    this->myfifo = fifo_name;
+			void setup(ofxGraph* graph){
 			    this->graph = graph;
 			}
 
 			void threadedFunction(){
 				char buf[MAX_BUF];
+				vector <float> gen_values;
+				vector <float> disc_values;
+				vector <float> values;
 				while(isThreadRunning()){
-					fd = open(this->myfifo, O_RDONLY | O_NONBLOCK);
+					fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
 		      // read(fd, buf, MAX_BUF);
-					while(read(fd, buf, MAX_BUF) == MAX_BUF) {
-						// cout << strlen(buf) << endl;
+					while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
 					}
 					// cout << buf << endl;
 		      if(strlen(buf) != 0){
@@ -109,12 +112,53 @@ class LossLoader: public ofThread{
 						    token = s.substr(0, pos);
 								// cout << token << endl;
 								if(token.length() == 5){
-									graph->add(stof(token));
+									gen_values.push_back(stof(token));
 									// cout << token << endl;
 								}
+
 						    s.erase(0, pos + delimiter.length());
 						}
 		      }
+					fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
+		      // read(fd, buf, MAX_BUF);
+					while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
+					}
+					// cout << buf << endl;
+		      if(strlen(buf) != 0){
+		        // cout<<"Received:"<< buf<<endl;
+						size_t pos = 0;
+						string token;
+						string s = std::string(buf);
+						string delimiter = "\n";
+						while ((pos = s.find(delimiter)) != string::npos) {
+						    token = s.substr(0, pos);
+								// cout << token << endl;
+								if(token.length() == 5){
+									// graph->add(stof(token), 1);
+									// disc_values.push_back(stof(token));
+									// value.push_back(stof(token))
+									// cout << token << endl;
+									disc_values.push_back(stof(token));
+								}
+
+						    s.erase(0, pos + delimiter.length());
+						}
+		      }
+
+					int max_ = disc_values.size();
+					if(gen_values < disc_values){
+						max_ = gen_values.size();
+					}
+					for (int i =0; i < max_; i++){
+						vector<float> temp;
+						temp.push_back(gen_values[i]);
+						temp.push_back(disc_values[i]);
+						graph->add(temp);
+						temp.clear();
+					}
+					gen_values.clear();
+					disc_values.clear();
+
 					sleep(10000); // amount of times graph is updated
 				}
 
@@ -213,13 +257,15 @@ class TrainingThread: public ofThread{
     int img_height;
     int input_channel;
     int output_channel;
-    float learning_rate;
+    int learning_rateX;
+    int learning_rateY;
     int max_epochs;
     int batch_size;
     int num_layers;
     int kernel_size;
     float beta;
     int lambda;
+		int latent_vector;
 
     //lol massive
     void setup(string python_file,
@@ -227,33 +273,39 @@ class TrainingThread: public ofThread{
     int img_height,
     int input_channel,
     int output_channel,
-    float learning_rate,
+    int learning_rateX,
+    int learning_rateY,
     int max_epochs,
     int batch_size,
     int num_layers,
     int kernel_size,
     float beta,
-    int lambda){
+    int lambda,
+		int latent_vector){
       this->python_file = python_file;
       this->img_width = img_width;
       this->img_height = img_height;
       this->input_channel = input_channel;
       this->output_channel = output_channel;
-      this->learning_rate = learning_rate;
+      this->learning_rateX = learning_rateX;
+      this->learning_rateY = learning_rateY;
       this->max_epochs = max_epochs;
       this->batch_size = batch_size;
       this->num_layers = num_layers;
       this->kernel_size = kernel_size;
       this->beta = beta;
       this->lambda = lambda;
+			this->latent_vector = latent_vector;
+
+			cout << "BETA" << to_string(beta) << endl;
     }
 
   	void threadedFunction(){
   		sleep(2000);
       string arguments = addArguments();
-      string s("python ../src/python/pix2pix_train.py ");
-			cout << s + arguments.c_str() << endl;
-			pid = system2((s + arguments).c_str(), &input, &output);
+			cout << python_file + arguments.c_str() << endl;
+			pid = system((python_file + arguments).c_str());
+			// pid = system2((s + arguments).c_str(), &input, &output);
   		cout << "STARTED:" << pid << endl;
   	}
 		void stopThread(){
@@ -270,19 +322,28 @@ class TrainingThread: public ofThread{
     string addArguments(){
       string base_dir = "data/saved_models/" + ModelManager::getInstance()->getModelName() +"/";
       string out = "";
-      out += "--image_width " + to_string(img_width);
-      out += " --image_height " + to_string(img_height);
-      out += " --input_channel " + to_string(input_channel);
-      out += " --output_channel " + to_string(output_channel);
-      out += " --learning_rate " + to_string(learning_rate);
-      out += " --max_epochs " + to_string(max_epochs);
-      out += " --batch_size " + to_string(batch_size);
-      out += " --num_layers " + to_string(num_layers);
-      out += " --kernel_size " + to_string(kernel_size);
-      out += " --beta " + to_string(beta);
-      out += " --lambda " + to_string(lambda);
-      out += " --img_save_dir " + base_dir + "images/";
-      out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
+			out += " --learning_rateX " + to_string(learning_rateX);
+			out += " --learning_rateY " + to_string(learning_rateY);
+			out += " --max_epochs " + to_string(max_epochs);
+			out += " --batch_size " + to_string(batch_size);
+			out += " --img_save_dir " + base_dir + "images/";
+			out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
+			if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+				out += " --image_width " + to_string(img_width);
+				out += " --image_height " + to_string(img_height);
+				out += " --input_channel " + to_string(input_channel);
+				out += " --output_channel " + to_string(output_channel);
+				out += " --num_layers " + to_string(num_layers);
+				out += " --kernel_size " + to_string(kernel_size);
+				out += " --beta " + to_string(beta);
+				out += " --lambda " + to_string(lambda);
+			}
+			else if (ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+				out += " --latent_dim " + to_string(latent_vector);
+				out += " --img_size " + to_string(img_width);
+				out += " --img_channel 1";// + to_string(input_channel);
+			}
+
       return out;
     }
 };

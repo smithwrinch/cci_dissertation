@@ -58,8 +58,12 @@ class ModelManager{
     void setOutputChannel(int i){
       config.setValue("config:output_channel", i);
     }
-    void setLearningRate(float f){
-      config.setValue("config:learning_rate", f);
+    void setLearningRateX(int f){
+      config.setValue("config:learning_rateX", f);
+    }
+
+    void setLearningRateY(int f){
+      config.setValue("config:learning_rateY", f);
     }
     void setMaxEpochs(int i){
       config.setValue("config:max_epochs", i);
@@ -78,6 +82,10 @@ class ModelManager{
     }
     void setLambda(int i){
       config.setValue("config:lambda", i);
+    }
+
+    void setLatentVector(int i){
+      config.setValue("config:latent_vector", i);
     }
     // all purpose set
     // wrote everything else out as I thought it would be safer
@@ -121,8 +129,11 @@ class ModelManager{
     int getOutputChannel(){
       return config.getValue("config:output_channel", -1);
     }
-    float getLearningRate(){
-      return config.getValue("config:learning_rate", -1);
+    int getLearningRateX(){
+      return config.getValue("config:learning_rateX", -1);
+    }
+    int getLearningRateY(){
+      return config.getValue("config:learning_rateY", -1);
     }
     int getMaxEpochs(){
       return config.getValue("config:max_epochs", -1);
@@ -142,6 +153,11 @@ class ModelManager{
     int getLambda(){
       return config.getValue("config:lambda", -1);
     }
+
+    int getLatentVector(){
+      return config.getValue("config:latent_vector", -1);
+    }
+
 
   private:
     ofxXmlSettings config;

@@ -9,14 +9,19 @@ import os
 import PIL
 from tensorflow.keras import layers
 import time
-from piper import Piper
+import argparse
 
 from IPython import display
 
-BATCH_SIZE = 256
+from piper import Piper
+from dcgan_builder import GAN
+from math import pow
+import os
 
-EPOCHS = 50
-noise_dim = 100
+# BATCH_SIZE = 256
+
+# EPOCHS = 50
+noise_dim = 128
 num_examples_to_generate = 16
 
 def load_data(BUFFER_SIZE = 60000):
@@ -30,47 +35,6 @@ def load_data(BUFFER_SIZE = 60000):
     return train_dataset
 
 
-def make_generator_model():
-    model = tf.keras.Sequential()
-    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-
-    model.add(layers.Reshape((7, 7, 256)))
-    assert model.output_shape == (None, 7, 7, 256)  # Note: None is the batch size
-
-    model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
-    assert model.output_shape == (None, 7, 7, 128)
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-
-    model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
-    assert model.output_shape == (None, 14, 14, 64)
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-
-    model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    assert model.output_shape == (None, 28, 28, 1)
-
-    return model
-# plt.imshow(generated_image[0, :, :, 0], cmap='gray')
-
-def make_discriminator_model():
-    model = tf.keras.Sequential()
-    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                                     input_shape=[28, 28, 1]))
-    model.add(layers.LeakyReLU())
-    model.add(layers.Dropout(0.3))
-
-    model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
-    model.add(layers.LeakyReLU())
-    model.add(layers.Dropout(0.3))
-
-    model.add(layers.Flatten())
-    model.add(layers.Dense(1))
-
-    return model
-
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -82,14 +46,11 @@ def discriminator_loss(real_output, fake_output):
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
-
-
-
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
-def train_step(images, generator, discriminator, generator_optimizer, discriminator_optimizer):
-    noise = tf.random.normal([BATCH_SIZE, noise_dim])
+def train_step(images, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size):
+    noise = tf.random.normal([batch_size, latent_dim])
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
       generated_images = generator(noise, training=True)
 
@@ -106,52 +67,79 @@ def train_step(images, generator, discriminator, generator_optimizer, discrimina
 
     return gen_loss, disc_loss
 
-def train(dataset, epochs, seed):
+def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size, batch_size, learning_rate, root_checkpoint_save, root_img_save):
 
-    generator = make_generator_model()
+    generator_optimizer = tf.keras.optimizers.Adam(learning_rate)
+    discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate)
+
+    gan = GAN(img_size, img_channel, kernel_size, latent_dim)
+    generator = gan.generator
+    discriminator = gan.discriminator
+
+    save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
+    epochs_passed = 0
+    if not os.path.exists(save_dir):
+        print("TRAINING FROM SCRATCH")
+        os.makedirs(save_dir)
+    else:
+        save = glob.glob(save_dir+"/*.h5")
+        if(len(save) == 2):
+            print("RESTORING FROM BACKUP")
+            save_ = save[0].split("/")[-1].split(".")[0][1:]
+            epochs_passed = int(save_)
+
+
+            if("discriminator.h5" in save[0]):
+                discriminator = tf.keras.models.load_model(save[0])
+                generator = tf.keras.models.load_model(save[1])
+            else:
+                disc = tf.keras.models.load_model(save[1])
+                discriminator = tf.keras.models.load_model(save[0])
+
+
+
     # noise = tf.random.normal([1, 100])
     # generated_image = generator(noise, training=False)
 
-    discriminator = make_discriminator_model()
+    # discriminator = make_discriminator_model(28, 1, noise_dim)
     # decision = discriminator(generated_image)
-
-    generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-    discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
     gen_pipe = Piper("/tmp/gen")
     disc_pipe = Piper("/tmp/disc")
 
-    generate_and_save_images(generator, seed)
-    generate_and_save_images(generator, seed, '../bin/data/images/0')
+
+
+    # generate_and_save_images(generator, seed, root_img_save+str(epochs_passed+1))
+
+    if not os.path.exists(ROOT_IMG_SAVE[:-1]):
+        os.makedirs(ROOT_IMG_SAVE[:-1])
+
     for epoch in range(epochs):
+        generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed+1))
+        files = glob.glob(save_dir+"/*")
+        for f in files:
+            os.remove(f)
+        generator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+".generator.h5")
+        discriminator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+".discriminator.h5")
         start = time.time()
 
         for n, image_batch in enumerate(dataset):
             # print(n)
-            g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer)
-            val = tf.keras.backend.get_value(g_loss)
-            precision = 8
-            if(val > 1):
-                precision = 9
-            val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
-            # print(val)
-            gen_pipe.send_message(str(val) + "\n")
-            print(g_loss)
-            # disc_pipe.send_message(d_loss)
-        # Produce images for the GIF as you go
+            g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size)
+            g_loss = g_loss.numpy()
+            d_loss = d_loss.numpy()
+            gen_pipe.send_message(str(g_loss)[:5] + "\n")
+            disc_pipe.send_message(str(d_loss)[:5] + "\n")
+
+
         display.clear_output(wait=True)
-        generate_and_save_images(generator, seed)
-        generate_and_save_images(generator, seed, '../bin/data/images/'+str(epoch+1))
-        # Save the model every 15 epochs
-        if (epoch + 1) % 15 == 0:
-            checkpoint.save(file_prefix = checkpoint_prefix)
+        # generate_and_save_images(generator, seed)
 
-        print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
+        print ('Time for epoch {} is {} sec'.format(epoch + 1 + epochs_passed, time.time()-start))
     # Generate after the final epoch
     display.clear_output(wait=True)
     # generate_and_save_images(generator, epochs, seed)
-
 
 def generate_and_save_images(model, test_input,filepath='../bin/data/images_/current'):
   # Notice `training` is set to False.
@@ -174,10 +162,41 @@ if __name__ == '__main__':
 
     # You will reuse this seed overtime (so it's easier)
     # to visualize progress in the animated GIF)
-    seed = tf.random.normal([num_examples_to_generate, noise_dim])
 
-    gpu = tf.config.experimental.list_physical_devices('GPU')
-    print(gpu)
-    device_lib.list_local_devices()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--max_epochs", help="epochs to train for", type=int, default=50, required=False)
+    parser.add_argument("--batch_size", help="batch size", type=int, default=256, required=False)
+    parser.add_argument("--learning_rateX", help="X: Xe^Y learning rate for discriminator and generator", type=int, default=1, required=False)
+    parser.add_argument("--learning_rateY", help="Y: Xe^Y learning rate for discriminator and generator", type=int, default=-4, required=False)
+    parser.add_argument("--img_size", help="(size x size) pixels", type=int, default=28, required=False)
+    parser.add_argument("--img_channel", help="number of channels for output image", type=int, default=1, required=False)
+    parser.add_argument("--latent_dim", help="[advanced] latent vector length", type=int, default=128, required=False)
+    parser.add_argument("--kernel_size", help="[advanced] kernel size for convolutional layers", type=int, default=4, required=False)
+    parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
+    parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
+
+
+    args = parser.parse_args()
+    ROOT_IMG_SAVE = args.img_save_dir
+    ROOT_CHECKPOINT_SAVE = args.checkpoint_save_dir
+    # print(args.echo)
+
+    MAX_EPOCHS = args.max_epochs
+    BATCH_SIZE = args.batch_size
+    LEARNING_RATE = args.learning_rateX * pow(10, args.learning_rateY)
+    IMG_SIZE = args.img_size
+    IMG_CHANNEL = args.img_channel
+
+    # advanced:
+    KERNEL_SIZE = args.kernel_size
+    LATENT_DIM = args.latent_dim
+
+    seed = tf.random.normal([num_examples_to_generate, LATENT_DIM])
+
     train_dataset = load_data(60000)
-    train(train_dataset, EPOCHS, seed)
+
+    print("LEARNIGN RATE " + str(LEARNING_RATE))
+
+
+    train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM, KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE)

@@ -36,9 +36,17 @@ void ArchitectureBasicBuilderScene::setup(){
   imgWidthSlider->setPosition(centreX, startY);
   imgWidthSlider->setPrecision(0);
 
+
+  imgSizeSlider = new ofxDatGuiSlider("IMAGE SIZE: ", 28, 1024, 256);
+  imgSizeSlider->setPosition(centreX, startY);
+  imgSizeSlider->setPrecision(0);
+
+
   imgHeightSlider = new ofxDatGuiSlider("IMAGE HEIGHT: ", 32, 1024, 256);
   imgHeightSlider->setPosition(centreX, imgWidthSlider->getY() + imgWidthSlider->getHeight());
   imgHeightSlider->setPrecision(0);
+
+
 
   inputRGBToggle = new ofxDatGuiToggle("INPUT IMAGE GRAYSCALE");
   inputRGBToggle->setPosition(centreX, imgHeightSlider->getY() + imgHeightSlider->getHeight());
@@ -67,6 +75,11 @@ void ArchitectureBasicBuilderScene::setup(){
   numLayersSlider->setPosition(centreX, batchSizeSlider->getY() + batchSizeSlider->getHeight());
   numLayersSlider->setPrecision(0);
 
+
+  latentDimSlider = new ofxDatGuiSlider("LATENT DIM SIZE: ", 28, 1024, 128);
+  latentDimSlider->setPosition(centreX, batchSizeSlider->getY() + batchSizeSlider->getHeight());
+  latentDimSlider->setPrecision(0);
+
   kernelSizeSlider = new ofxDatGuiSlider("KERNEL SIZE", 1, 9, 4);
   kernelSizeSlider->setPosition(centreX, numLayersSlider->getY() + numLayersSlider->getHeight()*2);
   kernelSizeSlider->setPrecision(0);
@@ -91,44 +104,58 @@ void ArchitectureBasicBuilderScene::setup(){
   kernelSizeSlider->setWidth(width, label_width);
   betaSlider->setWidth(width, label_width);
   lambdaSlider->setWidth(width, label_width);
+
+
+  imgSizeSlider->setWidth(width, label_width);
+  latentDimSlider->setWidth(width, label_width);
 }
 
 void ArchitectureBasicBuilderScene::update(){
-  imgWidthSlider->update();
-  imgHeightSlider->update();
   inputRGBToggle->update();
-  outputRGBToggle->update();
   learningRateSlider->update();
   learningRateSlider2->update();
   maxEpochsSlider->update();
   batchSizeSlider->update();
-  numLayersSlider->update();
   // advancedButton->update();
   kernelSizeSlider->update();
-  betaSlider->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+    outputRGBToggle->update();
+    imgWidthSlider->update();
+    imgHeightSlider->update();
+    outputRGBToggle->update();
     lambdaSlider->update();
+    numLayersSlider->update();
+    betaSlider->update();
+  }
+  else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+    imgSizeSlider->update();
+    latentDimSlider->update();
   }
   backButton->update();
   continueButton->update();
 }
 
 void ArchitectureBasicBuilderScene::draw(){
-  imgWidthSlider->draw();
-  imgHeightSlider->draw();
   inputRGBToggle->draw();
-  outputRGBToggle->draw();
   learningRateSlider->draw();
   learningRateSlider2->draw();
   maxEpochsSlider->draw();
   batchSizeSlider->draw();
-  numLayersSlider->draw();
   // advancedButton->draw();
   kernelSizeSlider->draw();
-  betaSlider->draw();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+
+    imgWidthSlider->draw();
+    imgHeightSlider->draw();
+    outputRGBToggle->draw();
     lambdaSlider->draw();
+    numLayersSlider->draw();
   }
+  if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+    imgSizeSlider->draw();
+    latentDimSlider->draw();
+  }
+
   backButton->draw();
   continueButton->draw();
 }
@@ -152,25 +179,38 @@ void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
 void ArchitectureBasicBuilderScene::setModel(){
   ModelManager * model = model->getInstance();
 
-  model->setImgWidth(imgWidthSlider->getValue());
-  model->setImgHeight(imgHeightSlider->getValue());
+  model->setLearningRateX(learningRateSlider->getValue());
+  model->setLearningRateY(-learningRateSlider2->getValue());
+  model->setMaxEpochs(maxEpochsSlider->getValue());
+  model->setBatchSize(batchSizeSlider->getValue());
+  model->setKernelSize(kernelSizeSlider->getValue());
   int channels = 3;
   if(inputRGBToggle->getChecked()){
     channels = 1;
   }
+
   model->setInputChannel(channels);
-  int channels_ = 3;
-  if(outputRGBToggle->getChecked()){
-    channels_ = 1;
+
+  if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+    model->setImgWidth(imgWidthSlider->getValue());
+    model->setImgHeight(imgHeightSlider->getValue());
+    int channels_ = 3;
+    if(outputRGBToggle->getChecked()){
+      channels_ = 1;
+    }
+    model->setOutputChannel(channels_);
+
+    model->setNumLayers(numLayersSlider->getValue());
+    model->setBeta(betaSlider->getValue());
+    model->setLambda(lambdaSlider->getValue());
   }
-  model->setOutputChannel(channels);
-  float learning_rate = pow(learningRateSlider->getValue(), learningRateSlider2->getValue());
-  model->setLearningRate(learning_rate);
-  model->setMaxEpochs(maxEpochsSlider->getValue());
-  model->setBatchSize(batchSizeSlider->getValue());
-  model->setNumLayers(numLayersSlider->getValue());
-  model->setKernelSize(kernelSizeSlider->getValue());
-  model->setBeta(betaSlider->getValue());
-  model->setLambda(lambdaSlider->getValue());
+  if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+
+    model->setImgWidth(imgSizeSlider->getValue());
+    model->setImgHeight(imgSizeSlider->getValue());
+    model->setLatentVector(latentDimSlider->getValue());
+  }
+
+
   model->save();
 }
