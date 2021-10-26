@@ -187,12 +187,11 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == ganButton){
     createModel(MODEL_TYPE::GAN);
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
-
     state = 0;
+
   }
   if(e.target == pix2pixButton){
     createModel(MODEL_TYPE::PIX2PIX);
-
     state = 0;
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }

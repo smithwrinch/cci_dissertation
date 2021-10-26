@@ -77,7 +77,7 @@ class ModelManager{
     void setKernelSize(int i){
       config.setValue("config:kernel_size", i);
     }
-    void setBeta(float f){
+    void setBeta(int f){
       config.setValue("config:beta", f);
     }
     void setLambda(int i){
@@ -95,7 +95,7 @@ class ModelManager{
 
 
     MODEL_TYPE::ID getModelType(){
-      int modelType = config.getValue("config:model_type", -1);
+      int modelType = config.getValue("config:model_type", 0);
       MODEL_TYPE::ID val = static_cast<MODEL_TYPE::ID>(modelType);
       return val;
     }
@@ -118,10 +118,24 @@ class ModelManager{
     }
 
     int getImgWidth(){
-      return config.getValue("config:image_width", -1);
+      int default_;
+      if(singleton->getModelType() == MODEL_TYPE::GAN){
+        default_ = 28;
+      }
+      else{
+        default_ = 256;
+      }
+      return config.getValue("config:image_width", default_);
     }
     int getImgHeight(){
-      return config.getValue("config:image_height", -1);
+      int default_;
+      if(singleton->getModelType() == MODEL_TYPE::GAN){
+        default_ = 28;
+      }
+      else{
+        default_ = 256;
+      }
+      return config.getValue("config:image_height", default_);
     }
     int getInputChannel(){
       return config.getValue("config:input_channel", -1);
@@ -130,32 +144,53 @@ class ModelManager{
       return config.getValue("config:output_channel", -1);
     }
     int getLearningRateX(){
-      return config.getValue("config:learning_rateX", -1);
+      int default_;
+      if(singleton->getModelType() == MODEL_TYPE::GAN){
+        default_ = 1;
+      }
+      else{
+        default_ = 2;
+      }
+      return config.getValue("config:learning_rateX", default_);
     }
     int getLearningRateY(){
-      return config.getValue("config:learning_rateY", -1);
+      int default_;
+      if(singleton->getModelType() == MODEL_TYPE::GAN){
+        default_ = 4;
+      }
+      else{
+        default_ = 5;
+      }
+      return config.getValue("config:learning_rateY", default_);
     }
     int getMaxEpochs(){
-      return config.getValue("config:max_epochs", -1);
+      return config.getValue("config:max_epochs", 1000);
     }
     int getBatchSize(){
-      return config.getValue("config:batch_size", -1);
+      int default_;
+      if(singleton->getModelType() == MODEL_TYPE::GAN){
+        default_ = 128;
+      }
+      else{
+        default_ = 1;
+      }
+      return config.getValue("config:batch_size", default_);
     }
     int getNumLayers(){
-      return config.getValue("config:num_layers", -1);
+      return config.getValue("config:num_layers", 7);
     }
     int getKernelSize(){
-      return config.getValue("config:kernel_size", -1);
+      return config.getValue("config:kernel_size", 4);
     }
-    float getBeta(){
-      return config.getValue("config:beta", -1);
+    int getBeta(){
+      return config.getValue("config:beta", 50);
     }
     int getLambda(){
-      return config.getValue("config:lambda", -1);
+      return config.getValue("config:lambda", 100);
     }
 
     int getLatentVector(){
-      return config.getValue("config:latent_vector", -1);
+      return config.getValue("config:latent_vector", 128);
     }
 
 

@@ -2,6 +2,7 @@
 #include "../sceneManager.h"
 #include "../model.h"
 #include "../sceneTypes.h"
+#include "architectureBasicBuilderScene.h"
 
 class ArchitectureTypeSelectScene : public BaseScene {
   public:

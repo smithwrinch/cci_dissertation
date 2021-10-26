@@ -18,6 +18,12 @@ void ofApp::setup(){
   sceneManager->addScene(&architectureSelectorScene);
   architectureBuilderScene.setup();
   sceneManager->addScene(&architectureBuilderScene);
+
+  datasetMainScene.setup();
+  sceneManager->addScene(&datasetMainScene);
+  datasetSelectorScene.setup();
+  sceneManager->addScene(&datasetSelectorScene);
+
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }
 

@@ -14,6 +14,8 @@
 #include "scenes/architectureBasicBuilderScene.h"
 #include "scenes/architectureTypeSelectorScene.h"
 #include "scenes/trainScene.h"
+#include "scenes/datasetMainScene.h"
+#include "scenes/datasetSelectorScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -49,6 +51,8 @@ class ofApp : public ofBaseApp{
 		InputGANScene inputGANScene;
 		ArchitectureTypeSelectScene architectureSelectorScene;
 		ArchitectureBasicBuilderScene architectureBuilderScene;
+		DatasetSelectorScene datasetSelectorScene;
+		DatasetMainScene datasetMainScene;
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
 };

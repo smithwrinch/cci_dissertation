@@ -24,13 +24,13 @@ import os
 noise_dim = 128
 num_examples_to_generate = 16
 
-def load_data(BUFFER_SIZE = 60000):
+def load_data(BUFFER_SIZE = 60000, batch_size=100):
     (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
     train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
     train_images = (train_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
 
     # Batch and shuffle the data
-    train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+    train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(batch_size)
 
     return train_dataset
 
@@ -85,6 +85,7 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
         save = glob.glob(save_dir+"/*.h5")
         if(len(save) == 2):
             print("RESTORING FROM BACKUP")
+            print(save)
             save_ = save[0].split("/")[-1].split(".")[0][1:]
             epochs_passed = int(save_)
 
@@ -93,8 +94,8 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
                 discriminator = tf.keras.models.load_model(save[0])
                 generator = tf.keras.models.load_model(save[1])
             else:
-                disc = tf.keras.models.load_model(save[1])
-                discriminator = tf.keras.models.load_model(save[0])
+                discriminator = tf.keras.models.load_model(save[1])
+                generator = tf.keras.models.load_model(save[0])
 
 
 
@@ -115,7 +116,7 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
         os.makedirs(ROOT_IMG_SAVE[:-1])
 
     for epoch in range(epochs):
-        generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed+1))
+        generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed+1), img_channel)
         files = glob.glob(save_dir+"/*")
         for f in files:
             os.remove(f)
@@ -141,7 +142,7 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     display.clear_output(wait=True)
     # generate_and_save_images(generator, epochs, seed)
 
-def generate_and_save_images(model, test_input,filepath='../bin/data/images_/current'):
+def generate_and_save_images(model, test_input,filepath='../bin/data/images_/current', img_channel=1):
   # Notice `training` is set to False.
   # This is so all layers run in inference mode (batchnorm).
   predictions = model(test_input, training=False)
@@ -150,11 +151,34 @@ def generate_and_save_images(model, test_input,filepath='../bin/data/images_/cur
 
   for i in range(predictions.shape[0]):
       plt.subplot(4, 4, i+1)
-      plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
+      if(img_channel == 1):
+          plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
+      else:
+          plt.imshow(predictions[i, :, :, :] * 0.5 + 0.5)
       plt.axis('off')
 
   plt.savefig(filepath+'.png')
   # plt.show()
+
+def process(image):
+    image = tf.cast(image/255. ,tf.float32)
+    return image
+
+
+def get_dataset(dir, batch_size, image_width, image_height, image_channels):
+    colour_mode = "rgb"
+    if(image_channels == 1):
+        colour_mode = "grayscale"
+
+    print("colour mode " + colour_mode)
+    train_images = tf.keras.utils.image_dataset_from_directory(dir, label_mode = None, batch_size=batch_size,
+    image_size=(image_width, image_height), color_mode = colour_mode)
+
+
+    # train_images = train_images.astype('float32')
+    train_dataset  = train_images.map(process)
+    # TODO image augmentations
+    return train_dataset
 
 from tensorflow.python.client import device_lib
 if __name__ == '__main__':
@@ -175,11 +199,15 @@ if __name__ == '__main__':
     parser.add_argument("--kernel_size", help="[advanced] kernel size for convolutional layers", type=int, default=4, required=False)
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
+    parser.add_argument("--dataset_dir", help="Location of dataset", required=True)
+
 
 
     args = parser.parse_args()
     ROOT_IMG_SAVE = args.img_save_dir
     ROOT_CHECKPOINT_SAVE = args.checkpoint_save_dir
+
+    DATASET_DIR = args.dataset_dir
     # print(args.echo)
 
     MAX_EPOCHS = args.max_epochs
@@ -194,9 +222,8 @@ if __name__ == '__main__':
 
     seed = tf.random.normal([num_examples_to_generate, LATENT_DIM])
 
-    train_dataset = load_data(60000)
-
-    print("LEARNIGN RATE " + str(LEARNING_RATE))
+    # train_dataset = load_data(60000, BATCH_SIZE)
+    train_dataset = get_dataset(DATASET_DIR, BATCH_SIZE, IMG_SIZE, IMG_SIZE, IMG_CHANNEL)
 
 
     train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM, KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE)

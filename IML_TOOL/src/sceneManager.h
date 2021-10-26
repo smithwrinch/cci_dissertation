@@ -26,6 +26,7 @@ class SceneManager{
           break;
         }
       }
+      cout << "Tried changing scene to " << id << " but it doesn't exist..." << endl;
     }
     int getNumScenesAdded(){
       return scenes.size();

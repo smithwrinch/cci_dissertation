@@ -279,7 +279,7 @@ class TrainingThread: public ofThread{
     int batch_size,
     int num_layers,
     int kernel_size,
-    float beta,
+    int beta,
     int lambda,
 		int latent_vector){
       this->python_file = python_file;
@@ -326,22 +326,23 @@ class TrainingThread: public ofThread{
 			out += " --learning_rateY " + to_string(learning_rateY);
 			out += " --max_epochs " + to_string(max_epochs);
 			out += " --batch_size " + to_string(batch_size);
+			out += " --img_channel " + to_string(input_channel);// + to_string(input_channel);
 			out += " --img_save_dir " + base_dir + "images/";
 			out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
+			out += " --dataset_dir data/saved_datasets/pokemon";
+      out += " --kernel_size " + to_string(kernel_size);
 			if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
 				out += " --image_width " + to_string(img_width);
 				out += " --image_height " + to_string(img_height);
 				out += " --input_channel " + to_string(input_channel);
 				out += " --output_channel " + to_string(output_channel);
 				out += " --num_layers " + to_string(num_layers);
-				out += " --kernel_size " + to_string(kernel_size);
 				out += " --beta " + to_string(beta);
 				out += " --lambda " + to_string(lambda);
 			}
 			else if (ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
 				out += " --latent_dim " + to_string(latent_vector);
 				out += " --img_size " + to_string(img_width);
-				out += " --img_channel 1";// + to_string(input_channel);
 			}
 
       return out;
@@ -385,4 +386,5 @@ class TrainingScene : public BaseScene {
       ofxDatGuiButton* playButton = new ofxDatGuiButton("CONTINUE");
 
 			ofxThreadedImageLoader threadedImageLoader;
+
 };

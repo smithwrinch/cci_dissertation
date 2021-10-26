@@ -104,7 +104,7 @@ def make_discriminator_model(img_size, img_channel=3, kernel_size=5):
 
     elif(img_size == 64):
         model.add(layers.Conv2D(64, kernel_size, strides=(2, 2), padding='same',
-                                         input_shape=[64, 64, image_channel]))
+                                         input_shape=[64, 64, img_channel]))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
 

@@ -14,6 +14,23 @@
 // parser.add_argument("--img_save_dir", help="Directory to save images to", default="../../bin/data/default_save/", required=False)
 // parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="../../bin/data/default_save/", required=False)
 
+void ArchitectureBasicBuilderScene::refresh(){
+  ModelManager * model = ModelManager::getInstance();
+
+  imgWidthSlider->setValue(model->getImgWidth());
+  imgSizeSlider->setValue(model->getImgWidth());
+  imgHeightSlider->setValue(model->getImgHeight());
+  learningRateSlider->setValue(model->getLearningRateX());
+  learningRateSlider2->setValue(model->getLearningRateY());
+  maxEpochsSlider->setValue(model->getMaxEpochs());
+  batchSizeSlider->setValue(model->getBatchSize());
+  numLayersSlider->setValue(model->getNumLayers());
+  latentDimSlider->setValue(model->getLatentVector());
+  kernelSizeSlider->setValue(model->getKernelSize());
+  betaSlider->setValue(model->getBeta());
+  lambdaSlider->setValue(model->getLambda());
+}
+
 void ArchitectureBasicBuilderScene::setup(){
 
   setID(SCENE_TYPE::ARCHITECTURE_BUILDER);
@@ -23,6 +40,8 @@ void ArchitectureBasicBuilderScene::setup(){
   int startY = 125;
   int btnBuffer = 200;
 
+  ModelManager * model = ModelManager::getInstance();
+
   backButton = new ofxDatGuiButton("BACK<-");
   backButton->setPosition(btnBuffer, ofGetHeight() - 200);
   backButton->onButtonEvent(this, &ArchitectureBasicBuilderScene::onButtonEvent);
@@ -31,18 +50,18 @@ void ArchitectureBasicBuilderScene::setup(){
   continueButton->setPosition(ofGetWidth() - backButton->getWidth() - btnBuffer, ofGetHeight() - 200);
   continueButton->onButtonEvent(this, &ArchitectureBasicBuilderScene::onButtonEvent);
 
-  imgWidthSlider = new ofxDatGuiSlider("IMAGE WIDTH: ", 32, 1024, 256);
+  imgWidthSlider = new ofxDatGuiSlider("IMAGE WIDTH: ", 32, 1024, model->getImgWidth());
   int centreX = ofGetWidth()/2 - width / 2;
   imgWidthSlider->setPosition(centreX, startY);
   imgWidthSlider->setPrecision(0);
 
 
-  imgSizeSlider = new ofxDatGuiSlider("IMAGE SIZE: ", 28, 1024, 256);
+  imgSizeSlider = new ofxDatGuiSlider("IMAGE SIZE: ", 28, 64, model->getImgWidth());
   imgSizeSlider->setPosition(centreX, startY);
   imgSizeSlider->setPrecision(0);
 
 
-  imgHeightSlider = new ofxDatGuiSlider("IMAGE HEIGHT: ", 32, 1024, 256);
+  imgHeightSlider = new ofxDatGuiSlider("IMAGE HEIGHT: ", 32, 1024, model->getImgHeight());
   imgHeightSlider->setPosition(centreX, imgWidthSlider->getY() + imgWidthSlider->getHeight());
   imgHeightSlider->setPrecision(0);
 
@@ -55,39 +74,40 @@ void ArchitectureBasicBuilderScene::setup(){
   outputRGBToggle->setPosition(centreX, inputRGBToggle->getY() + inputRGBToggle->getHeight());
 
   // learningRateInput = new ofxDatGuiSlider("LEARNING RATE", 0.0000001, 0.00002, 0.001)
-  learningRateSlider = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) X:", 1, 9, 2);
+  learningRateSlider = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) X:", 1, 9, model->getLearningRateX());
   learningRateSlider->setPosition(centreX, outputRGBToggle->getY() + outputRGBToggle->getHeight()*2);
   learningRateSlider->setPrecision(0);
 
-  learningRateSlider2 = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) Y:", 1, 9, 5);
+  learningRateSlider2 = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) Y:", 1, 9, model->getLearningRateY());
   learningRateSlider2->setPosition(centreX, learningRateSlider->getY() + learningRateSlider->getHeight());
   learningRateSlider2->setPrecision(0);
 
-  maxEpochsSlider = new ofxDatGuiSlider("MAX EPOCHS", 1, 50000, 1000);
+  maxEpochsSlider = new ofxDatGuiSlider("MAX EPOCHS", 1, 50000, model->getMaxEpochs());
   maxEpochsSlider->setPosition(centreX, learningRateSlider2->getY() + learningRateSlider2->getHeight());
   maxEpochsSlider->setPrecision(0);
 
-  batchSizeSlider = new ofxDatGuiSlider("BATCH SIZE", 1, 128, 1);
+  batchSizeSlider = new ofxDatGuiSlider("BATCH SIZE", 1, 256, model->getBatchSize());
   batchSizeSlider->setPosition(centreX, maxEpochsSlider->getY() + maxEpochsSlider->getHeight());
   batchSizeSlider->setPrecision(0);
 
-  numLayersSlider = new ofxDatGuiSlider("# LAYERS", 4, 9, 7);
+  numLayersSlider = new ofxDatGuiSlider("# LAYERS", 4, 9, model->getNumLayers());
   numLayersSlider->setPosition(centreX, batchSizeSlider->getY() + batchSizeSlider->getHeight());
   numLayersSlider->setPrecision(0);
 
 
-  latentDimSlider = new ofxDatGuiSlider("LATENT DIM SIZE: ", 28, 1024, 128);
+  latentDimSlider = new ofxDatGuiSlider("LATENT DIM SIZE: ", 28, 1024, model->getLatentVector());
   latentDimSlider->setPosition(centreX, batchSizeSlider->getY() + batchSizeSlider->getHeight());
   latentDimSlider->setPrecision(0);
 
-  kernelSizeSlider = new ofxDatGuiSlider("KERNEL SIZE", 1, 9, 4);
+  kernelSizeSlider = new ofxDatGuiSlider("KERNEL SIZE", 1, 9, model->getKernelSize());
   kernelSizeSlider->setPosition(centreX, numLayersSlider->getY() + numLayersSlider->getHeight()*2);
   kernelSizeSlider->setPrecision(0);
 
-  betaSlider = new ofxDatGuiSlider("BETA", 0, 1);
+  betaSlider = new ofxDatGuiSlider("BETA (*10^-2)", 0, 100, model->getBeta());
   betaSlider->setPosition(centreX, kernelSizeSlider->getY()+kernelSizeSlider->getHeight());
+  betaSlider->setPrecision(0);
 
-  lambdaSlider = new ofxDatGuiSlider("LAMBDA", 0, 200);
+  lambdaSlider = new ofxDatGuiSlider("LAMBDA", 0, model->getLambda());
   lambdaSlider->setPosition(centreX, betaSlider->getY()+betaSlider->getHeight());
   lambdaSlider->setPrecision(0);
 
@@ -145,6 +165,7 @@ void ArchitectureBasicBuilderScene::draw(){
   kernelSizeSlider->draw();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
 
+    betaSlider->draw();
     imgWidthSlider->draw();
     imgHeightSlider->draw();
     outputRGBToggle->draw();
@@ -171,7 +192,7 @@ void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
     setModel();
     TrainingScene * scene = (TrainingScene *) SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
     scene->refresh();
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
   }
 }
 
@@ -201,7 +222,7 @@ void ArchitectureBasicBuilderScene::setModel(){
     model->setOutputChannel(channels_);
 
     model->setNumLayers(numLayersSlider->getValue());
-    model->setBeta(betaSlider->getValue());
+    model->setBeta(int(betaSlider->getValue()));
     model->setLambda(lambdaSlider->getValue());
   }
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){

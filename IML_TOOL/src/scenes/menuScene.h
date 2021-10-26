@@ -1,6 +1,5 @@
 #include "../baseScene.h"
 #include <filesystem> // foe removing fules revursively
-
 #include "../sceneManager.h"
 class MenuScene : public BaseScene{
   public:
@@ -34,6 +33,8 @@ class MenuScene : public BaseScene{
     ofxDatGuiScrollView* modelScroll;
     ofxDatGuiButton* scrollDeleteButton;
     ofxDatGuiButton* scrollContinueButton;
+    string currentScroll = "";
+
 
     void onScrollViewEvent(ofxDatGuiScrollViewEvent e);
     void populateScroll();
@@ -48,7 +49,6 @@ class MenuScene : public BaseScene{
     };
     int state = 0; // 0 for start, 1 for save, 2 for load, 3 for model type selection
 
-    string currentScroll = "";
 
 
 };

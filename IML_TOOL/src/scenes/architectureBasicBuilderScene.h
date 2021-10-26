@@ -1,3 +1,4 @@
+# pragma once
 #include "../baseScene.h"
 #include "../sceneManager.h"
 #include "../model.h"
@@ -6,6 +7,7 @@
 #include<cmath>
 class ArchitectureBasicBuilderScene : public BaseScene {
   public:
+    void refresh();
     void setup();
     void update();
     void draw();

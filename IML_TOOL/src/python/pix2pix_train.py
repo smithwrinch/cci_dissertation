@@ -286,7 +286,7 @@ if __name__ == '__main__':
     parser.add_argument("--output_channel", help="number of channels for output image", type=int, default=3, required=False)
     parser.add_argument("--num_layers", help="[advanced] number of layers in generator decoder and encoder", type=int, default=7, required=False)
     parser.add_argument("--kernel_size", help="[advanced] kernel size for convolutional layers", type=int, default=4, required=False)
-    parser.add_argument("--beta", help="[advanced] momentum for ADAM optimiser", type=float, default=0.5, required=False)
+    parser.add_argument("--beta", help="[advanced] (*10-2) momentum for ADAM optimiser", type=float, default=0.5, required=False)
     parser.add_argument("--lambda_", help="[advanced] variable to improve structural loss", type=int, default=100, required=False)
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     # advanced:
     NUM_LAYERS = args.num_layers
     KERNEL_SIZE = args.kernel_size
-    BETA = args.beta
+    BETA = args.beta /100 
     LAMBDA = args.lambda_
 
     GEN_LOSS = generator_loss
