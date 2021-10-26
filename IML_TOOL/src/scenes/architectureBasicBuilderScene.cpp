@@ -17,6 +17,8 @@
 void ArchitectureBasicBuilderScene::refresh(){
   ModelManager * model = ModelManager::getInstance();
 
+  cout << "MODEL: " << model->getModelName() << endl;
+
   imgWidthSlider->setValue(model->getImgWidth());
   imgSizeSlider->setValue(model->getImgWidth());
   imgHeightSlider->setValue(model->getImgHeight());
@@ -183,15 +185,13 @@ void ArchitectureBasicBuilderScene::draw(){
 
 void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-    setModel();
+    ModelManager::getInstance()->reset();
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
   }
 
   if(e.target == continueButton){
     // TODO change to dataset
     setModel();
-    TrainingScene * scene = (TrainingScene *) SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
-    scene->refresh();
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
   }
 }

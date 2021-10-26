@@ -16,6 +16,7 @@
 #include "scenes/trainScene.h"
 #include "scenes/datasetMainScene.h"
 #include "scenes/datasetSelectorScene.h"
+#include "scenes/datasetBuilderScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -53,6 +54,7 @@ class ofApp : public ofBaseApp{
 		ArchitectureBasicBuilderScene architectureBuilderScene;
 		DatasetSelectorScene datasetSelectorScene;
 		DatasetMainScene datasetMainScene;
+		DatasetBuilderScene datasetBuilderScene;
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
 };

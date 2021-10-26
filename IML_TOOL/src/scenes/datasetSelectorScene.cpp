@@ -32,19 +32,27 @@ void DatasetSelectorScene::setup(){
 void DatasetSelectorScene::update(){
   scrollContinueButton->update();
   scrollDeleteButton->update();
+  datasetScroll->update();
 }
 
 void DatasetSelectorScene::draw(){
   scrollContinueButton->draw();
   scrollDeleteButton->draw();
+  datasetScroll->draw();
 }
 
 void DatasetSelectorScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == scrollContinueButton){
-    // SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_SELECTOR);
+    ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+currentScroll);
+    ModelManager::getInstance()->save();
+
+    TrainingScene * scene = (TrainingScene *) SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
+    scene->refresh();
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
   }
   if(e.target == scrollDeleteButton){
     // SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER);
+    filesystem::remove_all("../bin/data/saved_datasets/"+currentScroll);
   }
 }
 
@@ -62,12 +70,12 @@ void DatasetSelectorScene::onScrollViewEvent(ofxDatGuiScrollViewEvent e)
     else{
 
 
-    scrollDeleteButton->setVisible(true);
-    scrollContinueButton->setVisible(true);
-    refreshScroll();
-    button->setBorder(ofColor(255, 255, 255), 1);
-    button->setStripeColor(ofColor(255,255,255));
-    currentScroll = button->getLabel();
+      scrollDeleteButton->setVisible(true);
+      scrollContinueButton->setVisible(true);
+      refreshScroll();
+      button->setBorder(ofColor(255, 255, 255), 1);
+      button->setStripeColor(ofColor(255,255,255));
+      currentScroll = button->getLabel();
 
   }
 }
@@ -81,8 +89,10 @@ void DatasetSelectorScene::populateScroll(){
 
     if(dir.getFile(i).isDirectory()==1){
 
-        datasetScroll->add(dir.getFile(i).getBaseName());
+        string name = dir.getFile(i).getBaseName();
+        datasetScroll->add(name);
         datasetScroll->update();
+
 
     }
   }
@@ -92,21 +102,6 @@ void DatasetSelectorScene::refreshScroll(){
   currentScroll = "";
   for (int i =0; i < datasetScroll->getNumItems(); i++){
     ofxDatGuiScrollViewItem * button = datasetScroll->getItemAtIndex(i);
-    string label = button->getLabel();
-
-    // ofDirectory dir = ofDirectory(label);
-    ModelManager * mm = ModelManager::getInstance();
-    mm->load(label);
-    int type = mm->getModelType();
-    if(type == 0){
-      button->setStripeColor(ofColor(253,106,2));
-    }
-    else if(type == 1){
-        button->setStripeColor(ofColor(2,132,30));
-    }
-    else{
-      button->setStripeColor(ofColor(100,100,100));
-    }
     button->setBorder(ofColor(200, 200, 200), 0);
   }
 }

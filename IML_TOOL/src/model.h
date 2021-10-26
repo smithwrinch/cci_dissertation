@@ -83,9 +83,11 @@ class ModelManager{
     void setLambda(int i){
       config.setValue("config:lambda", i);
     }
-
     void setLatentVector(int i){
       config.setValue("config:latent_vector", i);
+    }
+    void setDatasetDir(string dir){
+      config.setValue("config:dataset_dir", dir);
     }
     // all purpose set
     // wrote everything else out as I thought it would be safer
@@ -188,9 +190,11 @@ class ModelManager{
     int getLambda(){
       return config.getValue("config:lambda", 100);
     }
-
     int getLatentVector(){
       return config.getValue("config:latent_vector", 128);
+    }
+    string getDatasetDir(){
+      return config.getValue("config:dataset_dir", "ERROR");
     }
 
 

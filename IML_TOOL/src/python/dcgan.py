@@ -17,7 +17,7 @@ from piper import Piper
 from dcgan_builder import GAN
 from math import pow
 import os
-
+import shutil
 # BATCH_SIZE = 256
 
 # EPOCHS = 50
@@ -82,20 +82,27 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
         print("TRAINING FROM SCRATCH")
         os.makedirs(save_dir)
     else:
-        save = glob.glob(save_dir+"/*.h5")
-        if(len(save) == 2):
-            print("RESTORING FROM BACKUP")
-            print(save)
-            save_ = save[0].split("/")[-1].split(".")[0][1:]
-            epochs_passed = int(save_)
+        save = glob.glob(save_dir+"/*")
+        print(save)
+        if(len(save) != 2):
+            nums = [s.split("/")[-1].split("_")[0][1:] for s in save]
+
+            for i, n in enumerate(nums):
+                if(nums.count(n) != 2):
+                    save.pop(i)
+
+        print("RESTORING FROM BACKUP")
+        print(save)
+        save_ = save[0].split("/")[-1].split("_")[0][1:]
+        epochs_passed = int(save_)
 
 
-            if("discriminator.h5" in save[0]):
-                discriminator = tf.keras.models.load_model(save[0])
-                generator = tf.keras.models.load_model(save[1])
-            else:
-                discriminator = tf.keras.models.load_model(save[1])
-                generator = tf.keras.models.load_model(save[0])
+        if("discriminator" in save[0]):
+            discriminator = tf.keras.models.load_model(save[0])
+            generator = tf.keras.models.load_model(save[1])
+        else:
+            discriminator = tf.keras.models.load_model(save[1])
+            generator = tf.keras.models.load_model(save[0])
 
 
 
@@ -118,10 +125,11 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     for epoch in range(epochs):
         generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed+1), img_channel)
         files = glob.glob(save_dir+"/*")
+        generator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+"_generator")
+        discriminator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+"_discriminator")
+
         for f in files:
-            os.remove(f)
-        generator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+".generator.h5")
-        discriminator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+".discriminator.h5")
+            shutil.rmtree(f, ignore_errors=True)
         start = time.time()
 
         for n, image_batch in enumerate(dataset):
@@ -154,14 +162,14 @@ def generate_and_save_images(model, test_input,filepath='../bin/data/images_/cur
       if(img_channel == 1):
           plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
       else:
-          plt.imshow(predictions[i, :, :, :] * 0.5 + 0.5)
+          plt.imshow(predictions[i, :, :, :]* 0.5 + 0.5)
       plt.axis('off')
 
   plt.savefig(filepath+'.png')
   # plt.show()
 
 def process(image):
-    image = tf.cast(image/255. ,tf.float32)
+    image = tf.cast((image-127.5)/127.5,tf.float32)
     return image
 
 

@@ -179,7 +179,7 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     }
 
   if (e.target == backButton){
-
+      ModelManager::getInstance()->reset();
       scrollDeleteButton->setVisible(false);
       scrollContinueButton->setVisible(false);
       state = 0;

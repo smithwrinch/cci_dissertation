@@ -214,6 +214,7 @@ class ImageLoader: public ofThread{
 									unlock();
 									break;
 							}
+              f.close();
 					}
 
 		    	// int nImages = DIR->listDir(image_dir);
@@ -266,6 +267,7 @@ class TrainingThread: public ofThread{
     float beta;
     int lambda;
 		int latent_vector;
+    string dataset_dir;
 
     //lol massive
     void setup(string python_file,
@@ -281,7 +283,8 @@ class TrainingThread: public ofThread{
     int kernel_size,
     int beta,
     int lambda,
-		int latent_vector){
+		int latent_vector,
+    string dataset_dir){
       this->python_file = python_file;
       this->img_width = img_width;
       this->img_height = img_height;
@@ -296,8 +299,7 @@ class TrainingThread: public ofThread{
       this->beta = beta;
       this->lambda = lambda;
 			this->latent_vector = latent_vector;
-
-			cout << "BETA" << to_string(beta) << endl;
+      this->dataset_dir = dataset_dir;
     }
 
   	void threadedFunction(){
@@ -329,7 +331,7 @@ class TrainingThread: public ofThread{
 			out += " --img_channel " + to_string(input_channel);// + to_string(input_channel);
 			out += " --img_save_dir " + base_dir + "images/";
 			out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
-			out += " --dataset_dir data/saved_datasets/pokemon";
+			out += " --dataset_dir " + dataset_dir;
       out += " --kernel_size " + to_string(kernel_size);
 			if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
 				out += " --image_width " + to_string(img_width);

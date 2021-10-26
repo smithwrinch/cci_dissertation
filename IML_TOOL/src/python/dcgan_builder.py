@@ -5,7 +5,8 @@ def make_generator_model(img_size, img_channel = 3, latent_vector = 128, kernel_
 
     model = tf.keras.Sequential()
     if(img_size == 28):
-        model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(latent_vector,)))
+        model.add(tf.keras.Input(shape=(latent_vector,)))
+        model.add(layers.Dense(7*7*256, use_bias=False ))
         model.add(layers.BatchNormalization())
         model.add(layers.LeakyReLU())
 
@@ -27,7 +28,9 @@ def make_generator_model(img_size, img_channel = 3, latent_vector = 128, kernel_
         assert model.output_shape == (None, 28, 28, img_channel)
 
     elif(img_size == 64):
-        model.add(layers.Dense(8*8*128, use_bias=False, input_shape=(latent_vector,)))
+
+        model.add(tf.keras.Input(shape=(latent_vector,)))
+        model.add(layers.Dense(8*8*128, use_bias=False))
         model.add(layers.BatchNormalization())
         model.add(layers.LeakyReLU())
 

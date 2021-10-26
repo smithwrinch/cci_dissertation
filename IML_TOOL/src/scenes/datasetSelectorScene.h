@@ -2,6 +2,8 @@
 #include "../sceneManager.h"
 #include "../model.h"
 #include "../sceneTypes.h"
+#include "trainScene.h"
+#include <filesystem>
 
 class DatasetSelectorScene : public BaseScene {
   public:

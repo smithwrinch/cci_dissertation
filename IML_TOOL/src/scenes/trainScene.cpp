@@ -32,6 +32,7 @@ void TrainingScene::refresh(){
     int kernel_size = model->getKernelSize();
     float beta = model->getBeta();
     int lambda = model->getLambda();
+    string dataset_dir = model->getDatasetDir();
 
     int latent_vector = model->getLatentVector();
     string pythonFile;
@@ -55,7 +56,7 @@ void TrainingScene::refresh(){
       kernel_size,
       beta,
       lambda,
-      latent_vector);
+      latent_vector, dataset_dir);
 }
 
 void TrainingScene::setup(){
