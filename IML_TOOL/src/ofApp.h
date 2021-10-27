@@ -43,7 +43,6 @@ class ofApp : public ofBaseApp{
 		SceneManager * sceneManager = SceneManager::getInstance();
 		ModelManager * modelManager = ModelManager::getInstance();
 
-		ofxDatGuiButton* button;
 
 	private:
 		MenuScene menuScene;
@@ -59,4 +58,22 @@ class ofApp : public ofBaseApp{
 		DatasetPix2PixBuilderScene datasetPix2PixBuilderScene;
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
+
+
+		ofxDatGuiButton* menuButton;
+		ofxDatGuiButton* architectureButton;
+		ofxDatGuiButton* datasetButton;
+		ofxDatGuiButton* trainButton;
+		ofxDatGuiButton* evaluateButton;
+
+		ofxDatGuiButton* architectureButton_;
+		ofxDatGuiButton* datasetButton_;
+		ofxDatGuiButton* trainButton_;
+		ofxDatGuiButton* evaluateButton_;
+
+		vector<ofxDatGuiButton*> topGui;
+		vector<ofxDatGuiButton*> topGuiSelected;
+
+		int idToHighlight;
+
 };

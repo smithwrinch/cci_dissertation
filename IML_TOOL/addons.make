@@ -6,3 +6,4 @@ ofxTensorFlow2
 ofxXmlSettings
 ofxDirList
 ofxThreadedImageLoader
+ofxOpenCv

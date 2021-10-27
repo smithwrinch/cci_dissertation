@@ -186,7 +186,7 @@ void ArchitectureBasicBuilderScene::draw(){
 void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
     ModelManager::getInstance()->reset();
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }
 
   if(e.target == continueButton){

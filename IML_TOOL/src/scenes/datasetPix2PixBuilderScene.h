@@ -2,6 +2,7 @@
 #include "../sceneManager.h"
 #include "../model.h"
 #include "../sceneTypes.h"
+#include "ofxOpenCv.h"
 
 class DatasetPix2PixBuilderScene : public BaseScene {
   public:
@@ -13,8 +14,11 @@ class DatasetPix2PixBuilderScene : public BaseScene {
 
   private:
     ofImage im1;
-    ofImage im2;
-    ofImage im3;
-    ofImage im4;
+    ofxCvColorImage colorImg;
+    ofxCvGrayscaleImage grayImage, grayBg, grayDiff;
+    ofxCvContourFinder contourFinder;
     ofDirectory d;
+
+    int width = 400;
+    int height = 400;
 };

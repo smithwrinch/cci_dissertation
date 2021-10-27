@@ -3,6 +3,72 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
   // sceneManager = SceneManager::getInstance();
+
+
+  float width = 1024 / 5;
+  menuButton = new ofxDatGuiButton("MENU");
+  menuButton->setWidth(width, 0.5);
+  menuButton->setPosition(0, 0);
+  menuButton->onButtonEvent(this, &ofApp::onButtonEvent);
+
+  architectureButton = new ofxDatGuiButton("ARCHITECTURE");
+  architectureButton->setWidth(width, 0.5);
+  architectureButton->setPosition(width, 0);
+  architectureButton->onButtonEvent(this, &ofApp::onButtonEvent);
+
+  datasetButton = new ofxDatGuiButton("DATASET");
+  datasetButton->setWidth(width, 0.5);
+  datasetButton->setPosition(width*2, 0);
+  datasetButton->onButtonEvent(this, &ofApp::onButtonEvent);
+
+  trainButton = new ofxDatGuiButton("TRAIN");
+  trainButton->setWidth(width, 0.5);
+  trainButton->setPosition(width*3, 0);
+  trainButton->onButtonEvent(this, &ofApp::onButtonEvent);
+
+  evaluateButton = new ofxDatGuiButton("EVALUATE");
+  evaluateButton->setWidth(width, 0.5);
+  evaluateButton->setPosition(width*4, 0);
+  evaluateButton->onButtonEvent(this, &ofApp::onButtonEvent);
+
+  topGui.push_back(menuButton);
+  topGui.push_back(architectureButton);
+  topGui.push_back(datasetButton);
+  topGui.push_back(trainButton);
+  topGui.push_back(evaluateButton);
+
+  for (int i; i < topGui.size(); i++){
+    topGui[i]->setStripeColor(ofColor(255,255,255));
+  }
+////////////////////////////////////////////////////////////////
+
+
+  architectureButton_ = new ofxDatGuiButton("-ARCHITECTURE-");
+  architectureButton_->setWidth(width, 0.5);
+  architectureButton_->setPosition(width, 0);
+
+  datasetButton_ = new ofxDatGuiButton("-DATASET-");
+  datasetButton_->setWidth(width, 0.5);
+  datasetButton_->setPosition(width*2, 0);
+
+  trainButton_ = new ofxDatGuiButton("-TRAIN-");
+  trainButton_->setWidth(width, 0.5);
+  trainButton_->setPosition(width*3, 0);
+
+  evaluateButton_ = new ofxDatGuiButton("-EVALUATE-");
+  evaluateButton_->setWidth(width, 0.5);
+  evaluateButton_->setPosition(width*4, 0);
+
+  topGuiSelected.push_back(architectureButton_);
+  topGuiSelected.push_back(datasetButton_);
+  topGuiSelected.push_back(trainButton_);
+  topGuiSelected.push_back(evaluateButton_);
+
+  for (int i; i < topGuiSelected.size(); i++){
+    topGuiSelected[i]->setStripeColor(ofColor(0,255,0));
+  }
+
+///////////////////////////////////////////////////////////////
   menuScene.setup();
   sceneManager->addScene(&menuScene);
   playModelSelectorScene.setup();
@@ -33,12 +99,60 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+  SCENE_TYPE::ID id = sceneManager->getCurrentSceneID();
   sceneManager->getCurrentScene()->update();
+
+  if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
+    for(int i = 0; i < topGui.size(); i++){
+      if(id <=SCENE_TYPE::DATASET_SELECTOR ){
+        if(i != 2){
+          topGui[i]->update();
+        }
+      }
+      else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
+        if(i != 1){
+          topGui[i]->update();
+        }
+      }
+      else if(id <= SCENE_TYPE::TRAIN){
+          if(i != 3){
+            topGui[i]->update();
+          }
+      }
+      else{
+        if(i != 4){
+          topGui[i]->update();
+        }
+      }
+    }
+  }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    SCENE_TYPE::ID id = sceneManager->getCurrentSceneID();
     sceneManager->getCurrentScene()->draw();
+    if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
+      for(int i = 0; i < topGui.size(); i++){
+
+          topGui[i]->draw();
+
+          if(id <=SCENE_TYPE::DATASET_SELECTOR ){
+            topGuiSelected[1]->draw();
+          }
+          else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
+              topGuiSelected[0]->draw();
+          }
+
+          else if(id <= SCENE_TYPE::TRAIN){
+              topGuiSelected[2]->draw();
+          }
+
+          else{
+            topGuiSelected[3]->draw();
+          }
+        }
+      }
 }
 
 //--------------------------------------------------------------
@@ -99,7 +213,21 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 }
 
 // //--------------------------------------------------------------
-// void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
-//
-//     sceneManager.getCurrentScene()->onButtonEvent(e);
-// }
+void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
+    if(e.target == menuButton){
+      modelManager->reset();
+      sceneManager->changeSceneTo(SCENE_TYPE::MENU);
+    }
+    if(e.target == architectureButton){
+      sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_BUILDER);
+    }
+    if(e.target == datasetButton){
+      sceneManager->changeSceneTo(SCENE_TYPE::DATASET_MENU);
+    }
+    if(e.target == trainButton){
+      sceneManager->changeSceneTo(SCENE_TYPE::TRAIN);
+    }
+    if(e.target == evaluateButton){
+      // sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_BUILDER);
+    }
+}

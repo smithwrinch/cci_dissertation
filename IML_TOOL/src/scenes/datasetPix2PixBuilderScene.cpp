@@ -2,14 +2,22 @@
 
 
 void DatasetPix2PixBuilderScene::refresh(){
+  colorImg.clear();
+  im1.clear();
   ModelManager * m = ModelManager::getInstance();
+  // width_ = m->getImgWidth();
+  // height_ = m->getImgHeight();
   string dir = m->getDatasetDir();
+  d.close();
   d = ofDirectory(dir);
   d.listDir();
   im1.load(d.getPath(0));
-  im2.load(d.getPath(1));
-  im3.load(d.getPath(2));
-  im4.load(d.getPath(3));
+  im1.setImageType(OF_IMAGE_COLOR);
+  colorImg.allocate(im1.getWidth(), im1.getHeight());
+  // im1.resize(width, height);
+  // im1.update();
+
+
 }
 
 void DatasetPix2PixBuilderScene::setup(){
@@ -18,17 +26,16 @@ void DatasetPix2PixBuilderScene::setup(){
   // buildButton->setPosition(ofGetWidth()/2 - buildButton->getWidth()/2, ofGetHeight()/2 - buildButton->getHeight());
   // buildButton->onButtonEvent(this, &DatasetMainScene::onButtonEvent);
 
-
 }
 
 void DatasetPix2PixBuilderScene::update(){
+  colorImg.setFromPixels(im1.getPixels());
 }
 
+
 void DatasetPix2PixBuilderScene::draw(){
-  im1.draw(0, 0);
-  im2.draw(100, 0);
-  im3.draw(0, 100);
-  im4.draw(100, 100);
+  im1.draw(ofGetWidth()/2 -width - 25, ofGetHeight()/2 - height / 2, width, height);
+  colorImg.draw(ofGetWidth()/2 + 25, ofGetHeight()/2 - height / 2, width, height);
 }
 
 void DatasetPix2PixBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
