@@ -25,6 +25,8 @@ void ofApp::setup(){
   sceneManager->addScene(&datasetSelectorScene);
   datasetBuilderScene.setup();
   sceneManager->addScene(&datasetBuilderScene);
+  datasetPix2PixBuilderScene.setup();
+  sceneManager->addScene(&datasetPix2PixBuilderScene);
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }

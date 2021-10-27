@@ -257,7 +257,7 @@ class TrainingThread: public ofThread{
     int img_width;
     int img_height;
     int input_channel;
-    int output_channel;
+    // int output_channel;
     int learning_rateX;
     int learning_rateY;
     int max_epochs;
@@ -274,7 +274,7 @@ class TrainingThread: public ofThread{
     int img_width,
     int img_height,
     int input_channel,
-    int output_channel,
+    // int output_channel,
     int learning_rateX,
     int learning_rateY,
     int max_epochs,
@@ -289,7 +289,7 @@ class TrainingThread: public ofThread{
       this->img_width = img_width;
       this->img_height = img_height;
       this->input_channel = input_channel;
-      this->output_channel = output_channel;
+      // this->output_channel = output_channel;
       this->learning_rateX = learning_rateX;
       this->learning_rateY = learning_rateY;
       this->max_epochs = max_epochs;
@@ -328,7 +328,6 @@ class TrainingThread: public ofThread{
 			out += " --learning_rateY " + to_string(learning_rateY);
 			out += " --max_epochs " + to_string(max_epochs);
 			out += " --batch_size " + to_string(batch_size);
-			out += " --img_channel " + to_string(input_channel);// + to_string(input_channel);
 			out += " --img_save_dir " + base_dir + "images/";
 			out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
 			out += " --dataset_dir " + dataset_dir;
@@ -337,12 +336,13 @@ class TrainingThread: public ofThread{
 				out += " --image_width " + to_string(img_width);
 				out += " --image_height " + to_string(img_height);
 				out += " --input_channel " + to_string(input_channel);
-				out += " --output_channel " + to_string(output_channel);
+				out += " --output_channel " + to_string(input_channel);
 				out += " --num_layers " + to_string(num_layers);
 				out += " --beta " + to_string(beta);
 				out += " --lambda " + to_string(lambda);
 			}
 			else if (ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+        out += " --img_channel " + to_string(input_channel);// + to_string(input_channel);
 				out += " --latent_dim " + to_string(latent_vector);
 				out += " --img_size " + to_string(img_width);
 			}

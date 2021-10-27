@@ -10,6 +10,7 @@ import glob
 from pix2pix_builder import GeneratorTemplate, DiscriminatorTemplate
 from piper import Piper
 
+import shutil
 
 
 """
@@ -17,18 +18,20 @@ DATASET ------------------------------------------------------------------------
 """
 
 # loads image file and splits into two tensors
-def load(image_file):
-    # Read and decode an image file to a uint8 tensor
-    image = tf.io.read_file(image_file)
-    image = tf.image.decode_jpeg(image)
-
-    # Split each image tensor into two tensors:
+def load(image):
     # - one with a real building facade image
     # - one with an architecture label image
+    print(image.shape)
     w = tf.shape(image)[1]
     w = w // 2
-    input_image = image[:, w:, :]
-    real_image = image[:, :w, :]
+
+    w = image.shape[2] // 2
+    print(w)
+    input_image = image[:, :, w:, :]
+    real_image = image[:, :, :w, :]
+
+    print(input_image.shape)
+
 
     # Convert both images to float32 tensors
     input_image = tf.cast(input_image, tf.float32)
@@ -83,17 +86,9 @@ for i in range(4):
 plt.show()
 """
 
-def load_image_train(image_file):
-    input_image, real_image = load(image_file)
-    input_image, real_image = random_jitter(input_image, real_image)
-    input_image, real_image = normalize(input_image, real_image)
-
-    return input_image, real_image
-
-def load_image_test(image_file):
-    input_image, real_image = load(image_file)
-    input_image, real_image = resize(input_image, real_image,
-                                   IMG_HEIGHT, IMG_WIDTH)
+def load_image_train(image):
+    input_image, real_image = load(image)
+    # input_image, real_image = random_jitter(input_image, real_image) # TODO ADD BACK IN
     input_image, real_image = normalize(input_image, real_image)
 
     return input_image, real_image
@@ -154,7 +149,7 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def train(train_ds, test_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
+def train(train_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
 
     # checkpoint.restore(manager.latest_checkpoint)
     # epochs = 0
@@ -169,31 +164,55 @@ def train(train_ds, test_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, 
 
     save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
     epochs = 0
+    # if not os.path.exists(save_dir):
+    #     print("TRAINING FROM SCRATCH")
+    #     os.makedirs(save_dir)
+    # else:
+    #     save = glob.glob(save_dir+"/*.h5")
+    #     if(len(save) == 2):
+    #         print("RESTORING FROM BACKUP")
+    #         save_ = save[0].split("/")[-1].split(".")[0][1:]
+    #         epochs = int(save_)
+    #
+    #
+    #         if("discriminator.h5" in save[0]):
+    #             disc = tf.keras.models.load_model(save[0])
+    #             gen = tf.keras.models.load_model(save[1])
+    #         else:
+    #             disc = tf.keras.models.load_model(save[1])
+    #             gen = tf.keras.models.load_model(save[0])
+
     if not os.path.exists(save_dir):
         print("TRAINING FROM SCRATCH")
         os.makedirs(save_dir)
     else:
-        save = glob.glob(save_dir+"/*.h5")
-        if(len(save) == 2):
-            print("RESTORING FROM BACKUP")
-            save_ = save[0].split("/")[-1].split(".")[0][1:]
-            epochs = int(save_)
+        save = glob.glob(save_dir+"/*")
+        print(save)
+        if(len(save) != 2):
+            nums = [s.split("/")[-1].split("_")[0][1:] for s in save]
 
+            for i, n in enumerate(nums):
+                if(nums.count(n) != 2):
+                    save.pop(i)
 
-            if("discriminator.h5" in save[0]):
-                disc = tf.keras.models.load_model(save[0])
-                gen = tf.keras.models.load_model(save[1])
-            else:
-                disc = tf.keras.models.load_model(save[1])
-                gen = tf.keras.models.load_model(save[0])
+        print("RESTORING FROM BACKUP")
+        print(save)
+        save_ = save[0].split("/")[-1].split("_")[0][1:]
+        epochs = int(save_)
 
+        if("discriminator" in save[0]):
+            disc = tf.keras.models.load_model(save[0])
+            gen = tf.keras.models.load_model(save[1])
+        else:
+            disc = tf.keras.models.load_model(save[1])
+            gen = tf.keras.models.load_model(save[0])
 
     gen_pipe = Piper("/tmp/gen")
     disc_pipe = Piper("/tmp/disc")
 
-    example_input, example_target = next(iter(test_ds.take(1)))
-    example_input2, example_target2 = next(iter(test_ds.take(1)))
-    example_input3, example_target3 = next(iter(test_ds.take(1)))
+    example_input, example_target = next(iter(train_ds.take(1)))
+    example_input2, example_target2 = next(iter(train_ds.take(1)))
+    example_input3, example_target3 = next(iter(train_ds.take(1)))
     start = time.time()
 
 
@@ -210,10 +229,11 @@ def train(train_ds, test_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, 
               generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
 
               files = glob.glob(save_dir+"/*")
+              gen.save(save_dir+"/-" +str(epochs)+"_generator")
+              disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
+
               for f in files:
-                  os.remove(f)
-              gen.save(save_dir+"/-" +str(epochs)+".generator.h5")
-              disc.save(save_dir+"/-" +str(epochs)+".discriminator.h5")
+                  shutil.rmtree(f, ignore_errors=True)
 
               if step != 0:
                   print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
@@ -272,9 +292,24 @@ def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
 
 
 
+def get_dataset(dir, batch_size, image_width, image_height, image_channels):
+    colour_mode = "rgb"
+    if(image_channels == 1):
+        colour_mode = "grayscale"
+
+    print("colour mode " + colour_mode)
+    train_images = tf.keras.utils.image_dataset_from_directory(dir, label_mode = None, batch_size=batch_size,
+    image_size=(image_height,image_width*2), color_mode = colour_mode)
+
+
+    # train_images = train_images.astype('float32')
+    train_dataset = train_images.map(load_image_train, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    # TODO image augmentations
+    return train_dataset
+
 if __name__ == '__main__':
 
-    NUM_IMGS = 10
+    NUM_IMGS = 400
     parser = argparse.ArgumentParser()
     parser.add_argument("--max_epochs", help="epochs to train for", type=int, default=10000, required=False)
     parser.add_argument("--batch_size", help="batch size", type=int, default=1, required=False)
@@ -290,10 +325,12 @@ if __name__ == '__main__':
     parser.add_argument("--lambda_", help="[advanced] variable to improve structural loss", type=int, default=100, required=False)
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
+    parser.add_argument("--dataset_dir", help="Location of dataset", required=True)
 
 
 
     args = parser.parse_args()
+    DATASET_DIR = args.dataset_dir
     ROOT_IMG_SAVE = args.img_save_dir
     ROOT_CHECKPOINT_SAVE = args.checkpoint_save_dir
     # print(args.echo)
@@ -304,44 +341,45 @@ if __name__ == '__main__':
     IMG_WIDTH = args.image_width
     IMG_HEIGHT = args.image_height
     INPUT_CHANNEL = args.input_channel
-    OUTPUT_CHANNEL = args.output_channel
+    OUTPUT_CHANNEL = args.output_channel # currently useless
 
     # advanced:
     NUM_LAYERS = args.num_layers
     KERNEL_SIZE = args.kernel_size
-    BETA = args.beta /100 
+    BETA = args.beta /100
     LAMBDA = args.lambda_
 
     GEN_LOSS = generator_loss
     DISC_LOSS = discriminator_loss
 
-    """
-    TODO: implement dataset selection
-    """
-    dataset_name = "facades"
 
-    _URL = f'http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/{dataset_name}.tar.gz'
 
-    path_to_zip = tf.keras.utils.get_file(
-        fname=f"{dataset_name}.tar.gz",
-        origin=_URL,
-        extract=True)
+    # dataset_name = "facades"
+    #
+    # _URL = f'http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/{dataset_name}.tar.gz'
+    #
+    # path_to_zip = tf.keras.utils.get_file(
+    #     fname=f"{dataset_name}.tar.gz",
+    #     origin=_URL,
+    #     extract=True)
+    #
+    # path_to_zip  = pathlib.Path(path_to_zip)
+    #
+    # PATH = path_to_zip.parent/dataset_name
+    # train_dataset = tf.data.Dataset.list_files(str(PATH / 'train/*.jpg'))
+    # train_dataset = train_dataset.map(load_image_train,
+    #                                   num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    # train_dataset = train_dataset.shuffle(NUM_IMGS)
+    # train_dataset = train_dataset.batch(BATCH_SIZE)
+    #
+    # try:
+    #   test_dataset = tf.data.Dataset.list_files(str(PATH / 'test/*.jpg'))
+    # except tf.errors.InvalidArgumentError:
+    #   test_dataset = tf.data.Dataset.list_files(str(PATH / 'val/*.jpg'))
+    # test_dataset = test_dataset.map(load_image_test)
+    # test_dataset = test_dataset.batch(BATCH_SIZE)
 
-    path_to_zip  = pathlib.Path(path_to_zip)
 
-    PATH = path_to_zip.parent/dataset_name
-    train_dataset = tf.data.Dataset.list_files(str(PATH / 'train/*.jpg'))
-    train_dataset = train_dataset.map(load_image_train,
-                                      num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.shuffle(NUM_IMGS)
-    train_dataset = train_dataset.batch(BATCH_SIZE)
-
-    try:
-      test_dataset = tf.data.Dataset.list_files(str(PATH / 'test/*.jpg'))
-    except tf.errors.InvalidArgumentError:
-      test_dataset = tf.data.Dataset.list_files(str(PATH / 'val/*.jpg'))
-    test_dataset = test_dataset.map(load_image_test)
-    test_dataset = test_dataset.batch(BATCH_SIZE)
 
 
     steps_per_epoch = NUM_IMGS // BATCH_SIZE
@@ -353,15 +391,7 @@ if __name__ == '__main__':
     disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
     generator = gen.build()
     discriminator = disc.build()
-    #
-    # checkpoint_dir = ROOT_CHECKPOINT_SAVE
-    # checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-    # checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
-    # discriminator_optimizer=discriminator_optimizer,
-    # generator=generator,
-    # discriminator=discriminator)
-    # manager = tf.train.CheckpointManager(checkpoint, checkpoint_prefix, checkpoint_name = "", max_to_keep=1)
-    #
 
+    train_dataset = get_dataset(DATASET_DIR, BATCH_SIZE, IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL)
 
-    train(train_dataset, test_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator)
+    train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator)

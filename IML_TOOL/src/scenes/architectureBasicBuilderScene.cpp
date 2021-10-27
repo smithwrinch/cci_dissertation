@@ -69,15 +69,15 @@ void ArchitectureBasicBuilderScene::setup(){
 
 
 
-  inputRGBToggle = new ofxDatGuiToggle("INPUT IMAGE GRAYSCALE");
+  inputRGBToggle = new ofxDatGuiToggle("IMAGE GRAYSCALE");
   inputRGBToggle->setPosition(centreX, imgHeightSlider->getY() + imgHeightSlider->getHeight());
-
-  outputRGBToggle = new ofxDatGuiToggle("OUTPUT IMAGE GRAYSCALE");
-  outputRGBToggle->setPosition(centreX, inputRGBToggle->getY() + inputRGBToggle->getHeight());
+  //
+  // outputRGBToggle = new ofxDatGuiToggle("OUTPUT IMAGE GRAYSCALE");
+  // outputRGBToggle->setPosition(centreX, inputRGBToggle->getY() + inputRGBToggle->getHeight());
 
   // learningRateInput = new ofxDatGuiSlider("LEARNING RATE", 0.0000001, 0.00002, 0.001)
   learningRateSlider = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) X:", 1, 9, model->getLearningRateX());
-  learningRateSlider->setPosition(centreX, outputRGBToggle->getY() + outputRGBToggle->getHeight()*2);
+  learningRateSlider->setPosition(centreX, inputRGBToggle->getY() + inputRGBToggle->getHeight()*2);
   learningRateSlider->setPrecision(0);
 
   learningRateSlider2 = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) Y:", 1, 9, model->getLearningRateY());
@@ -116,7 +116,7 @@ void ArchitectureBasicBuilderScene::setup(){
   imgWidthSlider->setWidth(width, label_width);
   imgHeightSlider->setWidth(width, label_width);
   inputRGBToggle->setWidth(width, label_width);
-  outputRGBToggle->setWidth(width, label_width);
+  // outputRGBToggle->setWidth(width, label_width);
   learningRateSlider->setWidth(width, label_width);
   learningRateSlider2->setWidth(width, label_width);
   maxEpochsSlider->setWidth(width, label_width);
@@ -141,10 +141,10 @@ void ArchitectureBasicBuilderScene::update(){
   // advancedButton->update();
   kernelSizeSlider->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
-    outputRGBToggle->update();
+    // outputRGBToggle->update();
     imgWidthSlider->update();
     imgHeightSlider->update();
-    outputRGBToggle->update();
+    // outputRGBToggle->update();
     lambdaSlider->update();
     numLayersSlider->update();
     betaSlider->update();
@@ -170,7 +170,7 @@ void ArchitectureBasicBuilderScene::draw(){
     betaSlider->draw();
     imgWidthSlider->draw();
     imgHeightSlider->draw();
-    outputRGBToggle->draw();
+    // outputRGBToggle->draw();
     lambdaSlider->draw();
     numLayersSlider->draw();
   }
@@ -215,11 +215,11 @@ void ArchitectureBasicBuilderScene::setModel(){
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     model->setImgWidth(imgWidthSlider->getValue());
     model->setImgHeight(imgHeightSlider->getValue());
-    int channels_ = 3;
-    if(outputRGBToggle->getChecked()){
-      channels_ = 1;
-    }
-    model->setOutputChannel(channels_);
+    // int channels_ = 3;
+    // if(outputRGBToggle->getChecked()){
+    //   channels_ = 1;
+    // }
+    // model->setOutputChannel(channels_);
 
     model->setNumLayers(numLayersSlider->getValue());
     model->setBeta(int(betaSlider->getValue()));

@@ -23,7 +23,7 @@ void TrainingScene::refresh(){
     int img_width = model->getImgWidth();
     int img_height = model->getImgHeight();
     int input_channel = model->getInputChannel();
-    int output_channel = model->getOutputChannel();
+    // int output_channel = model->getOutputChannel();
     int learning_rateX = model->getLearningRateX();
     int learning_rateY = model->getLearningRateY();
     int max_epochs = model->getMaxEpochs();
@@ -47,7 +47,7 @@ void TrainingScene::refresh(){
       img_width,
       img_height,
       input_channel,
-      output_channel,
+      // output_channel,
       learning_rateX,
       learning_rateY,
       max_epochs,

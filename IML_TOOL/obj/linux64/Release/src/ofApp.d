@@ -632,7 +632,8 @@ obj/linux64/Release/src/ofApp.o: \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureTypeSelectorScene.h \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetMainScene.h \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetSelectorScene.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetBuilderScene.h
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetBuilderScene.h \
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetPix2PixBuilderScene.h
 
 /home/hans/uni/diss/main/IML_TOOL/src/ofApp.h:
 
@@ -1933,3 +1934,5 @@ obj/linux64/Release/src/ofApp.o: \
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetSelectorScene.h:
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetBuilderScene.h:
+
+/home/hans/uni/diss/main/IML_TOOL/src/scenes/datasetPix2PixBuilderScene.h:

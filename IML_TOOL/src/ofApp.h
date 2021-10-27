@@ -17,6 +17,7 @@
 #include "scenes/datasetMainScene.h"
 #include "scenes/datasetSelectorScene.h"
 #include "scenes/datasetBuilderScene.h"
+#include "scenes/datasetPix2PixBuilderScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -55,6 +56,7 @@ class ofApp : public ofBaseApp{
 		DatasetSelectorScene datasetSelectorScene;
 		DatasetMainScene datasetMainScene;
 		DatasetBuilderScene datasetBuilderScene;
+		DatasetPix2PixBuilderScene datasetPix2PixBuilderScene;
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
 };

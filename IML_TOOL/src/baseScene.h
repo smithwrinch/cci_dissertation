@@ -14,6 +14,7 @@ class BaseScene{
 		virtual void setup(){};
 		virtual void update(){};
 		virtual void draw(){};
+		virtual void refresh(){};
     virtual SCENE_TYPE::ID getID(){
       return id;
     }

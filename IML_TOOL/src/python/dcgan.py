@@ -96,15 +96,12 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
         save_ = save[0].split("/")[-1].split("_")[0][1:]
         epochs_passed = int(save_)
 
-
         if("discriminator" in save[0]):
             discriminator = tf.keras.models.load_model(save[0])
             generator = tf.keras.models.load_model(save[1])
         else:
             discriminator = tf.keras.models.load_model(save[1])
             generator = tf.keras.models.load_model(save[0])
-
-
 
     # noise = tf.random.normal([1, 100])
     # generated_image = generator(noise, training=False)

@@ -20,6 +20,7 @@ class DatasetBuilderScene : public BaseScene {
     ofxDatGuiButton * buildButton;
     ofxDatGuiTextInput * datasetNameInput;
     ofxDatGuiLabel * errorLabel;
+    ofxDatGuiToggle * imagesAlreadyPaired;
     string datasetName;
     string dir = "";
 };
