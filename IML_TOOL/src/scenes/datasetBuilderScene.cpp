@@ -72,6 +72,7 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
             BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
             scene->refresh();
+            ModelManager::getInstance()->setStatus(2);
             SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
         }
         else{
@@ -87,11 +88,9 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
         ModelManager::getInstance()->setDatasetDir(datasetNameInput->getText());
         BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
         scene->refresh();
+        ModelManager::getInstance()->setStatus(2);
         SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
       }
-
-
-
     }
   }
 }

@@ -200,6 +200,7 @@ void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
 void ArchitectureBasicBuilderScene::setModel(){
   ModelManager * model = model->getInstance();
 
+  model->setStatus(1);
   model->setLearningRateX(learningRateSlider->getValue());
   model->setLearningRateY(-learningRateSlider2->getValue());
   model->setMaxEpochs(maxEpochsSlider->getValue());

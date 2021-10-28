@@ -138,6 +138,12 @@ void TrainingScene::update(){
 //--------------------------------------------------------------
 void TrainingScene::draw(){
   graph.draw();
+  // cout << graph.getX() << endl;
+  // cout << graph.getY() << endl;
+  // cout << graph.getWidth() << endl;
+  // cout << graph.getHeight() << endl;
+  ofDrawBitmapString(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()),
+  500, 450);
   training_img.draw(100, 50, 400, 400);
   if(state != 2){
     backButton->draw();

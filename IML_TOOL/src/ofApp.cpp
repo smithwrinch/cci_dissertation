@@ -105,17 +105,17 @@ void ofApp::update(){
   if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
     for(int i = 0; i < topGui.size(); i++){
       if(id <=SCENE_TYPE::DATASET_SELECTOR ){
-        if(i != 2){
+        if(i != 2 && modelManager->getStatus() >= 2){
           topGui[i]->update();
         }
       }
       else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
-        if(i != 1){
+        if(i != 1  && modelManager->getStatus() >= 1){
           topGui[i]->update();
         }
       }
       else if(id <= SCENE_TYPE::TRAIN){
-          if(i != 3){
+          if(i != 3  && modelManager->getStatus() >= 2){
             topGui[i]->update();
           }
       }
@@ -132,6 +132,10 @@ void ofApp::update(){
 void ofApp::draw(){
     SCENE_TYPE::ID id = sceneManager->getCurrentSceneID();
     sceneManager->getCurrentScene()->draw();
+    ofDrawBitmapString(modelManager->getModelName(), 0, menuButton->getHeight()+12);
+    ofDrawBitmapString(ofToString(modelManager->getStatus()), 0, menuButton->getHeight()+36);
+    ofDrawBitmapString(printModelType(modelManager->getModelType()), 0, menuButton->getHeight()+24);
+
     if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
       for(int i = 0; i < topGui.size(); i++){
 
@@ -219,12 +223,16 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
       sceneManager->changeSceneTo(SCENE_TYPE::MENU);
     }
     if(e.target == architectureButton){
+      BaseScene * scene = sceneManager->getScene(SCENE_TYPE::ARCHITECTURE_BUILDER);
+      scene->refresh();
       sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_BUILDER);
     }
     if(e.target == datasetButton){
       sceneManager->changeSceneTo(SCENE_TYPE::DATASET_MENU);
     }
     if(e.target == trainButton){
+      BaseScene * scene = sceneManager->getScene(SCENE_TYPE::TRAIN);
+      scene->refresh();;
       sceneManager->changeSceneTo(SCENE_TYPE::TRAIN);
     }
     if(e.target == evaluateButton){

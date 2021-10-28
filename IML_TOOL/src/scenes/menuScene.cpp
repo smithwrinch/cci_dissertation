@@ -191,7 +191,7 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
   }
   if(e.target == pix2pixButton){
-    createModel(MODEL_TYPE::PIX2PIX);
+    createModel(MODEL_TYPE::PIX2PIX); // TODO this is causing error
     state = 0;
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }

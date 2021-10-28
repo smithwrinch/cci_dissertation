@@ -44,10 +44,12 @@ void DatasetSelectorScene::draw(){
 void DatasetSelectorScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == scrollContinueButton){
     ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+currentScroll);
+    ModelManager::getInstance()->setStatus(2);
     ModelManager::getInstance()->save();
 
     TrainingScene * scene = (TrainingScene *) SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
     scene->refresh();
+
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
   }
   if(e.target == scrollDeleteButton){

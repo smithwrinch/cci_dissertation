@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Options>
+	<BufSize>128</BufSize>
+	<Pause>0</Pause>
+	<No_draw>0</No_draw>
+	<Toggle_plot_bar>1</Toggle_plot_bar>
+	<Auto_Scale>1</Auto_Scale>
+	<Y-Max>1</Y-Max>
+</Options>

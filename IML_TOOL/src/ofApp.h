@@ -76,4 +76,16 @@ class ofApp : public ofBaseApp{
 
 		int idToHighlight;
 
+		string printModelType(MODEL_TYPE::ID id){
+			if(id == MODEL_TYPE::GAN){
+				return "GAN";
+			}
+			else if(id == MODEL_TYPE::PIX2PIX){
+				return "PIX2PIX";
+			}
+			else{
+				return "";
+			}
+		}
+
 };

@@ -97,7 +97,7 @@ class ModelManager{
 
 
     MODEL_TYPE::ID getModelType(){
-      int modelType = config.getValue("config:model_type", 0);
+      int modelType = config.getValue("config:model_type", -1);
       MODEL_TYPE::ID val = static_cast<MODEL_TYPE::ID>(modelType);
       return val;
     }

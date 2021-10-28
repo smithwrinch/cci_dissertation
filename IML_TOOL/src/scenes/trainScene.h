@@ -90,37 +90,42 @@ class LossLoader: public ofThread{
 			void setup(ofxGraph* graph){
 			    this->graph = graph;
 			}
+      string line;
 
 			void threadedFunction(){
 				char buf[MAX_BUF];
 				vector <float> gen_values;
 				vector <float> disc_values;
 				vector <float> values;
+
 				while(isThreadRunning()){
-					fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
-		      // read(fd, buf, MAX_BUF);
+          // gen_values.push_back(ofRandom(1, 10));
+          // disc_values.push_back(ofRandom(1, 10));
+          lock();
+          fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
+          fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
+
+		      // read(fd_gen, buf, MAX_BUF);
+          // cout << buf << endl;
 					while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
 					}
-					// cout << buf << endl;
 		      if(strlen(buf) != 0){
-		        // cout<<"Received:"<< buf<<endl;
+		        cout<<"Received:"<< buf<<endl;
 						size_t pos = 0;
 						string token;
 						string s = std::string(buf);
 						string delimiter = "\n";
 						while ((pos = s.find(delimiter)) != string::npos) {
 						    token = s.substr(0, pos);
-								// cout << token << endl;
 								if(token.length() == 5){
 									gen_values.push_back(stof(token));
-									// cout << token << endl;
+									cout << token << endl;
 								}
 
 						    s.erase(0, pos + delimiter.length());
 						}
 		      }
-					fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
-		      // read(fd, buf, MAX_BUF);
+		      // read(fd_disc, buf, MAX_BUF);
 					while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
 					}
 					// cout << buf << endl;
@@ -159,22 +164,26 @@ class LossLoader: public ofThread{
 					gen_values.clear();
 					disc_values.clear();
 
-					sleep(10000); // amount of times graph is updated
+          // close(fd_disc);
+          // close(fd_gen);
+          unlock();
+					sleep(1000); // amount of times graph is updated
 				}
 
-				// close(fd);
 
 			}
 };
 
+// essentially gets epoch info
 class ImageLoader: public ofThread{
 	public:
 		ofImage * image;
     string image_dir;
 		ofxThreadedImageLoader *loader;
 		ofFile f;
-
+    int epochs;
     string img_dir;
+
 		// string a = "saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks";
 		ofDirectory dir;
 		void setup(ofImage * image, ofxThreadedImageLoader * loader){
@@ -306,15 +315,17 @@ class TrainingThread: public ofThread{
   		sleep(2000);
       string arguments = addArguments();
 			cout << python_file + arguments.c_str() << endl;
-			pid = system((python_file + arguments).c_str());
-			// pid = system2((s + arguments).c_str(), &input, &output);
+			// pid = system((python_file + arguments).c_str());
+			pid = system2((python_file + arguments).c_str(), &input, &output);
   		cout << "STARTED:" << pid << endl;
   	}
 		void stopThread(){
+      cout << "STOPPING TRAINING THREAD:" << endl;
 			kill(pid, SIGTERM);
 			sleep(3000);
 			kill(pid, SIGKILL);
 			system("killall python"); // hacky workaround for now. just POSIX.
+			system("killall python3");
 			ofThread::stopThread();
 		}
   private:
