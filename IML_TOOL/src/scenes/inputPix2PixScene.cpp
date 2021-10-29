@@ -7,7 +7,6 @@ void InputPix2PixScene::setup() {
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 	// ofBackground(54, 54, 54);
-	ofSetWindowTitle("example_pix2pix");
 	ofSetLogLevel("ofxTensorFlow2", OF_LOG_VERBOSE);
 
 	// use only a portion of the GPU memory & grow as needed

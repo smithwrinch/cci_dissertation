@@ -8,7 +8,6 @@ void InputGANScene::setup(){
   ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 	// ofBackground(54, 54, 54);
-	ofSetWindowTitle("example_gan");
 	ofSetLogLevel("ofxTensorFlow2", OF_LOG_VERBOSE);
 
 	// use only a portion of the GPU memory & grow as needed

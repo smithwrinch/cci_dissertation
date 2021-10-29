@@ -19,6 +19,8 @@ int main( ){
 	settings.resizable = false;
 	settings.setSize(1024, 768);
 	ofCreateWindow(settings);
+
+	ofSetWindowTitle("IML_TOOL_PROTOTYPE");
 	// ofSetupOpenGL(1024,768,OF_WINDOW);			// <-------- setup the GL context
 	// glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	// this kicks off the running of my app

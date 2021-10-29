@@ -101,73 +101,73 @@ class LossLoader: public ofThread{
 				while(isThreadRunning()){
           // gen_values.push_back(ofRandom(1, 10));
           // disc_values.push_back(ofRandom(1, 10));
-          lock();
-          fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
-          fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
-
-		      // read(fd_gen, buf, MAX_BUF);
-          // cout << buf << endl;
-					while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
-					}
-		      if(strlen(buf) != 0){
-		        cout<<"Received:"<< buf<<endl;
-						size_t pos = 0;
-						string token;
-						string s = std::string(buf);
-						string delimiter = "\n";
-						while ((pos = s.find(delimiter)) != string::npos) {
-						    token = s.substr(0, pos);
-								if(token.length() == 5){
-									gen_values.push_back(stof(token));
-									cout << token << endl;
-								}
-
-						    s.erase(0, pos + delimiter.length());
-						}
-		      }
-		      // read(fd_disc, buf, MAX_BUF);
-					while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
-					}
-					// cout << buf << endl;
-		      if(strlen(buf) != 0){
-		        // cout<<"Received:"<< buf<<endl;
-						size_t pos = 0;
-						string token;
-						string s = std::string(buf);
-						string delimiter = "\n";
-						while ((pos = s.find(delimiter)) != string::npos) {
-						    token = s.substr(0, pos);
-								// cout << token << endl;
-								if(token.length() == 5){
-									// graph->add(stof(token), 1);
-									// disc_values.push_back(stof(token));
-									// value.push_back(stof(token))
-									// cout << token << endl;
-									disc_values.push_back(stof(token));
-								}
-
-						    s.erase(0, pos + delimiter.length());
-						}
-		      }
-
-					int max_ = disc_values.size();
-					if(gen_values < disc_values){
-						max_ = gen_values.size();
-					}
-					for (int i =0; i < max_; i++){
-						vector<float> temp;
-						temp.push_back(gen_values[i]);
-						temp.push_back(disc_values[i]);
-						graph->add(temp);
-						temp.clear();
-					}
-					gen_values.clear();
-					disc_values.clear();
-
-          // close(fd_disc);
-          // close(fd_gen);
-          unlock();
-					sleep(1000); // amount of times graph is updated
+          // lock();
+          // fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
+          // fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
+          //
+		      // // read(fd_gen, buf, MAX_BUF);
+          // // cout << buf << endl;
+					// while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
+					// }
+		      // if(strlen(buf) != 0){
+		      //   cout<<"Received:"<< buf<<endl;
+					// 	size_t pos = 0;
+					// 	string token;
+					// 	string s = std::string(buf);
+					// 	string delimiter = "\n";
+					// 	while ((pos = s.find(delimiter)) != string::npos) {
+					// 	    token = s.substr(0, pos);
+					// 			if(token.length() == 5){
+					// 				gen_values.push_back(stof(token));
+					// 				cout << token << endl;
+					// 			}
+          //
+					// 	    s.erase(0, pos + delimiter.length());
+					// 	}
+		      // }
+		      // // read(fd_disc, buf, MAX_BUF);
+					// while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
+					// }
+					// // cout << buf << endl;
+		      // if(strlen(buf) != 0){
+		      //   // cout<<"Received:"<< buf<<endl;
+					// 	size_t pos = 0;
+					// 	string token;
+					// 	string s = std::string(buf);
+					// 	string delimiter = "\n";
+					// 	while ((pos = s.find(delimiter)) != string::npos) {
+					// 	    token = s.substr(0, pos);
+					// 			// cout << token << endl;
+					// 			if(token.length() == 5){
+					// 				// graph->add(stof(token), 1);
+					// 				// disc_values.push_back(stof(token));
+					// 				// value.push_back(stof(token))
+					// 				// cout << token << endl;
+					// 				disc_values.push_back(stof(token));
+					// 			}
+          //
+					// 	    s.erase(0, pos + delimiter.length());
+					// 	}
+		      // }
+          //
+					// int max_ = disc_values.size();
+					// if(gen_values < disc_values){
+					// 	max_ = gen_values.size();
+					// }
+					// for (int i =0; i < max_; i++){
+					// 	vector<float> temp;
+					// 	temp.push_back(gen_values[i]);
+					// 	temp.push_back(disc_values[i]);
+					// 	graph->add(temp);
+					// 	temp.clear();
+					// }
+					// gen_values.clear();
+					// disc_values.clear();
+          //
+          // // close(fd_disc);
+          // // close(fd_gen);
+          // unlock();
+					sleep(10000); // amount of times graph is updated
 				}
 
 
@@ -315,8 +315,8 @@ class TrainingThread: public ofThread{
   		sleep(2000);
       string arguments = addArguments();
 			cout << python_file + arguments.c_str() << endl;
-			// pid = system((python_file + arguments).c_str());
-			pid = system2((python_file + arguments).c_str(), &input, &output);
+			pid = system((python_file + arguments).c_str());
+			// pid = system2((python_file + arguments).c_str(), &input, &output);
   		cout << "STARTED:" << pid << endl;
   	}
 		void stopThread(){

@@ -1,13 +1,9 @@
 <config>
-    <image_width>256</image_width>
-    <image_height>256</image_height>
-    <input_channel>3</input_channel>
-    <output_channel>3</output_channel>
-    <learning_rate>32.000000000</learning_rate>
+    <status>1</status>
+    <learning_rateX>2</learning_rateX>
+    <learning_rateY>-5</learning_rateY>
     <max_epochs>1000</max_epochs>
     <batch_size>1</batch_size>
-    <num_layers>7</num_layers>
     <kernel_size>4</kernel_size>
-    <beta>0.500000000</beta>
-    <lambda>100</lambda>
+    <input_channel>3</input_channel>
 </config>
