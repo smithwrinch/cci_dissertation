@@ -1,9 +1,3 @@
 <config>
-    <status>1</status>
-    <learning_rateX>2</learning_rateX>
-    <learning_rateY>-5</learning_rateY>
-    <max_epochs>1000</max_epochs>
-    <batch_size>1</batch_size>
-    <kernel_size>4</kernel_size>
-    <input_channel>3</input_channel>
+    <epochs_trained_for>3</epochs_trained_for>
 </config>

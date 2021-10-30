@@ -8,8 +8,8 @@
 </head>
 <body>
 
-  <button href="#" id="p2p_dataset" style="left: 40%; top: 5%;">Pix2Pix</button>
-  <button href="#" id = "gan_dataset" style="left: 55%; top: 5%;">GAN</button>
+  <button href="#" id="p2p_train" style="left: 40%; top: 5%;">Pix2Pix</button>
+  <button href="#" id = "gan_train" style="left: 55%; top: 5%;">GAN</button>
 
   <div class="window">
     <img id="head" src="img/head.png"> </img>
@@ -29,9 +29,9 @@
       </a>
 
       <a href="train.html">
-      <div class="button navButton" style="left: 615px;">
+      <div class="button navButton"  style="left: 615px;">
         <span class="stripe_" style="background-color: #01ff01;"> </span>
-        -TRAIN-
+        <span id="trainButton">-TRAIN-</span>
       </div>
       </a>
 
@@ -49,34 +49,56 @@
       </div>
       </a>
     </div>
+    <img src="img/-1.png" class="notTraining"style="top:50px; left: 100px;"> </img>
+    <img src="img/graph2.png" class="notTraining" style="top:33px; left: 500px;"> </img>
 
-    <img src="img/-1.png" style="top:50px; left: 100px;"> </img>
-    <img src="img/527.png" class="training" style="top:50px; left: 100px;"> </img>
+    <img src="img/81.png" class="training p2p" style="top:50px; left: 100px; visibility: hidden;"> </img>
+    <img src="img/527.png" class="training gan" style="top:50px; left: 100px;"> </img>
+
     <img src="img/graph.png" class="training" style="top:33px; left: 500px;"> </img>
 
     </a>
-    <a href="#" id = "startTraining">
+    <a href="#" id = "startTraining" class="notTraining">
     <div class="button" style="top: 568px; ">
       <span class="stripe_"> </span>
-      START TRAINING
+      <span id="lol" style=""> START TRAINING </span>
     </div>
     </a>
 
-    <a href="#" id = "starTraining">
+    <a href="#" id = "stopTraining" class="training">
+    <div class="button" style="top: 568px; ">
+      <span class="stripe_"style="background-color: red;"> </span>
+      <span id="lol" > STOP TRAINING </span>
+    </div>
+    </a>
+
+    <a href="#"  class="notTraining">
     <div class="button" style="top: 618px; ">
-      <span class="stripe_"> </span>
+      <span class="stripe_" style="background-color: red;"> </span>
       RESTART TRAINING
     </div>
     </a>
+
+    <a href="#"  class="training" id="saveModelEpoch">
+    <div class="button" style="top: 618px; ">
+      <span class="stripe_"> </span>
+      SAVE MODEL AT CURRENT EPOCH
+    </div>
+    </a>
+
+    <div class="button" style="top: 450px; left: 100px;">
+      3/1000 epochs
+    </div>
+
     <a href="datasetMenu.html">
-    <div class="button" style="top: 670px; left: 10%;">
+    <div class="button notTraining" style="top: 670px; left: 10%;">
       <span class="stripe" style="top: 670px; left: 10%;"> </span>
       BACK<-
     </div>
     </a>
 
     <a href="#">
-    <div class="button" style="top: 670px; left: 65%;">
+    <div class="button notTraining" style="top: 670px; left: 65%;">
       <span class="stripe" style="top: 670px; left: 65%;"> </span>
       CONTINUE
     </div>

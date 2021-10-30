@@ -122,7 +122,7 @@ def discriminator_loss(disc_real_output, disc_generated_output):
 TRAINING ---------------------------------------------------------------------------
 """
 @tf.function
-def train_step(input_image, target, step, generator_optimizer, discriminator_optimizer, gen_loss_, disc_loss_, LAMBDA, generator, discriminator):
+def train_step(input_image, target, generator_optimizer, discriminator_optimizer, gen_loss_, disc_loss_, LAMBDA, generator, discriminator):
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         gen_output = generator(input_image, training=True)
@@ -149,7 +149,7 @@ def train_step(input_image, target, step, generator_optimizer, discriminator_opt
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def train(train_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
+def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
 
     # checkpoint.restore(manager.latest_checkpoint)
     # epochs = 0
@@ -220,53 +220,52 @@ def train(train_ds, steps, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, R
     g_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
     d_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
 
+    for epoch in range(max_epochs):
 
-    for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
-        if (step) % steps_per_epoch == 0:
+        clear_output(wait=True)
+        generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
 
-              clear_output(wait=True)
-              epochs += 1
-              generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
+        files = glob.glob(save_dir+"/*")
+        gen.save(save_dir+"/-" +str(epochs)+"_generator")
+        disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
 
-              files = glob.glob(save_dir+"/*")
-              gen.save(save_dir+"/-" +str(epochs)+"_generator")
-              disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
+        epochs += 1
+        for f in files:
+            shutil.rmtree(f, ignore_errors=True)
 
-              for f in files:
-                  shutil.rmtree(f, ignore_errors=True)
+        if epoch != 0:
+            print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
 
-              if step != 0:
-                  print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
-
-              start = time.time()
+            start = time.time()
 
 
-              if not os.path.exists(ROOT_IMG_SAVE[:-1]):
-                  os.makedirs(ROOT_IMG_SAVE[:-1])
-              fig = plt.savefig(ROOT_IMG_SAVE+str(epochs)+".png")
-              plt.clf()
-              plt.close(fig)
-              # print(epochs)
-              # print("EPOCHS!!")
-              print(f"Step: {step//steps_per_epoch}")
+            if not os.path.exists(ROOT_IMG_SAVE[:-1]):
+                os.makedirs(ROOT_IMG_SAVE[:-1])
+                fig = plt.savefig(ROOT_IMG_SAVE+str(epochs)+".png")
+                plt.clf()
+                plt.close(fig)
+                # print(epochs)
+                # print("EPOCHS!!")
+                print(f"Epoch: {epoch}")
+
+        for (input_image, target) in train_ds:
 
 
+            g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
+            g_loss = g_loss.numpy()
+            d_loss = d_loss.numpy()
+            # val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
+            # print(str(g_lossg_loss)[:5])
+            # print("-------------------")
+            gen_pipe.send_message(str(g_loss)[:5] + "\n")
+            disc_pipe.send_message(str(d_loss)[:5] + "\n")
+            # Training step
+            # if (step+1) % 10 == 0:
+            #     print('.', end='', flush=True)
 
-        g_loss, d_loss = train_step(input_image, target, step, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
-        g_loss = g_loss.numpy()
-        d_loss = d_loss.numpy()
-        # val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
-        # print(str(g_lossg_loss)[:5])
-        # print("-------------------")
-        gen_pipe.send_message(str(g_loss)[:5] + "\n")
-        disc_pipe.send_message(str(d_loss)[:5] + "\n")
-        # Training step
-        # if (step+1) % 10 == 0:
-        #     print('.', end='', flush=True)
 
-
-        # # Save (checkpoint) the model every epoch
-        # if int(step.numpy()) % steps_per_epoch == 0:
+            # # Save (checkpoint) the model every epoch
+            # if int(step.numpy()) % steps_per_epoch == 0:
 
 def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
     p1 = model(i1, training=True)
