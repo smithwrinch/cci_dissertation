@@ -45,6 +45,20 @@ $("#gan_dataset").click(function(){
 
 });
 
+
+$("#p2p_interact").click(function(){
+  $(".p2pp").css("visibility", "visible");
+  $(".gann").css("visibility", "hidden");
+  p2p = true;
+
+});
+
+$("#gan_interact").click(function(){
+  $(".p2pp").css("visibility", "hidden");
+  $(".gann").css("visibility", "visible");
+  p2p = false;
+});
+
 $("#loadFromFolder").click(function(){
   alert("opens file explorer to select folder full of images");
 });
@@ -64,6 +78,8 @@ $("#p2p__").click(function(){
 
 $("#startTraining").click(function(){
   $("#lol").text("RESUME TRAINING");
+  $("#lolll").text("3/1000 EPOCHS");
+
     $(".training").css("visibility", "visible");
     $(".notTraining").css("visibility", "hidden");
     $("#trainButton").text("-TRAINING-");
@@ -108,4 +124,26 @@ $("#tar").click(function(){
 
 $("#halffinished").click(function(){
   alert("opens a half finished dataset");
+});
+
+$("#exportGif").click(function(){
+  alert("Opens file directory to export GIF from training progression");
+});
+
+$("#playButton").click(function(){
+  alert("Opens menu of pretrained interaction demos");
+});
+
+
+
+$("#ls_ui").click(function(){
+  alert("Directly affect latent vector (includes graph input ie: y= {function})");
+});
+
+$("#ls_radial").click(function(){
+  alert("Turn dial to translate latent vector values");
+});
+
+$("#ls_graph").click(function(){
+  alert("Graphical representation of latent vector. \"Smudge\" elements of graph with different brush sizes");
 });

@@ -162,4 +162,11 @@ a{
   visibility: hidden;
 }
 
-#
+#dial {
+  background-color: gold;
+width: 4px;
+height: 15px;
+top: 206px;
+left: 226px;
+
+}

@@ -43,7 +43,7 @@ void InputGANScene::setup(){
   gui.setup();
   gui.add(latentVectorSelect.setup("Select latent vector idx", 0, 0, 512));
   gui.add(latentVectorSet.setup("latent vector value", 0, 1, 0.001));
-  gui.add(randomiseButton.setup("load field (l)"));
+  gui.add(randomiseButton.setup("Randomise (r)"));
   randomiseButton.addListener(this, &InputGANScene::randomiseLatentVector);
 }
 
