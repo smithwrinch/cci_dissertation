@@ -26,7 +26,7 @@ void ofApp::setup(){
   trainButton->setPosition(width*3, 0);
   trainButton->onButtonEvent(this, &ofApp::onButtonEvent);
 
-  evaluateButton = new ofxDatGuiButton("EVALUATE");
+  evaluateButton = new ofxDatGuiButton("INTERACT");
   evaluateButton->setWidth(width, 0.5);
   evaluateButton->setPosition(width*4, 0);
   evaluateButton->onButtonEvent(this, &ofApp::onButtonEvent);
@@ -55,7 +55,7 @@ void ofApp::setup(){
   trainButton_->setWidth(width, 0.5);
   trainButton_->setPosition(width*3, 0);
 
-  evaluateButton_ = new ofxDatGuiButton("-EVALUATE-");
+  evaluateButton_ = new ofxDatGuiButton("-INTERACT-");
   evaluateButton_->setWidth(width, 0.5);
   evaluateButton_->setPosition(width*4, 0);
 
@@ -103,28 +103,18 @@ void ofApp::update(){
   sceneManager->getCurrentScene()->update();
 
   if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
-    for(int i = 0; i < topGui.size(); i++){
-      if(id <=SCENE_TYPE::DATASET_SELECTOR ){
-        if(i != 2 && modelManager->getStatus() >= 2){
-          topGui[i]->update();
-        }
+      topGui[0]->update();
+
+      if(modelManager->getStatus() >= 1){
+        topGui[1]->update();
       }
-      else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
-        if(i != 1  && modelManager->getStatus() >= 1){
-          topGui[i]->update();
-        }
+      if(modelManager->getStatus() >= 2){
+        topGui[2]->update();
+        topGui[3]->update();
       }
-      else if(id <= SCENE_TYPE::TRAIN){
-          if(i != 3  && modelManager->getStatus() >= 2){
-            topGui[i]->update();
-          }
+      if(modelManager->getStatus() >= 3){
+        topGui[4]->update();
       }
-      else{
-        if(i != 4){
-          topGui[i]->update();
-        }
-      }
-    }
   }
 }
 
@@ -135,6 +125,7 @@ void ofApp::draw(){
     ofDrawBitmapString(modelManager->getModelName(), 0, menuButton->getHeight()+12);
     ofDrawBitmapString(ofToString(modelManager->getStatus()), 0, menuButton->getHeight()+36);
     ofDrawBitmapString(printModelType(modelManager->getModelType()), 0, menuButton->getHeight()+24);
+    ofDrawBitmapString(ofToString(sceneManager->getCurrentSceneID()), 0, menuButton->getHeight()+48);
 
     if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
       for(int i = 0; i < topGui.size(); i++){

@@ -200,7 +200,22 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     cout << "WE WILL NOW LOAD TO " << currentScroll << endl;
     state = 0;
     ModelManager::getInstance()->load(currentScroll);
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
+    int status = ModelManager::getInstance()->getStatus();
+    if(status <= 1){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::ARCHITECTURE_MENU);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
+    }
+    else if (status <= 2){
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
+
+    }
+
+    else if (status <= 3){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+    }
 
   }
   if(e.target == scrollDeleteButton){
@@ -330,12 +345,13 @@ void MenuScene::populateScroll(){
 
 void MenuScene::refreshScroll(){
   currentScroll = "";
+
+  ModelManager * mm = ModelManager::getInstance();
   for (int i =0; i < modelScroll->getNumItems(); i++){
     ofxDatGuiScrollViewItem * button = modelScroll->getItemAtIndex(i);
     string label = button->getLabel();
 
     // ofDirectory dir = ofDirectory(label);
-    ModelManager * mm = ModelManager::getInstance();
     mm->load(label);
     int type = mm->getModelType();
     if(type == 0){
@@ -349,4 +365,5 @@ void MenuScene::refreshScroll(){
     }
     button->setBorder(ofColor(200, 200, 200), 0);
   }
+  mm->reset();
 }

@@ -224,6 +224,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
         clear_output(wait=True)
         generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
+        plt.savefig(ROOT_IMG_SAVE + str(epochs) +".png")
 
         files = glob.glob(save_dir+"/*")
         gen.save(save_dir+"/-" +str(epochs)+"_generator")

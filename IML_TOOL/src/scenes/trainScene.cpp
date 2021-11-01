@@ -11,10 +11,11 @@ void TrainingScene::refresh(){
 
     // training_img.allocate(1600, 1600, OF_IMAGE_COLOR);
     training_img.load("images/-1.png");
-    training_img.resize(400, 400);
+    // training_img.resize(400, 400);
+    // threadedImageLoader.loadFromDisk(training_img, img_dir+"/"+ofToString(ModelManager::getInstance()->getEpochsTrained())+".png");
 
     // current_image = -1;
-    imageLoader.setup(&training_img, &threadedImageLoader);
+    epochManager.setup(&training_img, &threadedImageLoader, epochLabel);
     // imageLoader.startThread();
 
 
@@ -57,6 +58,9 @@ void TrainingScene::refresh(){
       beta,
       lambda,
       latent_vector, dataset_dir);
+
+    epochLabel->setLabel(ofToString(model->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
+
 }
 
 void TrainingScene::setup(){
@@ -73,6 +77,9 @@ void TrainingScene::setup(){
   graph.setColor(ofColor::white);  // ofColor(255,255,255)
   graph.setLabel({"GENERATOR","DISCRIMINATOR"});
 
+  epochLabel->setPosition(100, 450);
+  epochLabel->setWidth(400);
+
 
   startTrainingButton->setPosition(ofGetWidth() / 2 - startTrainingButton->getWidth()/2, ofGetHeight() - 200);
   startTrainingButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
@@ -87,6 +94,10 @@ void TrainingScene::setup(){
   restartTrainingButton->setPosition(ofGetWidth() / 2 - restartTrainingButton->getWidth()/2, ofGetHeight() - 150);
   restartTrainingButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
   restartTrainingButton->setStripeColor(ofColor(255,0,0));
+
+
+  saveModelButton->setPosition(ofGetWidth() / 2 - resumeTrainingButton->getWidth()/2, ofGetHeight() - 150);
+  saveModelButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
   backButton->setPosition(ofGetWidth() / 2 - 1.5 * backButton->getWidth(), ofGetHeight() - 100);
   backButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
@@ -126,12 +137,13 @@ void TrainingScene::update(){
   }
   else if(state == 1){
     stopTrainingButton->update();
+    saveModelButton->update();
   }
   else if(state == 2){
     confirmButton->update();
     unconfirmButton->update();
   }
-
+  epochLabel->update();
   training_img.update();
 }
 
@@ -142,8 +154,8 @@ void TrainingScene::draw(){
   // cout << graph.getY() << endl;
   // cout << graph.getWidth() << endl;
   // cout << graph.getHeight() << endl;
-  ofDrawBitmapString(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()),
-  500, 450);
+  // ofDrawBitmapString(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()),
+  // 500, 450);
   training_img.draw(100, 50, 400, 400);
   if(state != 2){
     backButton->draw();
@@ -160,26 +172,32 @@ void TrainingScene::draw(){
   }
   else if(state == 1){
     stopTrainingButton->draw();
+    saveModelButton->draw();
   }
   else if(state == 2){
     confirmButton->draw();
     unconfirmButton->draw();
   }
+  epochLabel->draw();
 }
+
 
 void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
   if(e.target == startTrainingButton || e.target == resumeTrainingButton){
     trainingThread.startThread();
     lossLoader.startThread();
-    imageLoader.startThread();
+    epochManager.startThread();
+
+    ModelManager::getInstance()->setStatus(3);
+    ModelManager::getInstance()->save();
     state = 1;
   }
 
   if(e.target == stopTrainingButton){
     lossLoader.stopThread();
     trainingThread.stopThread();
-    imageLoader.stopThread();
+    epochManager.stopThread();
     state = 0;
   }
 
@@ -192,6 +210,7 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     ofDirectory::removeDirectory(basePath+"/saved_networks/ckpt", true);
     ofDirectory::removeDirectory(basePath+"/images", true);
     ModelManager::getInstance()->setEpochsTrained(0);
+    ModelManager::getInstance()->setStatus(2);
     ModelManager::getInstance()->save();
     cout << "RESTART" << endl;
     state = 0;
@@ -204,4 +223,22 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     state = 0;
   }
 
+  if(e.target == saveModelButton){
+    saveModelAtCurrentEpoch();
+  }
+
+}
+
+void TrainingScene::saveModelAtCurrentEpoch(){
+  ofFileDialogResult result = ofSystemLoadDialog("Select output folder", true);
+  if (result.bSuccess) {
+    string path = result.getPath();
+    ofDirectory dir_ = ofDirectory("saved_models/"+ModelManager::getInstance()->getModelName()+"/saved_networks/ckpt/");
+
+    string newFolder = ModelManager::getInstance()->getModelName() + "_"+ofToString(ModelManager::getInstance()->getEpochsTrained());
+
+    ofDirectory dir__ = ofDirectory(path + "/" + newFolder);
+    dir__.create(true);
+    dir_.copyTo(path + "/" + newFolder +"/", true, true);
+  }
 }

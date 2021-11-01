@@ -175,7 +175,7 @@ class LossLoader: public ofThread{
 };
 
 // essentially gets epoch info
-class ImageLoader: public ofThread{
+class EpochManager: public ofThread{
 	public:
 		ofImage * image;
     string image_dir;
@@ -183,12 +183,14 @@ class ImageLoader: public ofThread{
 		ofFile f;
     int epochs;
     string img_dir;
+    ofxDatGuiLabel * epochLabel;
 
 		// string a = "saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks";
 		ofDirectory dir;
-		void setup(ofImage * image, ofxThreadedImageLoader * loader){
+		void setup(ofImage * image, ofxThreadedImageLoader * loader, ofxDatGuiLabel * label){
 			this->image = image;
 			this->loader = loader;
+      this->epochLabel = label;
 			this->image_dir = "saved_models/"+ModelManager::getInstance()->getModelName()+"/images";
 			dir.open("saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks/ckpt");
 		}
@@ -216,6 +218,7 @@ class ImageLoader: public ofThread{
 										filename = "images/-1.png";
 									}
 									else{
+                    epochLabel->setLabel(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
 										ModelManager::getInstance()->setEpochsTrained(stoi(out_num));
 										ModelManager::getInstance()->save();
 									}
@@ -371,9 +374,12 @@ class TrainingScene : public BaseScene {
     void refresh();
 
   private:
+
+      void saveModelAtCurrentEpoch();
+
       LossLoader lossLoader;
       TrainingThread trainingThread;
-			ImageLoader imageLoader; // used to check if new images
+			EpochManager epochManager; // used to check if new images
 
       bool training = false;
 
@@ -387,9 +393,12 @@ class TrainingScene : public BaseScene {
       int current_image;
       ofImage training_img;
 
+      ofxDatGuiLabel* epochLabel = new ofxDatGuiLabel("");
+
       ofxDatGuiButton* startTrainingButton = new ofxDatGuiButton("START TRAINING");
       ofxDatGuiButton* resumeTrainingButton = new ofxDatGuiButton("RESUME TRAINING");
       ofxDatGuiButton* stopTrainingButton = new ofxDatGuiButton("STOP TRAINING");
+      ofxDatGuiButton* saveModelButton = new ofxDatGuiButton("SAVE MODEL AT CURRENT EPOCH");
 
       ofxDatGuiButton* restartTrainingButton = new ofxDatGuiButton("RESTART TRAINING");
       ofxDatGuiButton* confirmButton = new ofxDatGuiButton("CONFIRM RESTART");

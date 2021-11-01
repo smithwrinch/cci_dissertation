@@ -23,7 +23,7 @@ void ArchitectureBasicBuilderScene::refresh(){
   imgSizeSlider->setValue(model->getImgWidth());
   imgHeightSlider->setValue(model->getImgHeight());
   learningRateSlider->setValue(model->getLearningRateX());
-  learningRateSlider2->setValue(model->getLearningRateY());
+  learningRateSlider2->setValue(-model->getLearningRateY());
   maxEpochsSlider->setValue(model->getMaxEpochs());
   batchSizeSlider->setValue(model->getBatchSize());
   numLayersSlider->setValue(model->getNumLayers());
@@ -31,6 +31,9 @@ void ArchitectureBasicBuilderScene::refresh(){
   kernelSizeSlider->setValue(model->getKernelSize());
   betaSlider->setValue(model->getBeta());
   lambdaSlider->setValue(model->getLambda());
+
+  cout << "LEARNING RATE X " << model->getLearningRateX() << endl;
+  cout << "LEARNING RATE Y " << model->getLearningRateY() << endl;
 }
 
 void ArchitectureBasicBuilderScene::setup(){
@@ -185,7 +188,6 @@ void ArchitectureBasicBuilderScene::draw(){
 
 void ArchitectureBasicBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-    ModelManager::getInstance()->reset();
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }
 
