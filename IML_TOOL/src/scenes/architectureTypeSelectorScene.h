@@ -9,9 +9,16 @@ class ArchitectureTypeSelectScene : public BaseScene {
     void setup();
     void update();
     void draw();
+    void refresh();
     void onButtonEvent(ofxDatGuiButtonEvent e);
 
   private:
     ofxDatGuiButton * buildButton;
     ofxDatGuiButton * selectButton;
+
+
+    ofxDatGuiButton * rebuildArchitectureButton;
+    ofxDatGuiButton * confirmButton;
+    ofxDatGuiButton * unconfirmButton;
+    int state;
 };

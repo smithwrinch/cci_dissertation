@@ -107,9 +107,9 @@ void ofApp::update(){
 
       if(modelManager->getStatus() >= 1){
         topGui[1]->update();
+        topGui[2]->update();
       }
       if(modelManager->getStatus() >= 2){
-        topGui[2]->update();
         topGui[3]->update();
       }
       if(modelManager->getStatus() >= 3){
@@ -135,7 +135,7 @@ void ofApp::draw(){
           if(id <=SCENE_TYPE::DATASET_SELECTOR ){
             topGuiSelected[1]->draw();
           }
-          else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
+          else if(id <= SCENE_TYPE::ARCHITECTURE_MENU){
               topGuiSelected[0]->draw();
           }
 
@@ -214,9 +214,9 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
       sceneManager->changeSceneTo(SCENE_TYPE::MENU);
     }
     if(e.target == architectureButton){
-      BaseScene * scene = sceneManager->getScene(SCENE_TYPE::ARCHITECTURE_BUILDER);
+      BaseScene * scene = sceneManager->getScene(SCENE_TYPE::ARCHITECTURE_MENU);
       scene->refresh();
-      sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_BUILDER);
+      sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
     }
     if(e.target == datasetButton){
       sceneManager->changeSceneTo(SCENE_TYPE::DATASET_MENU);

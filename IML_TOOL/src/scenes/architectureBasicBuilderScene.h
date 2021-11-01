@@ -5,6 +5,7 @@
 #include "../sceneTypes.h"
 #include "trainScene.h"
 #include<cmath>
+
 class ArchitectureBasicBuilderScene : public BaseScene {
   public:
     void refresh();
@@ -14,7 +15,22 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     void onButtonEvent(ofxDatGuiButtonEvent e);
 
   private:
+    void onToggleEvent(ofxDatGuiToggleEvent e);
     void setModel();
+
+    int getImageSize();
+    void setImageSizeChecked();
+
+    ofxDatGuiToggle*  button28;
+    ofxDatGuiToggle * button64G;
+
+    ofxDatGuiToggle*  button32;
+    ofxDatGuiToggle*  button64;
+    ofxDatGuiToggle * button128;
+    ofxDatGuiToggle * button256;
+    ofxDatGuiToggle * button512;
+    ofxDatGuiToggle * button1024;
+
 
     ofxDatGuiSlider* imgWidthSlider;
     ofxDatGuiSlider* imgHeightSlider;
@@ -34,6 +50,16 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     ofxDatGuiSlider * imgSizeSlider;
     ofxDatGuiSlider * latentDimSlider;
 
+    ofxDatGuiButton * showAdvanced;
+    bool showingAdvanced = false;
+
     ofxDatGuiButton* backButton;
     ofxDatGuiButton* continueButton;
+
+    vector<ofxDatGuiToggle*> ganButtons;
+    vector<ofxDatGuiToggle*> pix2pixButtons;
+
+    const vector<int> pix2pixSize = {32, 64, 128, 256, 512, 1024};
+    const vector<int> ganSize = {28, 64};
+
 };

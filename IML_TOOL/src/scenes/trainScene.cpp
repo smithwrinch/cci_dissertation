@@ -15,9 +15,8 @@ void TrainingScene::refresh(){
     // threadedImageLoader.loadFromDisk(training_img, img_dir+"/"+ofToString(ModelManager::getInstance()->getEpochsTrained())+".png");
 
     // current_image = -1;
-    epochManager.setup(&training_img, &threadedImageLoader, epochLabel);
+    epochManager.setup(&training_img, &threadedImageLoader, epochLabel, maxEpochsSlider);
     // imageLoader.startThread();
-
 
 
     ModelManager * model = ModelManager::getInstance();
@@ -61,16 +60,17 @@ void TrainingScene::refresh(){
 
     epochLabel->setLabel(ofToString(model->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
 
+    learningRateSlider->setValue(learning_rateX);
+    learningRateSlider2->setValue(-learning_rateY);
+    batchSizeSlider->setValue(batch_size);
+    maxEpochsSlider->setValue(max_epochs);
+    maxEpochsSlider->setMin(model->getEpochsTrained());
+
 }
 
 void TrainingScene::setup(){
 
-  /*
-  ERROR IN HERE SOMEWHERE
-  */
   setID(SCENE_TYPE::TRAIN);
-
-
 
   graph.setup("LIVE LOSSES");
   graph.setDx(-1.0); // which means delta of time
@@ -112,9 +112,30 @@ void TrainingScene::setup(){
 
   playButton->setPosition(ofGetWidth() / 2 + playButton->getWidth()/2, ofGetHeight() - 100);
   playButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
-  /*
-  /ERROR
-  */
+
+  learningRateSlider = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) X:", 1, 9,  ModelManager::getInstance()->getLearningRateX());
+  learningRateSlider->setPosition(575, 300);
+  learningRateSlider->setWidth(450, 0.5);
+  learningRateSlider->setPrecision(0);
+
+  learningRateSlider2 = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) Y:", 1, 9, -( ModelManager::getInstance()->getLearningRateY()));
+  learningRateSlider2->setPosition(575, 300 + learningRateSlider->getHeight());
+  learningRateSlider2->setWidth(450, 0.5);
+  learningRateSlider2->setPrecision(0);
+
+
+  batchSizeSlider = new ofxDatGuiSlider("BATCH SIZE", 1, 256,  ModelManager::getInstance()->getBatchSize());
+  batchSizeSlider->setPosition(575, 300 + 2*learningRateSlider->getHeight());
+  batchSizeSlider->setWidth(450, 0.5);
+  batchSizeSlider->setPrecision(0);
+
+  maxEpochsSlider = new ofxDatGuiSlider("MAX EPOCHS", 1, 50000,  ModelManager::getInstance()->getMaxEpochs());
+  maxEpochsSlider->setPosition(575, 300 + 3*learningRateSlider->getHeight());
+  maxEpochsSlider->setWidth(450, 0.5);
+  maxEpochsSlider->setPrecision(0);
+  maxEpochsSlider->setMin(ModelManager::getInstance()->getEpochsTrained());
+
+
 
 }
 
@@ -133,6 +154,11 @@ void TrainingScene::update(){
     else{
       resumeTrainingButton->update();
     }
+
+    learningRateSlider->update();
+    learningRateSlider2->update();
+    batchSizeSlider->update();
+    maxEpochsSlider->update();
     restartTrainingButton->update();
   }
   else if(state == 1){
@@ -169,6 +195,10 @@ void TrainingScene::draw(){
       resumeTrainingButton->draw();
     }
     restartTrainingButton->draw();
+    learningRateSlider->draw();
+    learningRateSlider2->draw();
+    batchSizeSlider->draw();
+    maxEpochsSlider->draw();
   }
   else if(state == 1){
     stopTrainingButton->draw();
@@ -190,6 +220,12 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     epochManager.startThread();
 
     ModelManager::getInstance()->setStatus(3);
+
+    ModelManager::getInstance()->setLearningRateX(learningRateSlider->getValue());
+    ModelManager::getInstance()->setLearningRateY(-learningRateSlider2->getValue());
+    ModelManager::getInstance()->setMaxEpochs(maxEpochsSlider->getValue());
+    ModelManager::getInstance()->setBatchSize(batchSizeSlider->getValue());
+
     ModelManager::getInstance()->save();
     state = 1;
   }

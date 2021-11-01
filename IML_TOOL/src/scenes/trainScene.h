@@ -179,18 +179,20 @@ class EpochManager: public ofThread{
 	public:
 		ofImage * image;
     string image_dir;
-		ofxThreadedImageLoader *loader;
+		ofxThreadedImageLoader* loader;
 		ofFile f;
     int epochs;
     string img_dir;
-    ofxDatGuiLabel * epochLabel;
+    ofxDatGuiLabel* epochLabel;
+    ofxDatGuiSlider* maxEpochsSlider;
 
 		// string a = "saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks";
 		ofDirectory dir;
-		void setup(ofImage * image, ofxThreadedImageLoader * loader, ofxDatGuiLabel * label){
+		void setup(ofImage * image, ofxThreadedImageLoader * loader, ofxDatGuiLabel * label, ofxDatGuiSlider * maxEpochsSlider){
 			this->image = image;
 			this->loader = loader;
       this->epochLabel = label;
+      this->maxEpochsSlider = maxEpochsSlider;
 			this->image_dir = "saved_models/"+ModelManager::getInstance()->getModelName()+"/images";
 			dir.open("saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks/ckpt");
 		}
@@ -218,9 +220,10 @@ class EpochManager: public ofThread{
 										filename = "images/-1.png";
 									}
 									else{
-                    epochLabel->setLabel(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
-										ModelManager::getInstance()->setEpochsTrained(stoi(out_num));
+                    ModelManager::getInstance()->setEpochsTrained(stoi(out_num));
 										ModelManager::getInstance()->save();
+                    epochLabel->setLabel(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
+                    maxEpochsSlider->setMin(stoi(out_num));
 									}
 									loader->loadFromDisk(*image, filename);
 									unlock();
@@ -408,5 +411,12 @@ class TrainingScene : public BaseScene {
       ofxDatGuiButton* playButton = new ofxDatGuiButton("CONTINUE");
 
 			ofxThreadedImageLoader threadedImageLoader;
+
+      ofxDatGuiSlider* learningRateSlider;
+      ofxDatGuiSlider* learningRateSlider2;
+      ofxDatGuiSlider* batchSizeSlider;
+      ofxDatGuiSlider* maxEpochsSlider;
+
+
 
 };
