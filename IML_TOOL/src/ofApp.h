@@ -18,6 +18,8 @@
 #include "scenes/datasetSelectorScene.h"
 #include "scenes/datasetBuilderScene.h"
 #include "scenes/datasetPix2PixBuilderScene.h"
+#include "scenes/interactMenuScene.h"
+#include "scenes/exploreLatentSpaceScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -56,6 +58,10 @@ class ofApp : public ofBaseApp{
 		DatasetMainScene datasetMainScene;
 		DatasetBuilderScene datasetBuilderScene;
 		DatasetPix2PixBuilderScene datasetPix2PixBuilderScene;
+		InteractMenuScene interactMenuScene;
+		ExploreLatentSpaceScene exploreLatentSpaceScene;
+
+
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
 

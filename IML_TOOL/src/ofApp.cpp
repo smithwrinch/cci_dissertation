@@ -94,6 +94,12 @@ void ofApp::setup(){
   datasetPix2PixBuilderScene.setup();
   sceneManager->addScene(&datasetPix2PixBuilderScene);
 
+
+  interactMenuScene.setup();
+  sceneManager->addScene(&interactMenuScene);
+  exploreLatentSpaceScene.setup();
+  sceneManager->addScene(&exploreLatentSpaceScene);
+
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }
 
@@ -227,6 +233,6 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
       sceneManager->changeSceneTo(SCENE_TYPE::TRAIN);
     }
     if(e.target == evaluateButton){
-      // sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_BUILDER);
+      sceneManager->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
     }
 }
