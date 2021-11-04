@@ -20,6 +20,7 @@
 #include "scenes/datasetPix2PixBuilderScene.h"
 #include "scenes/interactMenuScene.h"
 #include "scenes/exploreLatentSpaceScene.h"
+#include "scenes/syncMusicScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -60,6 +61,7 @@ class ofApp : public ofBaseApp{
 		DatasetPix2PixBuilderScene datasetPix2PixBuilderScene;
 		InteractMenuScene interactMenuScene;
 		ExploreLatentSpaceScene exploreLatentSpaceScene;
+		SyncMusicScene syncMusicScene;
 
 
 		void positionButtons();

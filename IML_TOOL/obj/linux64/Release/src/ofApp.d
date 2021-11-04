@@ -781,7 +781,8 @@ obj/linux64/Release/src/ofApp.o: \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/interactMenuScene.h \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/exploreLatentSpaceScene.h \
  /home/hans/uni/diss/main/IML_TOOL/src/scenes/../dialWidget.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h \
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/syncMusicScene.h
 
 /home/hans/uni/diss/main/IML_TOOL/src/ofApp.h:
 
@@ -2380,3 +2381,5 @@ obj/linux64/Release/src/ofApp.o: \
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/../dialWidget.h:
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h:
+
+/home/hans/uni/diss/main/IML_TOOL/src/scenes/syncMusicScene.h:

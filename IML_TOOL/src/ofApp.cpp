@@ -99,6 +99,9 @@ void ofApp::setup(){
   sceneManager->addScene(&interactMenuScene);
   exploreLatentSpaceScene.setup();
   sceneManager->addScene(&exploreLatentSpaceScene);
+  syncMusicScene.setup();
+  sceneManager->addScene(&syncMusicScene);
+
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
 }

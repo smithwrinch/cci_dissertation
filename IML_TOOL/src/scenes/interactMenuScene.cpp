@@ -102,4 +102,10 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::EXPLORE_LATENT);
   }
+  else if (e.target == musicSyncButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_SYNC_MUSIC);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_SYNC_MUSIC);
+
+  }
 }

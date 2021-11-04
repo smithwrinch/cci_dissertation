@@ -46,10 +46,17 @@ class SceneManager{
       // lol
       return nullptr;
     }
+    bool showNavBar(){
+      return showNavBar;
+    }
+    bool setNavBar(bool b){
+      showNavBar = b;
+    }
   private:
     SceneManager(){
       // as singleton
     };
     BaseScene * currentScene;
     vector<BaseScene*> scenes;
+    bool showNavBar = false;
 };

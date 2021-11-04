@@ -205,7 +205,7 @@ void ArchitectureBasicBuilderScene::update(){
   maxEpochsSlider->update();
   batchSizeSlider->update();
   if(showingAdvanced){
-    kernelSizeSlider->update();
+    // kernelSizeSlider->update();
   }
   showAdvanced->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
@@ -242,7 +242,7 @@ void ArchitectureBasicBuilderScene::draw(){
   batchSizeSlider->draw();
 
   if(showingAdvanced){
-    kernelSizeSlider->draw();
+    // kernelSizeSlider->draw();
   }
   showAdvanced->draw();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
