@@ -3,7 +3,7 @@
 
 void ExploreLatentSpaceScene::refresh(){
   // neural network setup, bail out on error
-  // the default model is edges2shoes and excepts [None, None, None, 3]
+  // the default model is edges2shoes and accepts [None, None, None, 3]
   ModelManager * modelManager = ModelManager::getInstance();
 
   if(modelManager->getModelType() != MODEL_TYPE::GAN){
@@ -42,7 +42,12 @@ void ExploreLatentSpaceScene::refresh(){
   // fbo.allocate(nnWidth, nnHeight, GL_RGB);
   // imgIn.allocate(nnWidth, nnHeight, OF_IMAGE_COLOR);
   imgOut.clear();
-  imgOut.allocate(nnWidth, nnHeight, OF_IMAGE_COLOR);
+  if(ModelManager::getInstance()->getInputChannel() == 1){
+      imgOut.allocate(nnWidth, nnHeight, OF_IMAGE_GRAYSCALE);
+  }
+  else{
+    imgOut.allocate(nnWidth, nnHeight, OF_IMAGE_COLOR);
+  }
 
 
   // shorten idle time to have model check for input more frequently,
@@ -121,7 +126,8 @@ void ExploreLatentSpaceScene::update(){
 
     // pull output from model
     output = model.getOutput();
-
+    output = (output *127.5f ) + 127.5f;
+    // output = cppflow::cast(input, TF_UINT8, TF_FLOAT);
     // write tensor to ofImage
     ofxTF2::tensorToImage(output, imgOut);
     imgOut.update();

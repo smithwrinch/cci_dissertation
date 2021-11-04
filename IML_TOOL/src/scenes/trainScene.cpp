@@ -4,22 +4,23 @@
 
 //
 void TrainingScene::refresh(){
-    lossLoader.setup(&graph);
 
     string img_dir = "saved_models/"+ModelManager::getInstance()->getModelName()+"/images";
     // num_images = DIR.listDir(img_dir);
 
     // training_img.allocate(1600, 1600, OF_IMAGE_COLOR);
     training_img.load("images/-1.png");
+    graph_img.load("images/-1.png");
     // training_img.resize(400, 400);
     // threadedImageLoader.loadFromDisk(training_img, img_dir+"/"+ofToString(ModelManager::getInstance()->getEpochsTrained())+".png");
 
     // current_image = -1;
-    epochManager.setup(&training_img, &threadedImageLoader, epochLabel, maxEpochsSlider);
+    epochManager.setup(&training_img, &graph_img, &threadedImageLoader, epochLabel, maxEpochsSlider);
     // imageLoader.startThread();
-
-
     ModelManager * model = ModelManager::getInstance();
+
+    lossLoader.setup(&graph, "data/saved_models/" + model->getModelName() +"/saved_networks/" );
+
     int img_width = model->getImgWidth();
     int img_height = model->getImgHeight();
     int input_channel = model->getInputChannel();
@@ -136,6 +137,8 @@ void TrainingScene::setup(){
   maxEpochsSlider->setMin(ModelManager::getInstance()->getEpochsTrained());
 
 
+  toggleGraphButton->setPosition(699, 526);
+  toggleGraphButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
 }
 
@@ -164,6 +167,7 @@ void TrainingScene::update(){
   else if(state == 1){
     stopTrainingButton->update();
     saveModelButton->update();
+    toggleGraphButton->update();
   }
   else if(state == 2){
     confirmButton->update();
@@ -171,6 +175,7 @@ void TrainingScene::update(){
   }
   epochLabel->update();
   training_img.update();
+  graph_img.update();
 }
 
 //--------------------------------------------------------------
@@ -201,6 +206,8 @@ void TrainingScene::draw(){
     maxEpochsSlider->draw();
   }
   else if(state == 1){
+    graph_img.draw(522, 275, 450, 250);
+    toggleGraphButton->draw();
     stopTrainingButton->draw();
     saveModelButton->draw();
   }
@@ -219,8 +226,6 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     lossLoader.startThread();
     epochManager.startThread();
 
-    ModelManager::getInstance()->setStatus(3);
-
     ModelManager::getInstance()->setLearningRateX(learningRateSlider->getValue());
     ModelManager::getInstance()->setLearningRateY(-learningRateSlider2->getValue());
     ModelManager::getInstance()->setMaxEpochs(maxEpochsSlider->getValue());
@@ -230,20 +235,21 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     state = 1;
   }
 
-  if(e.target == stopTrainingButton){
+  else if(e.target == stopTrainingButton){
     lossLoader.stopThread();
     trainingThread.stopThread();
     epochManager.stopThread();
     state = 0;
   }
 
-  if(e.target == restartTrainingButton){
+  else if(e.target == restartTrainingButton){
     state = 2;
   }
-  if(e.target == confirmButton){
+  else if(e.target == confirmButton){
     // TODO: code for restart
     string basePath = "saved_models/"+ModelManager::getInstance()->getModelName();
     ofDirectory::removeDirectory(basePath+"/saved_networks/ckpt", true);
+    ofDirectory::removeDirectory(basePath+"/saved_networks/losses", true);
     ofDirectory::removeDirectory(basePath+"/images", true);
     ModelManager::getInstance()->setEpochsTrained(0);
     ModelManager::getInstance()->setStatus(2);
@@ -251,7 +257,7 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     cout << "RESTART" << endl;
     state = 0;
   }
-  if(e.target == unconfirmButton){
+  else if(e.target == unconfirmButton){
     // trainingThread.stopThread();
     // lossLoader.stopThread();
     // imageLoader.stopThread();
@@ -259,8 +265,27 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     state = 0;
   }
 
-  if(e.target == saveModelButton){
+  else if(e.target == saveModelButton){
     saveModelAtCurrentEpoch();
+  }
+  else if(e.target == toggleGraphButton){
+    graphToShow++;
+    if(graphToShow > 2){
+      graphToShow = 0;
+    }
+    string name = "graph.png";
+    switch(graphToShow){
+      case 0:
+        name = "graph.png";
+        break;
+      case 1:
+        name = "graphG.png";
+        break;
+      case 2:
+        name = "graphD.png";
+        break;
+    }
+    threadedImageLoader.loadFromDisk(graph_img, "saved_models/" + ModelManager::getInstance()->getModelName()+"/saved_networks/losses/"+name);
   }
 
 }

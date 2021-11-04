@@ -203,7 +203,7 @@ void SyncMusicScene::onButtonEvent(ofxDatGuiButtonEvent e){
     if(videoDir == "" || musicDir == ""){
       errorLabel->setLabel("video directory or .mp3 missing");
     }
-    if(!checkNameValid){
+    if(!checkNameValid()){
       errorLabel->setLabel("VIDEO NAME MUST END IN .MP4");
     }
     else{

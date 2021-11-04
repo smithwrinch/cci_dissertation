@@ -14,6 +14,8 @@ import argparse
 from IPython import display
 
 from piper import Piper
+from lossWriter import Messager
+from lossManager import LossManager
 from dcgan_builder import GAN
 from math import pow
 import os
@@ -76,7 +78,7 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     generator = gan.generator
     discriminator = gan.discriminator
 
-    save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
+    save_dir = root_checkpoint_save+"ckpt"
     epochs_passed = 0
     if not os.path.exists(save_dir):
         print("TRAINING FROM SCRATCH")
@@ -109,8 +111,12 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     # discriminator = make_discriminator_model(28, 1, noise_dim)
     # decision = discriminator(generated_image)
 
+    lm = LossManager(ROOT_CHECKPOINT_SAVE+"losses/")
     gen_pipe = Piper("/tmp/gen")
     disc_pipe = Piper("/tmp/disc")
+
+    gen_msg = Messager(root_checkpoint_save+"gen.txt")
+    disc_msg = Messager(root_checkpoint_save+"disc.txt")
 
 
 
@@ -119,11 +125,13 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     if not os.path.exists(ROOT_IMG_SAVE[:-1]):
         os.makedirs(ROOT_IMG_SAVE[:-1])
 
+    lossG = []
+    lossD = []
     for epoch in range(epochs):
-        generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed+1), img_channel)
+        generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed), img_channel)
         files = glob.glob(save_dir+"/*")
-        generator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+"_generator")
-        discriminator.save(save_dir+"/-" +str(epoch+epochs_passed+1)+"_discriminator")
+        generator.save(save_dir+"/-" +str(epoch+epochs_passed)+"_generator")
+        discriminator.save(save_dir+"/-" +str(epoch+epochs_passed)+"_discriminator")
 
         for f in files:
             shutil.rmtree(f, ignore_errors=True)
@@ -134,9 +142,17 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
             g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
-            gen_pipe.send_message(str(g_loss)[:5] + "\n")
-            disc_pipe.send_message(str(d_loss)[:5] + "\n")
+            gen_msg.send_message(str(g_loss)[:5] + "\n")
+            disc_msg.send_message(str(d_loss)[:5] + "\n")
+            lossG.append(g_loss)
+            lossD.append(d_loss)
 
+
+        lm.addGeneratorLosses(np.array(lossG))
+        lm.addDiscriminatorLosses(np.array(lossD))
+        lm.generate_graph(ROOT_CHECKPOINT_SAVE)
+        lm.generate_graphD(ROOT_CHECKPOINT_SAVE)
+        lm.generate_graphG(ROOT_CHECKPOINT_SAVE)
 
         display.clear_output(wait=True)
         # generate_and_save_images(generator, seed)
@@ -163,6 +179,7 @@ def generate_and_save_images(model, test_input,filepath='../bin/data/images_/cur
       plt.axis('off')
 
   plt.savefig(filepath+'.png')
+  plt.close(fig)
   # plt.show()
 
 def process(image):

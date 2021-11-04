@@ -81,105 +81,140 @@ static pid_t system2(const char * command, int * infp, int * outfp)
 
 class LossLoader: public ofThread{
 		public:
-			int fd_gen;
-			int fd_disc;
-			int MAX_BUF = 100;
-			char *genfifo = "/tmp/gen";
-			char * discfifo = "/tmp/disc";
-			ofxGraph * graph;
-			void setup(ofxGraph* graph){
+			// int fd_gen;
+			// int fd_disc;
+			// int MAX_BUF = 100;
+			// char *genfifo = "/tmp/gen";
+			// char * discfifo = "/tmp/disc";
+			void setup(ofxGraph* graph, string rootDir){
 			    this->graph = graph;
+          this->rootDir = rootDir;
+          ofFile f1;
+          ofFile f2;
+
+          f1.removeFile(rootDir+"gen.txt");
+          f2.removeFile(rootDir+"disc.txt");
+
 			}
-      string line;
+      // string line;
 
 			void threadedFunction(){
-				char buf[MAX_BUF];
+				// char buf[MAX_BUF];
 				vector <float> gen_values;
 				vector <float> disc_values;
 				vector <float> values;
 
 				while(isThreadRunning()){
-          gen_values.push_back(ofRandom(1, 10));
-          disc_values.push_back(ofRandom(1, 10));
-          lock();
-          fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
-          fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
+          ofFile fileGen;
+          ofFile fileDisc;
+          cout << rootDir+"gen.txt" << endl;
+          if(fileGen.open(rootDir+"gen.txt") && fileDisc.open(rootDir+"disc.txt")){
+            buffGen = fileGen.readToBuffer();
+            buffDisc = fileDisc.readToBuffer();
+            cout << buffGen.getText() << endl;
 
-		      // read(fd_gen, buf, MAX_BUF);
-          // cout << buf << endl;
-					while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
-					}
-		      if(strlen(buf) != 0){
-		        cout<<"Received:"<< buf<<endl;
-						size_t pos = 0;
-						string token;
-						string s = std::string(buf);
-						string delimiter = "\n";
-						while ((pos = s.find(delimiter)) != string::npos) {
-						    token = s.substr(0, pos);
-								if(token.length() == 5){
-									gen_values.push_back(stof(token));
-									cout << token << endl;
-								}
+            string gen = (buffGen.getText()).c_str();
+            string disc = (buffDisc.getText()).c_str();
 
-						    s.erase(0, pos + delimiter.length());
-						}
-		      }
-		      // read(fd_disc, buf, MAX_BUF);
-					while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
-					}
-					// cout << buf << endl;
-		      if(strlen(buf) != 0){
-		        // cout<<"Received:"<< buf<<endl;
-						size_t pos = 0;
-						string token;
-						string s = std::string(buf);
-						string delimiter = "\n";
-						while ((pos = s.find(delimiter)) != string::npos) {
-						    token = s.substr(0, pos);
-								// cout << token << endl;
-								if(token.length() == 5){
-									// graph->add(stof(token), 1);
-									// disc_values.push_back(stof(token));
-									// value.push_back(stof(token))
-									// cout << token << endl;
-									disc_values.push_back(stof(token));
-								}
-
-						    s.erase(0, pos + delimiter.length());
-						}
-		      }
-
-					int max_ = disc_values.size();
-					if(gen_values < disc_values){
-						max_ = gen_values.size();
-					}
-					for (int i =0; i < max_; i++){
-						vector<float> temp;
-						temp.push_back(gen_values[i]);
-						temp.push_back(disc_values[i]);
-						graph->add(temp);
-						temp.clear();
-					}
-					gen_values.clear();
-					disc_values.clear();
-          for (int i = 10; i < 4096; ++i)
-              ::close(i);
-
+            if(gen.length() > 0 && disc.length() > 0){
+              vector <float> values;
+              values.push_back(stof(buffGen));
+              values.push_back(stof(buffDisc));
+              graph->add(values);
+            }
+          }
+          sleep(4000);
+          fileGen.close();
+          fileDisc.close();
+          sleep(4000);
+          // gen_values.push_back(ofRandom(1, 10));
+          // disc_values.push_back(ofRandom(1, 10));
+          // lock();
+          // fd_gen = open(genfifo, O_RDONLY | O_NONBLOCK);
+          // fd_disc = open(discfifo, O_RDONLY | O_NONBLOCK);
+          //
+		      // // read(fd_gen, buf, MAX_BUF);
+          // // cout << buf << endl;
+					// while(read(fd_gen, buf, MAX_BUF) == MAX_BUF) {
+					// }
+          // cout<<"Received:"<< buf<<endl;
+		      // if(strlen(buf) != 0){
+					// 	size_t pos = 0;
+					// 	string token;
+					// 	string s = std::string(buf);
+					// 	string delimiter = "\n";
+					// 	while ((pos = s.find(delimiter)) != string::npos) {
+					// 	    token = s.substr(0, pos);
+					// 			if(token.length() == 5){
+					// 				gen_values.push_back(stof(token));
+					// 				cout << token << endl;
+					// 			}
+          //
+					// 	    s.erase(0, pos + delimiter.length());
+					// 	}
+		      // }
+		      // // read(fd_disc, buf, MAX_BUF);
+					// while(read(fd_disc, buf, MAX_BUF) == MAX_BUF) {
+					// }
+					// // cout << buf << endl;
+		      // if(strlen(buf) != 0){
+		      //   cout<<"Received:"<< buf<<endl;
+					// 	size_t pos = 0;
+					// 	string token;
+					// 	string s = std::string(buf);
+					// 	string delimiter = "\n";
+					// 	while ((pos = s.find(delimiter)) != string::npos) {
+					// 	    token = s.substr(0, pos);
+					// 			// cout << token << endl;
+					// 			if(token.length() == 5){
+					// 				// graph->add(stof(token), 1);
+					// 				// disc_values.push_back(stof(token));
+					// 				// value.push_back(stof(token))
+					// 				// cout << token << endl;
+					// 				disc_values.push_back(stof(token));
+					// 			}
+          //
+					// 	    s.erase(0, pos + delimiter.length());
+					// 	}
+		      // }
+          //
+					// int max_ = disc_values.size();
+					// if(gen_values < disc_values){
+					// 	max_ = gen_values.size();
+					// }
+					// for (int i =0; i < max_; i++){
+					// 	vector<float> temp;
+					// 	temp.push_back(gen_values[i]);
+					// 	temp.push_back(disc_values[i]);
+					// 	graph->add(temp);
+					// 	temp.clear();
+					// }
+					// gen_values.clear();
+					// disc_values.clear();
+          //
+          // unlock();
+					// sleep(100); // amount of times graph is updated
+          // lock();
           // close(fd_disc);
           // close(fd_gen);
-          unlock();
-					sleep(1000); // amount of times graph is updated
+          // unlock();
+
 				}
 
 
 			}
+    private:
+      ofBuffer buffGen;
+      ofBuffer buffDisc;
+      string rootDir;
+			ofxGraph * graph;
 };
 
 // essentially gets epoch info
 class EpochManager: public ofThread{
 	public:
 		ofImage * image;
+    ofImage * graphImage;
     string image_dir;
 		ofxThreadedImageLoader* loader;
 		ofFile f;
@@ -190,8 +225,9 @@ class EpochManager: public ofThread{
 
 		// string a = "saved_models/" + ModelManager::getInstance()->getModelName() + "/saved_networks";
 		ofDirectory dir;
-		void setup(ofImage * image, ofxThreadedImageLoader * loader, ofxDatGuiLabel * label, ofxDatGuiSlider * maxEpochsSlider){
+		void setup(ofImage * image, ofImage * graphImage, ofxThreadedImageLoader * loader, ofxDatGuiLabel * label, ofxDatGuiSlider * maxEpochsSlider){
 			this->image = image;
+      this->graphImage = graphImage;
 			this->loader = loader;
       this->epochLabel = label;
       this->maxEpochsSlider = maxEpochsSlider;
@@ -223,11 +259,13 @@ class EpochManager: public ofThread{
 									}
 									else{
                     ModelManager::getInstance()->setEpochsTrained(stoi(out_num));
+                    ModelManager::getInstance()->setStatus(3);
 										ModelManager::getInstance()->save();
                     epochLabel->setLabel(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
                     maxEpochsSlider->setMin(stoi(out_num));
 									}
 									loader->loadFromDisk(*image, filename);
+									loader->loadFromDisk(*graphImage, "saved_models/" + ModelManager::getInstance()->getModelName()+"/saved_networks/losses/graph.png");
 									unlock();
 									break;
 							}
@@ -393,10 +431,12 @@ class TrainingScene : public BaseScene {
 
       int num_images;
 			int state = 0; // 0 = not training, 1 = training, 2 = restarting
+      int graphToShow = 0;
 
       ofxDirList DIR;
       int current_image;
       ofImage training_img;
+      ofImage graph_img;
 
       ofxDatGuiLabel* epochLabel = new ofxDatGuiLabel("");
 
@@ -404,6 +444,8 @@ class TrainingScene : public BaseScene {
       ofxDatGuiButton* resumeTrainingButton = new ofxDatGuiButton("RESUME TRAINING");
       ofxDatGuiButton* stopTrainingButton = new ofxDatGuiButton("STOP TRAINING");
       ofxDatGuiButton* saveModelButton = new ofxDatGuiButton("SAVE MODEL AT CURRENT EPOCH");
+
+      ofxDatGuiButton* toggleGraphButton = new ofxDatGuiButton("TOGGLE GRAPH");
 
       ofxDatGuiButton* restartTrainingButton = new ofxDatGuiButton("RESTART TRAINING");
       ofxDatGuiButton* confirmButton = new ofxDatGuiButton("CONFIRM RESTART");

@@ -207,8 +207,8 @@ void ArchitectureBasicBuilderScene::update(){
   if(showingAdvanced){
     // kernelSizeSlider->update();
   }
-  showAdvanced->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+    showAdvanced->update();
     // outputRGBToggle->update();
     // imgWidthSlider->update();
     // imgHeightSlider->update();
@@ -244,8 +244,8 @@ void ArchitectureBasicBuilderScene::draw(){
   if(showingAdvanced){
     // kernelSizeSlider->draw();
   }
-  showAdvanced->draw();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+    showAdvanced->draw();
 
     if(showingAdvanced){
       betaSlider->draw();

@@ -8,8 +8,9 @@ import argparse
 import numpy as np
 import glob
 from pix2pix_builder import GeneratorTemplate, DiscriminatorTemplate
-from piper import Piper
-
+# from piper import Piper
+from lossManager import LossManager
+from lossWriter import Messager
 import shutil
 
 
@@ -162,32 +163,19 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     # else:
     #     print("Initializing from scratch.")
 
+
+
     save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
     epochs = 0
-    # if not os.path.exists(save_dir):
-    #     print("TRAINING FROM SCRATCH")
-    #     os.makedirs(save_dir)
-    # else:
-    #     save = glob.glob(save_dir+"/*.h5")
-    #     if(len(save) == 2):
-    #         print("RESTORING FROM BACKUP")
-    #         save_ = save[0].split("/")[-1].split(".")[0][1:]
-    #         epochs = int(save_)
-    #
-    #
-    #         if("discriminator.h5" in save[0]):
-    #             disc = tf.keras.models.load_model(save[0])
-    #             gen = tf.keras.models.load_model(save[1])
-    #         else:
-    #             disc = tf.keras.models.load_model(save[1])
-    #             gen = tf.keras.models.load_model(save[0])
 
+    gen_msg = Messager(ROOT_CHECKPOINT_SAVE+"gen.txt")
+    disc_msg = Messager(ROOT_CHECKPOINT_SAVE+"disc.txt")
+
+    save = glob.glob(save_dir+"/*")
     if not os.path.exists(save_dir):
         print("TRAINING FROM SCRATCH")
         os.makedirs(save_dir)
-    else:
-        save = glob.glob(save_dir+"/*")
-        print(save)
+    elif(len(save) != 0):
         if(len(save) != 2):
             nums = [s.split("/")[-1].split("_")[0][1:] for s in save]
 
@@ -207,8 +195,10 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
             disc = tf.keras.models.load_model(save[1])
             gen = tf.keras.models.load_model(save[0])
 
-    gen_pipe = Piper("/tmp/gen")
-    disc_pipe = Piper("/tmp/disc")
+    lm = LossManager(ROOT_CHECKPOINT_SAVE+"losses/")
+
+    # gen_pipe = Piper("/tmp/gen")
+    # disc_pipe = Piper("/tmp/disc")
 
     example_input, example_target = next(iter(train_ds.take(1)))
     example_input2, example_target2 = next(iter(train_ds.take(1)))
@@ -249,6 +239,9 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
                 # print("EPOCHS!!")
                 print(f"Epoch: {epoch}")
 
+        lossG = []
+        lossD = []
+
         for (input_image, target) in train_ds:
 
 
@@ -258,8 +251,15 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
             # val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
             # print(str(g_lossg_loss)[:5])
             # print("-------------------")
-            gen_pipe.send_message(str(g_loss)[:5] + "\n")
-            disc_pipe.send_message(str(d_loss)[:5] + "\n")
+            # gen_pipe.send_message(str(g_loss)[:5] + "\n")
+            # disc_pipe.send_message(str(d_loss)[:5] + "\n")
+
+            gen_msg.send_message(str(g_loss)[:5] + "\n")
+            disc_msg.send_message(str(d_loss)[:5] + "\n")
+
+
+            lossG.append(g_loss)
+            lossD.append(d_loss)
             # Training step
             # if (step+1) % 10 == 0:
             #     print('.', end='', flush=True)
@@ -267,6 +267,16 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
             # # Save (checkpoint) the model every epoch
             # if int(step.numpy()) % steps_per_epoch == 0:
+
+        lm.addGeneratorLosses(np.array(lossG))
+        lm.addDiscriminatorLosses(np.array(lossD))
+        lm.generate_graph(ROOT_CHECKPOINT_SAVE)
+        lm.generate_graphD(ROOT_CHECKPOINT_SAVE)
+        lm.generate_graphG(ROOT_CHECKPOINT_SAVE)
+
+
+
+    plt.close()
 
 def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
     p1 = model(i1, training=True)
@@ -326,8 +336,6 @@ if __name__ == '__main__':
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
     parser.add_argument("--dataset_dir", help="Location of dataset", required=True)
-
-
 
     args = parser.parse_args()
     DATASET_DIR = args.dataset_dir

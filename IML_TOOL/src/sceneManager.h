@@ -46,10 +46,10 @@ class SceneManager{
       // lol
       return nullptr;
     }
-    bool showNavBar(){
+    bool getShowNavBar(){
       return showNavBar;
     }
-    bool setNavBar(bool b){
+    void setNavBar(bool b){
       showNavBar = b;
     }
   private:
