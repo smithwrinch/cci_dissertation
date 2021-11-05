@@ -101,6 +101,8 @@ void ofApp::setup(){
   sceneManager->addScene(&exploreLatentSpaceScene);
   syncMusicScene.setup();
   sceneManager->addScene(&syncMusicScene);
+  exportGifScene.setup();
+  sceneManager->addScene(&exportGifScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);

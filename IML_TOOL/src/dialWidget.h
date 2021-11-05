@@ -4,7 +4,7 @@
 using std::vector;
 class DialWidget {
   public:
-    void setup(int x, int y, int radius, ofColor colour= ofColor(255,255,255));
+    void setup(int x, int y, int radius, ofColor colour= ofColor(255,255,255), bool isHalf = false);
     void update();
     void draw();
     void reset();
@@ -13,6 +13,7 @@ class DialWidget {
     void setLatentVectorFromMouse();
 
     int centreX, centreY, radius;
+    bool isHalf;
     vector <float> * latentVector;
     float startTheta;
     float endTheta;

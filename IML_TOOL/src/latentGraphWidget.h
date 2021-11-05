@@ -4,13 +4,14 @@
 using std::vector;
 class LatentGraphWidget {
   public:
-    void setup(int x, int y, int w, int h, ofColor colour= ofColor(255,255,255));
+    void setup(int x, int y, int w, int h, ofColor colour= ofColor(255,255,255), bool isHalf=false);
     void update();
     void draw();
     void reset();
     void setLatentVector(vector<float> *vec);
   private:
     int x_, y_, width_, height_;
+    bool isHalf_;
     vector <float> * latentVector;
 
     int brushRadius = 3;

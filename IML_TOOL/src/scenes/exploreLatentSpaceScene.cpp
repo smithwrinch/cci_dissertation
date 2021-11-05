@@ -208,7 +208,7 @@ void ExploreLatentSpaceScene::randomiseLatentVector(){
 void ExploreLatentSpaceScene::updateLatentVector(){
 
   for (int i =0; i < latentDim; i++){
-      latentVector[i] += speedVector[i]/ 1000.f;
+      latentVector[i] += speedVector[i]/ 100.f;
       if(latentVector[i] > 1){
         latentVector[i] = 1;
       }
@@ -304,8 +304,8 @@ void ExploreLatentSpaceScene::addGui(){
   latentGraphWidget.setLatentVector(&latentVector);
 
 
-  speedDialWidget.setup(150, 360, 125, ofColor(250, 218, 94));
-  speedLatentGraphWidget.setup(50, 520, 350, 175,  ofColor(250, 218, 94));
+  speedDialWidget.setup(150, 360, 125, ofColor(250, 218, 94), true);
+  speedLatentGraphWidget.setup(50, 520, 350, 175,  ofColor(250, 218, 94), true);
   speedDialWidget.setLatentVector(&speedVector);
   speedLatentGraphWidget.setLatentVector(&speedVector);
 

@@ -21,6 +21,7 @@
 #include "scenes/interactMenuScene.h"
 #include "scenes/exploreLatentSpaceScene.h"
 #include "scenes/syncMusicScene.h"
+#include "scenes/exportGifScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -62,6 +63,7 @@ class ofApp : public ofBaseApp{
 		InteractMenuScene interactMenuScene;
 		ExploreLatentSpaceScene exploreLatentSpaceScene;
 		SyncMusicScene syncMusicScene;
+		ExportGifScene exportGifScene;
 
 
 		void positionButtons();

@@ -108,4 +108,10 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_SYNC_MUSIC);
 
   }
+  else if (e.target == exportTrainingGifButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_EXPORT_GIF);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_EXPORT_GIF);
+
+  }
 }

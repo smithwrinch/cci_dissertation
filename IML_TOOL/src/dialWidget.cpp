@@ -1,10 +1,11 @@
 #include "dialWidget.h"
 
-void DialWidget::setup(int x, int y, int r, ofColor c){
+void DialWidget::setup(int x, int y, int r, ofColor c, bool half){
   centreX = x;
   centreY = y;
   radius = r;
   colour = c;
+  isHalf = half;
 
   offsetIndex = 0;
 
@@ -76,6 +77,12 @@ void DialWidget::draw(){
      float x = radius * radius_ * cos(angle);
      float y = radius * radius_ * sin(angle);
      ofDrawLine(centreX,centreY, x+centreX, y+centreY);
+   }
+
+   if(isHalf){
+      ofSetColor(127, 127, 127);
+      ofDrawCircle(centreX, centreY, radius/2);
+      ofSetColor(colour);
    }
 
    if(mouseInArea){

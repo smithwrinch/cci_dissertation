@@ -1,11 +1,12 @@
 #include "latentGraphWidget.h"
 
-void LatentGraphWidget::setup(int x, int y, int w, int h, ofColor c){
+void LatentGraphWidget::setup(int x, int y, int w, int h, ofColor c, bool half){
   x_ = x;
   y_ = y;
   width_ = w;
   height_ = h;
   colour_ = c;
+  isHalf_ = half;
 }
 
 void LatentGraphWidget::update(){
@@ -26,13 +27,24 @@ void LatentGraphWidget::draw(){
 
    ofDrawRectangle(x_, y_, width_, height_);
 
+   if(isHalf_){
+     ofSetColor(127, 127, 127);
+     ofDrawLine(x_, y_+height_/2, x_+width_, y_+height_/2);
+     ofSetColor(colour_);
+   }
+
    int size = latentVector->size();
    for(int i = 0; i < size; i ++){
      float radius_ = latentVector->at(i);
-
      float x = i*width_/size;
 
+     if(isHalf_){
+      ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (0.5-radius_/2) * height_);
+     }
+     else{
+
      ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (1-radius_) * height_);
+      }
 
    }
 
@@ -72,8 +84,15 @@ void LatentGraphWidget::setLatentVectorFromMouse(){
             if(new_idx2 >= size){
               new_idx2 = size - 1;
             }
-            latentVector->at(new_idx) = 1- new_y;
-            latentVector->at(new_idx2) = 1- new_y;
+            if(isHalf_){
+              latentVector->at(new_idx) = ((1- new_y)* 2) - 1;
+              latentVector->at(new_idx2) = ((1- new_y)* 2) - 1;
+            }
+            else{
+              latentVector->at(new_idx) = 1- new_y;
+              latentVector->at(new_idx2) = 1- new_y;
+            }
+
         }
 
         }
