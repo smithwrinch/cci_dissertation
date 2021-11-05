@@ -4,7 +4,11 @@
 void ExploreLatentSpaceScene::refresh(){
   // neural network setup, bail out on error
   // the default model is edges2shoes and accepts [None, None, None, 3]
+  resetSpeedVector();
+  randomiseLatentVector();
   ModelManager * modelManager = ModelManager::getInstance();
+
+
 
   if(modelManager->getModelType() != MODEL_TYPE::GAN){
       cout << "Should not have gone here..." << endl;
@@ -27,6 +31,7 @@ void ExploreLatentSpaceScene::refresh(){
       "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained()+1)+"_generator";
       // May have not updated getEpochsTrained
       if(!model.load(newModelDir)) {
+        cout << "couldn't load model" << endl;
         std::exit(EXIT_FAILURE);
       }
       else{
@@ -58,11 +63,13 @@ void ExploreLatentSpaceScene::refresh(){
   model.startThread();
 
   autoRun = true;
+  dirWidget = false;
 }
 
 void ExploreLatentSpaceScene::setup(){
   setID(SCENE_TYPE::EXPLORE_LATENT);
   randomiseLatentVector();
+  resetSpeedVector();
 
   ofSetFrameRate(60);
 	ofSetVerticalSync(true);
@@ -89,8 +96,15 @@ void ExploreLatentSpaceScene::update(){
   for(int i = 0; i < gui.size(); i++){
     gui[i]->update();
   }
-  latentGraphWidget.update();
-  dialWidget.update();
+  if(dirWidget){
+      speedLatentGraphWidget.update();
+      speedDialWidget.update();
+      speedSlider->update();
+  }
+  else{
+    latentGraphWidget.update();
+    dialWidget.update();
+  }
 
   // start & stop the model
   if(!autoRun && model.isThreadRunning()) {
@@ -101,6 +115,7 @@ void ExploreLatentSpaceScene::update(){
   }
 
   setLatentVector();
+  updateLatentVector();
 
   // write fbo to ofImage
   // fbo.readToPixels(imgIn.getPixels());
@@ -141,8 +156,16 @@ void ExploreLatentSpaceScene::draw(){
     for(int i = 0; i < gui.size(); i++){
       gui[i]->draw();
     }
-    dialWidget.draw();
-    latentGraphWidget.draw();
+    if(dirWidget){
+        speedLatentGraphWidget.draw();
+        speedDialWidget.draw();
+        speedSlider->draw();
+    }
+    else{
+      latentGraphWidget.draw();
+      dialWidget.draw();
+    }
+
 
     std::stringstream str;
   	ofPushMatrix();
@@ -167,6 +190,9 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   else if(e.target == randomiseButton){
     randomiseLatentVector();
   }
+  else if(e.target == toggleWidgetsButton){
+    dirWidget = !dirWidget;
+  }
 }
 
 void ExploreLatentSpaceScene::randomiseLatentVector(){
@@ -175,6 +201,30 @@ void ExploreLatentSpaceScene::randomiseLatentVector(){
   for (int i =0; i < latentDim; i++){
       float b = (float)rand() / (float)RAND_MAX;
       latentVector.push_back(b);
+  }
+
+}
+
+void ExploreLatentSpaceScene::updateLatentVector(){
+
+  for (int i =0; i < latentDim; i++){
+      latentVector[i] += speedVector[i]/ 1000.f;
+      if(latentVector[i] > 1){
+        latentVector[i] = 1;
+      }
+      else if (latentVector[i] < 0){
+        latentVector[i] = 0;
+      }
+  }
+
+}
+
+
+void ExploreLatentSpaceScene::resetSpeedVector(){
+
+  speedVector.clear();
+  for (int i =0; i < latentDim; i++){
+      speedVector.push_back(0);
   }
 
 }
@@ -214,19 +264,29 @@ bool ExploreLatentSpaceScene::drawImage(const T& img, string label) {
 
 void ExploreLatentSpaceScene::addGui(){
   int width = 350;
+  int buffer = 25;
   latentVectorSelectSlider = new ofxDatGuiSlider("Latent vector idx", 0, latentDim);
   latentVectorSelectSlider->setPosition(0, 50);
   latentVectorSelectSlider->setPrecision(0);
   latentVectorSelectSlider->setWidth(width, 0.5);
 
   latentVectorSlider = new ofxDatGuiSlider("Latent vector value", 0, 1);
-  latentVectorSlider->setPosition(0, 50+latentVectorSelectSlider->getHeight());
+  latentVectorSlider->setPosition(0, buffer+latentVectorSelectSlider->getHeight());
   latentVectorSlider->setWidth(width, 0.5);
 
   randomiseButton = new ofxDatGuiButton("RANDOMISE");
-  randomiseButton->setPosition(0, 50+2*latentVectorSelectSlider->getHeight());
+  randomiseButton->setPosition(0, buffer+latentVectorSlider->getY());
   randomiseButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
   randomiseButton->setWidth(width);
+
+  toggleWidgetsButton = new ofxDatGuiButton("TOGGLE MODE");
+  toggleWidgetsButton->setPosition(0, buffer+randomiseButton->getY());
+  toggleWidgetsButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+  toggleWidgetsButton->setWidth(width);
+
+  speedSlider = new ofxDatGuiSlider("Traversal speed", 0, 1);
+  speedSlider->setPosition(0, buffer+toggleWidgetsButton->getY());
+  speedSlider->setWidth(width, 0.5);
 
   backButton = new ofxDatGuiButton("BACK<-");
   backButton->setPosition(100, ofGetHeight()-50);
@@ -236,10 +296,17 @@ void ExploreLatentSpaceScene::addGui(){
   gui.push_back(latentVectorSelectSlider);
   gui.push_back(latentVectorSlider);
   gui.push_back(randomiseButton);
+  gui.push_back(toggleWidgetsButton);
 
-  dialWidget.setup(150, 260, 125);
-  latentGraphWidget.setup(50, 420, 350, 175);
-
+  dialWidget.setup(150, 360, 125, ofColor(255, 255, 255));
+  latentGraphWidget.setup(50, 520, 350, 175, ofColor(250, 255, 255));
   dialWidget.setLatentVector(&latentVector);
   latentGraphWidget.setLatentVector(&latentVector);
+
+
+  speedDialWidget.setup(150, 360, 125, ofColor(250, 218, 94));
+  speedLatentGraphWidget.setup(50, 520, 350, 175,  ofColor(250, 218, 94));
+  speedDialWidget.setLatentVector(&speedVector);
+  speedLatentGraphWidget.setLatentVector(&speedVector);
+
 }

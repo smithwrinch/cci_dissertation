@@ -112,17 +112,20 @@ void ofApp::update(){
   sceneManager->getCurrentScene()->update();
 
   if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
-      topGui[0]->update();
 
-      if(modelManager->getStatus() >= 1){
-        topGui[1]->update();
-        topGui[2]->update();
-      }
-      if(modelManager->getStatus() >= 2){
-        topGui[3]->update();
-      }
-      if(modelManager->getStatus() >= 3){
-        topGui[4]->update();
+      if(sceneManager->getShowNavBar()){
+        topGui[0]->update();
+
+        if(modelManager->getStatus() >= 1){
+          topGui[1]->update();
+          topGui[2]->update();
+        }
+        if(modelManager->getStatus() >= 2){
+          topGui[3]->update();
+        }
+        if(modelManager->getStatus() >= 3){
+          topGui[4]->update();
+        }
       }
   }
 }
@@ -139,21 +142,24 @@ void ofApp::draw(){
     if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
       for(int i = 0; i < topGui.size(); i++){
 
-          topGui[i]->draw();
+          if(sceneManager->getShowNavBar()){
 
-          if(id <=SCENE_TYPE::DATASET_SELECTOR ){
-            topGuiSelected[1]->draw();
-          }
-          else if(id <= SCENE_TYPE::ARCHITECTURE_MENU){
-              topGuiSelected[0]->draw();
-          }
+            topGui[i]->draw();
 
-          else if(id <= SCENE_TYPE::TRAIN){
-              topGuiSelected[2]->draw();
-          }
+            if(id <=SCENE_TYPE::DATASET_SELECTOR ){
+              topGuiSelected[1]->draw();
+            }
+            else if(id <= SCENE_TYPE::ARCHITECTURE_MENU){
+                topGuiSelected[0]->draw();
+            }
 
-          else{
-            topGuiSelected[3]->draw();
+            else if(id <= SCENE_TYPE::TRAIN){
+                topGuiSelected[2]->draw();
+            }
+
+            else{
+              topGuiSelected[3]->draw();
+            }
           }
         }
       }

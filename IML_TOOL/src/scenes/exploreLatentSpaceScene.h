@@ -44,9 +44,14 @@ class ExploreLatentSpaceScene : public BaseScene {
       void addGui();
       void randomiseLatentVector();
       void setLatentVector();
+      void updateLatentVector();
+      void resetSpeedVector();
 
       SceneManager * sceneManager = SceneManager::getInstance();
       vector<float> latentVector;
+      vector<float> speedVector;
+
+      bool dirWidget = false; // direction widgets
 
 
       // ofxPanel gui;
@@ -58,9 +63,14 @@ class ExploreLatentSpaceScene : public BaseScene {
       ofxDatGuiSlider* latentVectorSelectSlider;
       ofxDatGuiSlider* latentVectorSlider;
       ofxDatGuiButton* randomiseButton;
+      ofxDatGuiButton* toggleWidgetsButton;
+      ofxDatGuiSlider* speedSlider;
 
       DialWidget dialWidget;
       LatentGraphWidget latentGraphWidget;
+
+      DialWidget speedDialWidget;
+      LatentGraphWidget speedLatentGraphWidget;
 
       vector <ofxDatGuiComponent*> gui;
 

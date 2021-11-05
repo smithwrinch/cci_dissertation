@@ -1,11 +1,16 @@
 #include "dialWidget.h"
 
-void DialWidget::setup(int x, int y, int r){
+void DialWidget::setup(int x, int y, int r, ofColor c){
   centreX = x;
   centreY = y;
   radius = r;
+  colour = c;
 
   offsetIndex = 0;
+
+  mouseAngle = 0;
+  mouseLineX = radius * cos(mouseAngle);
+  mouseLineY = radius * sin(mouseAngle);
 }
 
 void DialWidget::update(){
@@ -18,6 +23,12 @@ void DialWidget::update(){
   if(sqrt(x_*x_ + y_*y_) <= radius){
     // in circle
     mouseInArea = true;
+    mouseAngle = atan(y_/x_);
+    if(x_ < 0){
+      mouseAngle = mouseAngle + PI;
+    }
+    mouseLineX = radius * cos(mouseAngle);
+    mouseLineY = radius * sin(mouseAngle);
 
     if(ofGetMousePressed()){
       if(mouseBeenPressed){
@@ -74,6 +85,8 @@ void DialWidget::draw(){
       ofDrawLine(centreX,centreY, x+centreX, y+centreY);
 
 
+      ofDrawLine(centreX,centreY, mouseLineX+centreX, mouseLineY+centreY);
+
       ofSetColor(ofColor(255, 155, 0));
       float x_ = radius * cos(endTheta);
       float y_ = radius * sin(endTheta);
@@ -83,7 +96,7 @@ void DialWidget::draw(){
       ofFill();
       ofDrawTriangle(centreX, centreY, x_+centreX , y_+centreY, x+centreX, y+centreY);
       ofNoFill();
-      ofSetColor(ofColor(255,255,255));
+      ofSetColor(colour);
 
 
    }
@@ -95,7 +108,6 @@ void DialWidget::setLatentVectorFromMouse(){
   float theta = startTheta - endTheta;
 
   offsetIndexTarget = int(theta*latentVector->size() / (2*PI)) % latentVector->size();
-
 
   rotate(latentVector->begin(), latentVector->begin() + offsetIndexTarget, latentVector->end());
 

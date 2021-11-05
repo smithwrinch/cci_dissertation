@@ -49,7 +49,7 @@ class SceneManager{
     bool getShowNavBar(){
       return showNavBar;
     }
-    void setNavBar(bool b){
+    void setShowNavBar(bool b){
       showNavBar = b;
     }
   private:
@@ -58,5 +58,5 @@ class SceneManager{
     };
     BaseScene * currentScene;
     vector<BaseScene*> scenes;
-    bool showNavBar = false;
+    bool showNavBar = true;
 };

@@ -226,6 +226,8 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     lossLoader.startThread();
     epochManager.startThread();
 
+    SceneManager::getInstance()->setShowNavBar(false);
+
     ModelManager::getInstance()->setLearningRateX(learningRateSlider->getValue());
     ModelManager::getInstance()->setLearningRateY(-learningRateSlider2->getValue());
     ModelManager::getInstance()->setMaxEpochs(maxEpochsSlider->getValue());
@@ -239,6 +241,7 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     lossLoader.stopThread();
     trainingThread.stopThread();
     epochManager.stopThread();
+    SceneManager::getInstance()->setShowNavBar(true);
     state = 0;
   }
 
@@ -254,6 +257,7 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     ModelManager::getInstance()->setEpochsTrained(0);
     ModelManager::getInstance()->setStatus(2);
     ModelManager::getInstance()->save();
+    epochLabel->setLabel(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
     cout << "RESTART" << endl;
     state = 0;
   }

@@ -4,7 +4,7 @@
 using std::vector;
 class LatentGraphWidget {
   public:
-    void setup(int x, int y, int w, int h);
+    void setup(int x, int y, int w, int h, ofColor colour= ofColor(255,255,255));
     void update();
     void draw();
     void reset();
@@ -15,5 +15,7 @@ class LatentGraphWidget {
 
     int brushRadius = 3;
     void setLatentVectorFromMouse();
+
+    ofColor colour_;
 
 };

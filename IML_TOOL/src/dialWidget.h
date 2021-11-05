@@ -4,7 +4,7 @@
 using std::vector;
 class DialWidget {
   public:
-    void setup(int x, int y, int radius);
+    void setup(int x, int y, int radius, ofColor colour= ofColor(255,255,255));
     void update();
     void draw();
     void reset();
@@ -20,9 +20,15 @@ class DialWidget {
     bool mouseInArea = false;
     int offsetIndexTarget;
     int offsetIndex;
+    float mouseAngle;
+
+    float mouseLineX;
+    float mouseLineY;
 
     float line1X;
     float line1Y;
     float line2X;
     float line2Y;
+
+    ofColor colour;
 };

@@ -1,10 +1,11 @@
 #include "latentGraphWidget.h"
 
-void LatentGraphWidget::setup(int x, int y, int w, int h){
+void LatentGraphWidget::setup(int x, int y, int w, int h, ofColor c){
   x_ = x;
   y_ = y;
   width_ = w;
   height_ = h;
+  colour_ = c;
 }
 
 void LatentGraphWidget::update(){
@@ -21,6 +22,8 @@ void LatentGraphWidget::setLatentVector(vector<float> *vec){
 
 void LatentGraphWidget::draw(){
 
+    ofSetColor(colour_);
+
    ofDrawRectangle(x_, y_, width_, height_);
 
    int size = latentVector->size();
@@ -29,7 +32,8 @@ void LatentGraphWidget::draw(){
 
      float x = i*width_/size;
 
-     ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + radius_ * height_);
+     ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (1-radius_) * height_);
+
    }
 
 
@@ -68,8 +72,8 @@ void LatentGraphWidget::setLatentVectorFromMouse(){
             if(new_idx2 >= size){
               new_idx2 = size - 1;
             }
-            latentVector->at(new_idx) = new_y;
-            latentVector->at(new_idx2) = new_y;
+            latentVector->at(new_idx) = 1- new_y;
+            latentVector->at(new_idx2) = 1- new_y;
         }
 
         }
