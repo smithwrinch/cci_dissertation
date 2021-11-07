@@ -22,6 +22,7 @@
 #include "scenes/exploreLatentSpaceScene.h"
 #include "scenes/syncMusicScene.h"
 #include "scenes/exportGifScene.h"
+#include "scenes/drawP2PScene.h"
 
 
 class ofApp : public ofBaseApp{
@@ -64,6 +65,7 @@ class ofApp : public ofBaseApp{
 		ExploreLatentSpaceScene exploreLatentSpaceScene;
 		SyncMusicScene syncMusicScene;
 		ExportGifScene exportGifScene;
+		DrawP2PScene drawP2PScene;
 
 
 		void positionButtons();

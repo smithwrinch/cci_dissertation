@@ -11,6 +11,7 @@ from pix2pix_builder import GeneratorTemplate, DiscriminatorTemplate
 # from piper import Piper
 from lossManager import LossManager
 from lossWriter import Messager
+from logger import LogManager
 import shutil
 
 
@@ -126,10 +127,10 @@ TRAINING -----------------------------------------------------------------------
 def train_step(input_image, target, generator_optimizer, discriminator_optimizer, gen_loss_, disc_loss_, LAMBDA, generator, discriminator):
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-        gen_output = generator(input_image, training=True)
+        gen_output = generator(input_image, training=False)
 
-        disc_real_output = discriminator([input_image, target], training=True)
-        disc_generated_output = discriminator([input_image, gen_output], training=True)
+        disc_real_output = discriminator([input_image, target], training=False)
+        disc_generated_output = discriminator([input_image, gen_output], training=False)
 
         gen_total_loss, gen_gan_loss, gen_l1_loss = gen_loss_(disc_generated_output, gen_output, target, LAMBDA)
         disc_loss = disc_loss_(disc_real_output, disc_generated_output)
@@ -150,7 +151,7 @@ def train_step(input_image, target, generator_optimizer, discriminator_optimizer
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc):
+def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc, log_msg):
 
     # checkpoint.restore(manager.latest_checkpoint)
     # epochs = 0
@@ -174,6 +175,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     save = glob.glob(save_dir+"/*")
     if not os.path.exists(save_dir):
         print("TRAINING FROM SCRATCH")
+        log_msg.send("Training from scratch")
         os.makedirs(save_dir)
     elif(len(save) != 0):
         if(len(save) != 2):
@@ -184,6 +186,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
                     save.pop(i)
 
         print("RESTORING FROM BACKUP")
+        log_msg.send("Restoring from saved")
         print(save)
         save_ = save[0].split("/")[-1].split("_")[0][1:]
         epochs = int(save_)
@@ -210,19 +213,25 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     g_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
     d_opt = tf.keras.optimizers.Adam(learning_rate, beta_1=beta)
 
+    log_msg.send("Beginning training...")
     for epoch in range(max_epochs):
 
+        log_msg.send("Epoch " + str(epochs))
         clear_output(wait=True)
         generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
         plt.savefig(ROOT_IMG_SAVE + str(epochs) +".png")
 
-        files = glob.glob(save_dir+"/*")
+        print(example_input)
+        print(example_target2)
+
+
+
         gen.save(save_dir+"/-" +str(epochs)+"_generator")
         disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
 
+        shutil.rmtree(save_dir+"/-" +str(epochs-1)+"_generator", ignore_errors=True)
+        shutil.rmtree(save_dir+"/-" +str(epochs-1)+"_discriminator", ignore_errors=True)
         epochs += 1
-        for f in files:
-            shutil.rmtree(f, ignore_errors=True)
 
         if epoch != 0:
             print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
@@ -244,7 +253,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
         for (input_image, target) in train_ds:
 
-
+            print(input_image)
             g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
@@ -279,9 +288,9 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     plt.close()
 
 def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
-    p1 = model(i1, training=True)
-    p2 = model(i2, training=True)
-    p3 = model(i3, training=True)
+    p1 = model(i1, training=False)
+    p2 = model(i2, training=False)
+    p3 = model(i3, training=False)
     # plt.figure(figsize=(4, 4))
 
     display_list = [i1[0], t1[0], p1[0], i2[0], t2[0], p2[0], i3[0], t3[0], p3[0]]
@@ -360,41 +369,11 @@ if __name__ == '__main__':
     GEN_LOSS = generator_loss
     DISC_LOSS = discriminator_loss
 
-
-
-    # dataset_name = "facades"
-    #
-    # _URL = f'http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/{dataset_name}.tar.gz'
-    #
-    # path_to_zip = tf.keras.utils.get_file(
-    #     fname=f"{dataset_name}.tar.gz",
-    #     origin=_URL,
-    #     extract=True)
-    #
-    # path_to_zip  = pathlib.Path(path_to_zip)
-    #
-    # PATH = path_to_zip.parent/dataset_name
-    # train_dataset = tf.data.Dataset.list_files(str(PATH / 'train/*.jpg'))
-    # train_dataset = train_dataset.map(load_image_train,
-    #                                   num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    # train_dataset = train_dataset.shuffle(NUM_IMGS)
-    # train_dataset = train_dataset.batch(BATCH_SIZE)
-    #
-    # try:
-    #   test_dataset = tf.data.Dataset.list_files(str(PATH / 'test/*.jpg'))
-    # except tf.errors.InvalidArgumentError:
-    #   test_dataset = tf.data.Dataset.list_files(str(PATH / 'val/*.jpg'))
-    # test_dataset = test_dataset.map(load_image_test)
-    # test_dataset = test_dataset.batch(BATCH_SIZE)
-
-
-
-
     steps_per_epoch = NUM_IMGS // BATCH_SIZE
 
-    """
-    END TODO
-    """
+    log_msg = LogManager(ROOT_CHECKPOINT_SAVE+"log.txt")
+    log_msg.send("Initialising...")
+
     gen = GeneratorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
     disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
     generator = gen.build()
@@ -402,4 +381,10 @@ if __name__ == '__main__':
 
     train_dataset = get_dataset(DATASET_DIR, BATCH_SIZE, IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL)
 
-    train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator)
+
+    if(len(train_dataset) == 0):
+        log_msg.send("[ERROR] No images found in dataset at " + DATASET_DIR)
+        exit(0)
+    else:
+        log_msg.send("Found " + str(len(train_dataset)) + " images...")
+    train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator, log_msg)

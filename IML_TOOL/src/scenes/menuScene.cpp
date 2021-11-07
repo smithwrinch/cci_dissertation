@@ -303,10 +303,12 @@ void MenuScene::createModel(MODEL_TYPE::ID type){
   ofDirectory dir3 = ofDirectory("saved_models/"+fname+"/outputs");
   ofDirectory dir4 = ofDirectory("saved_models/"+fname+"/checkpoints");
   ofDirectory dir5 = ofDirectory("saved_models/"+fname+"/python");
+  ofDirectory dir6 = ofDirectory("saved_models/"+fname+"/saved_networks");
   dir2.create(true);
   dir3.create(true);
   dir4.create(true);
   dir5.create(true);
+  dir6.create(true);
 
   ModelManager::getInstance()->setModelName(fname);
   ModelManager::getInstance()->setModelType(type);

@@ -1,6 +1,9 @@
 #include "interactMenuScene.h"
 
 void InteractMenuScene::refresh(){
+
+    SceneManager::getInstance()->setShowNavBar(true);
+
 }
 
 void InteractMenuScene::setup(){
@@ -113,5 +116,10 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_EXPORT_GIF);
 
+  }
+  else if (e.target == drawButton){
+    BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_DRAW_P2P);
+    scene->refresh();
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_DRAW_P2P);
   }
 }

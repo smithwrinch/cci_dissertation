@@ -68,7 +68,7 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
         if(imagesAlreadyPaired->getChecked()){
             ofDirectory dir_ = ofDirectory(dir);
             dir_.copyTo("saved_datasets/"+datasetNameInput->getText()+"/");
-            ModelManager::getInstance()->setDatasetDir(datasetNameInput->getText());
+            ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
 
             BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
             scene->refresh();
@@ -76,7 +76,7 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
             SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
         }
         else{
-          ModelManager::getInstance()->setDatasetDir(dir);
+          ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+dir);
           BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);
           scene->refresh();
           SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);

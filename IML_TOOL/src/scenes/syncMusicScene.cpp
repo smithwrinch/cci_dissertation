@@ -229,8 +229,9 @@ void SyncMusicScene::onButtonEvent(ofxDatGuiButtonEvent e){
 }
 
 bool SyncMusicScene::checkNameValid(){
-  string s = fnameInput->getText().substr(fnameInput->getText().size() - 3);
-  return s == ".mp4";
+  string s = fnameInput->getText().substr(fnameInput->getText().size() - 4);
+  cout << s << endl;
+  return s == ".mp4" || s == ".MP4";
 }
 
 void SyncMusicScene::setupPythonThread(){

@@ -137,7 +137,7 @@ void TrainingScene::setup(){
   maxEpochsSlider->setMin(ModelManager::getInstance()->getEpochsTrained());
 
 
-  toggleGraphButton->setPosition(699, 526);
+  toggleGraphButton->setPosition(701, 525);
   toggleGraphButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
 }
@@ -254,6 +254,10 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
     ofDirectory::removeDirectory(basePath+"/saved_networks/ckpt", true);
     ofDirectory::removeDirectory(basePath+"/saved_networks/losses", true);
     ofDirectory::removeDirectory(basePath+"/images", true);
+
+    ofDirectory dd(basePath+"/images");
+    dd.create();
+
     ModelManager::getInstance()->setEpochsTrained(0);
     ModelManager::getInstance()->setStatus(2);
     ModelManager::getInstance()->save();

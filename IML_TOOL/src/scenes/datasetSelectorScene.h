@@ -18,6 +18,8 @@ class DatasetSelectorScene : public BaseScene {
     ofxDatGuiScrollView* datasetScroll;
     ofxDatGuiButton* scrollDeleteButton;
     ofxDatGuiButton* scrollContinueButton;
+    ofxDatGuiButton* backButton;
+
     string currentScroll = "";
 
 

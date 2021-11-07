@@ -2,6 +2,12 @@
 
 void DatasetSelectorScene::setup(){
   setID(SCENE_TYPE::DATASET_SELECTOR);
+
+
+  backButton = new ofxDatGuiButton("BACK<-");
+  backButton->setPosition(100, ofGetHeight()-50);
+  backButton->onButtonEvent(this, &DatasetSelectorScene::onButtonEvent);
+
   datasetScroll = new ofxDatGuiScrollView("Saved Datasets", 10);
   datasetScroll->setWidth(300, 0.5);
   datasetScroll->setPosition(ofGetWidth()/2 - datasetScroll->getWidth()/2, ofGetHeight()/2 - datasetScroll->getHeight()/2);
@@ -52,9 +58,13 @@ void DatasetSelectorScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
   }
-  if(e.target == scrollDeleteButton){
+  else if(e.target == scrollDeleteButton){
     // SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER);
     filesystem::remove_all("../bin/data/saved_datasets/"+currentScroll);
+    refresh();
+  }
+  else if(e.target == backButton){
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
   }
 }
 

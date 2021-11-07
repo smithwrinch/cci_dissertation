@@ -103,6 +103,8 @@ void ofApp::setup(){
   sceneManager->addScene(&syncMusicScene);
   exportGifScene.setup();
   sceneManager->addScene(&exportGifScene);
+  drawP2PScene.setup();
+  sceneManager->addScene(&drawP2PScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);

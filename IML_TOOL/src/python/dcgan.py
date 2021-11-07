@@ -16,6 +16,7 @@ from IPython import display
 from piper import Piper
 from lossWriter import Messager
 from lossManager import LossManager
+from logger import LogManager
 from dcgan_builder import GAN
 from math import pow
 import os
@@ -69,7 +70,7 @@ def train_step(images, generator, discriminator, generator_optimizer, discrimina
 
     return gen_loss, disc_loss
 
-def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size, batch_size, learning_rate, root_checkpoint_save, root_img_save):
+def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size, batch_size, learning_rate, root_checkpoint_save, root_img_save, log_msg):
 
     generator_optimizer = tf.keras.optimizers.Adam(learning_rate)
     discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate)
@@ -79,12 +80,13 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     discriminator = gan.discriminator
 
     save_dir = root_checkpoint_save+"ckpt"
+    save = glob.glob(save_dir+"/*")
     epochs_passed = 0
     if not os.path.exists(save_dir):
         print("TRAINING FROM SCRATCH")
+        log_msg.send("Training from scratch")
         os.makedirs(save_dir)
-    else:
-        save = glob.glob(save_dir+"/*")
+    elif(len(save) !=0):
         print(save)
         if(len(save) != 2):
             nums = [s.split("/")[-1].split("_")[0][1:] for s in save]
@@ -94,6 +96,7 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
                     save.pop(i)
 
         print("RESTORING FROM BACKUP")
+        log_msg.send("Restoring from saved")
         print(save)
         save_ = save[0].split("/")[-1].split("_")[0][1:]
         epochs_passed = int(save_)
@@ -127,14 +130,18 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
 
     lossG = []
     lossD = []
+
+    log_msg.send("Beginning training...")
     for epoch in range(epochs):
+
+        log_msg.send("Epoch " + str(epoch+epochs_passed))
         generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed), img_channel)
         files = glob.glob(save_dir+"/*")
         generator.save(save_dir+"/-" +str(epoch+epochs_passed)+"_generator")
         discriminator.save(save_dir+"/-" +str(epoch+epochs_passed)+"_discriminator")
 
-        for f in files:
-            shutil.rmtree(f, ignore_errors=True)
+        shutil.rmtree(save_dir+"/-" +str(epoch+epochs_passed-1)+"_generator", ignore_errors=True)
+        shutil.rmtree(save_dir+"/-" +str(epoch+epochs_passed-1)+"_discriminator", ignore_errors=True)
         start = time.time()
 
         for n, image_batch in enumerate(dataset):
@@ -242,10 +249,18 @@ if __name__ == '__main__':
     KERNEL_SIZE = args.kernel_size
     LATENT_DIM = args.latent_dim
 
+    log_msg = LogManager(ROOT_CHECKPOINT_SAVE+"log.txt")
+    log_msg.send("Initialising...")
+
     seed = tf.random.normal([num_examples_to_generate, LATENT_DIM])
 
     # train_dataset = load_data(60000, BATCH_SIZE)
     train_dataset = get_dataset(DATASET_DIR, BATCH_SIZE, IMG_SIZE, IMG_SIZE, IMG_CHANNEL)
 
+    if(len(train_dataset) == 0):
+        log_msg.send("[ERROR] No images found in dataset at " + DATASET_DIR)
+        exit(0)
+    else:
+        log_msg.send("Found " + str(len(train_dataset)) + " images...")
 
-    train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM, KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE)
+    train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM, KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE, log_msg)
