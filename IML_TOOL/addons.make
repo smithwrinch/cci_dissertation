@@ -7,3 +7,4 @@ ofxXmlSettings
 ofxDirList
 ofxThreadedImageLoader
 ofxOpenCv
+ofxVideoRecorder

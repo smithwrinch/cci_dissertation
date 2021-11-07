@@ -5,6 +5,7 @@
 #include "inputPix2PixScene.h"
 #include <time.h>
 #include "ofxTensorFlow2.h"
+#include "ofxVideoRecorder.h"
 //
 //
 // // custom ofxTF2::ThreadedModel with built-in pre- & post-processing
@@ -73,8 +74,7 @@ class DrawP2PScene : public BaseScene {
   		void setupDrawingTool(std::string modelDir);
 			void setupGui();
 			void record();
-			void stopRecord();
-
+			void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
   		template <typename T>
   		bool drawImage(const T& img, std::string label, int x, int y, int width, int height);
 
@@ -99,10 +99,8 @@ class DrawP2PScene : public BaseScene {
   		bool autoRun = false;   // auto run every frame?
 
 			// for video grabbing
-			ofBufferObject pixelBufferBack, pixelBufferFront;
+	    ofxVideoRecorder    vidRecorder;
 			ofPixels pixels;
-			string frameDir;
-			int frameCount = 0;
 
   		// drawing tool
   		std::vector<ofColor> colors; // contains color palette

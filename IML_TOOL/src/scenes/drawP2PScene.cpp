@@ -28,10 +28,10 @@ void DrawP2PScene::refresh(){
   nnWidth = modelManager->getImgWidth();
   nnHeight = modelManager->getImgHeight();
 
-  drawWidth = nnWidth*2;
-  drawHeight = nnHeight*2;
+  drawWidth = 512;
+  drawHeight = 512;
 
-  drawY = 50;
+  drawY = 25;
   drawX = (ofGetWidth() / 2) - drawWidth;
 
   // allocate fbo and images with correct dimensions, no alpha channel
@@ -52,6 +52,15 @@ void DrawP2PScene::refresh(){
   setupDrawingTool("default_models/draw");
   setupGui();
 
+  //video shit
+  //    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg")); // use this is you have ffmpeg installed in your data folder
+
+  // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
+  vidRecorder.setVideoCodec("mpeg4");
+  vidRecorder.setVideoBitrate("800k");
+
+  ofAddListener(vidRecorder.outputFileCompleteEvent, this, &DrawP2PScene::recordingComplete);
+
   // shorten idle time to have model check for input more frequently,
   // this may increase responsiveness on faster machines but will use more cpu
   model.setIdleTime(10);
@@ -60,8 +69,6 @@ void DrawP2PScene::refresh(){
   hasChosenExportFolder = false;
   controlMode = 0;
   exportDir = "";
-  frameCount = 0;
-  frameDir = "";
 }
 
 //--------------------------------------------------------------
@@ -137,6 +144,13 @@ void DrawP2PScene::update() {
 		ofxTF2::tensorToImage(output, imgOut);
 		imgOut.update();
 
+    if(recording){
+      bool success = vidRecorder.addFrame(imgOut.getPixels());
+      if (!success) {
+         ofLogWarning("Frame was not added!");
+      }
+    }
+
 		// start new measurement
 		start = std::chrono::system_clock::now();
 	}
@@ -155,7 +169,11 @@ void DrawP2PScene::update() {
     exportPictureButton->update();
     exportPictureButton2->update();
   }
+  if(!recording){
+    backButton->update();
+  }
   drawColor = colourPicker->getColor();
+  drawRadius = brushRadius->getValue();
 }
 
 //--------------------------------------------------------------
@@ -172,6 +190,7 @@ void DrawP2PScene::draw() {
 	str << "p     : Remove colour from palette" << std::endl;
 	str << "a     : Add colour to palette" << std::endl;
   str << "r     : Toggle recording" << std::endl;
+  str << "g     : Toggle gui" << std::endl;
 
 	// str << std::endl;
 	// str << "Draw in the box on the left" << std::endl;
@@ -282,6 +301,10 @@ void DrawP2PScene::draw() {
     exportPictureButton->draw();
     exportPictureButton2->draw();
   }
+
+  if(!recording){
+    backButton->draw();
+  }
 }
 
 //--------------------------------------------------------------
@@ -295,11 +318,13 @@ void DrawP2PScene::keyPressed(int key) {
 		case 'c':
 			if(drawRadius > 0) {
 				drawRadius--;
+        brushRadius->setValue(drawRadius);
 			}
 			break;
 
 		case 'v':
 			drawRadius++;
+      brushRadius->setValue(drawRadius);
 			break;
 
 		case 'z':
@@ -323,8 +348,11 @@ void DrawP2PScene::keyPressed(int key) {
 
 		case 'i':
 		case 'I':
-			if(ofGetMouseX() < fbo.getWidth() && ofGetMouseY() < fbo.getHeight()) {
-				drawColor = imgIn.getColor(ofGetMouseX(), ofGetMouseY());
+			if(ofGetMouseX() < drawWidth && ofGetMouseY() < drawHeight) {
+        int x_ = float(nnWidth) / float(drawWidth) * ofGetMouseX();
+        int y_ =  float(nnHeight) / float(drawHeight) * ofGetMouseY();
+				drawColor = imgIn.getColor((x_-drawX), (y_-drawY));
+        colourPicker->setColor(drawColor);
 			}
 			break;
 
@@ -350,7 +378,15 @@ void DrawP2PScene::keyPressed(int key) {
     case 'r':
     case 'R':
       record();
+      break;
 
+
+    case 'g':
+    case 'G':
+      controlMode ++;
+      if(controlMode >= 3){
+        controlMode = 0;
+      }
       break;
 
 		case OF_KEY_DEL:
@@ -370,6 +406,7 @@ void DrawP2PScene::mouseDragged( int x, int y, int button) {
 	switch(drawMode) {
 		case 0: // draw
 			fbo.begin();
+      ofScale(float(nnWidth) / float(drawWidth), float(nnHeight) / float(drawHeight));
       ofTranslate(-drawX, -drawY);
 			ofSetColor(drawColor);
 			ofFill();
@@ -382,8 +419,6 @@ void DrawP2PScene::mouseDragged( int x, int y, int button) {
 			}
 			ofDrawLine(x, y, ofGetPreviousMouseX(), ofGetPreviousMouseY());
 
-      cout << endl;
-      cout << endl;
       fbo.end();
 			break;
 		case 1: // draw boxes
@@ -404,6 +439,7 @@ void DrawP2PScene::mouseReleased(int x, int y, int button) {
 			break;
 		case 1: // draw boxes
 			fbo.begin();
+      ofScale(float(nnWidth) / float(drawWidth), float(nnHeight) / float(drawHeight));
       ofTranslate(-drawX, -drawY);
 			ofSetColor(drawColor);
 			ofFill();
@@ -465,6 +501,9 @@ void DrawP2PScene::onButtonEvent(ofxDatGuiButtonEvent e){
   }
   else if(e.target == addColourButton){
     colors.push_back(colourPicker->getColor());
+  }
+  else if(e.target == recordButton){
+    record();
   }
 }
 
@@ -588,6 +627,7 @@ void DrawP2PScene::setupGui(){
   recordButton = new ofxDatGuiButton("START RECORDING");
   recordButton->setPosition(buttonsX, drawY+drawHeight+exportPictureButton->getHeight()*2);
   recordButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
+  recordButton->setStripeColor(ofColor(0,255,0));
 
   setExportFolderButton = new ofxDatGuiButton("SET EXPORT FOLDER");
   setExportFolderButton->setPosition(buttonsX, recordButton->getY()+recordButton->getHeight());
@@ -598,9 +638,8 @@ void DrawP2PScene::setupGui(){
   toggleControlsButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
 
 
-
-  brushRadius = new ofxDatGuiSlider("BRUSH RADIUS", 1, 50);
-  brushRadius->setPosition(controlsX, drawY+drawHeight+exportPictureButton2->getHeight()*2);
+  brushRadius = new ofxDatGuiSlider("BRUSH RADIUS", 1, 100, 1);
+  brushRadius->setPosition(controlsX, drawY+drawHeight+exportPictureButton2->getHeight());
   brushRadius->setWidth(400, 0.4);
 
   addColourButton = new ofxDatGuiButton("ADD COLOUR TO PALLETTE");
@@ -618,41 +657,24 @@ void DrawP2PScene::setupGui(){
   guiControls.push_back(brushRadius);
   guiControls.push_back(colourPicker);
   guiControls.push_back(addColourButton);
-  gui.push_back(backButton);
+}
+
+void DrawP2PScene::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
+  cout << "The recoded video file is now complete." << endl;
 }
 
 void DrawP2PScene::record(){
-//   if(record){
-//   // copy the fbo texture to a buffer
-//   fbo.getTexture().copyTo(pixelBufferBack);
-//
-//   // map the buffer so we can access it from the cpu
-//   // and wrap the memory in an ofPixels to save it
-//   // easily. Finally unmap it.
-//   pixelBufferFront.bind(GL_PIXEL_UNPACK_BUFFER);
-//   unsigned char * p = pixelBufferFront.map<unsigned char>(GL_READ_ONLY);
-//   pixels.setFromExternalPixels(p,fbo.getWidth(),fbo.getHeight(),OF_PIXELS_RGB);
-//   ofSaveImage(pixels,ofToString(ofGetFrameNum())+".jpg");
-//   pixelBufferFront.unmap();
-//
-//   // swap the front and back buffer so we are always
-//   // copying the texture to one buffer and reading
-//   // back from another to avoid stalls
-//   swap(pixelBufferBack,pixelBufferFront);
-// }
-  frameCount = 0;
-  pixels.clear();
-  frameDir = exportDir+"/tmp____frames/";
-  pixelBufferFront.clear();
-  pixelBufferBack.clear();
-  recording = true;
-}
-
-void DrawP2PScene::stopRecord(){
-  frameCount = 0;
-  pixels.clear();
-  frameDir = exportDir+"/tmp____frames/";
-  pixelBufferFront.clear();
-  pixelBufferBack.clear();
-  recording = false;
+  if(recording){
+      recording = false;
+      vidRecorder.close();
+      recordButton->setLabel("START RECORDING");
+      recordButton->setStripeColor(ofColor(0,255,0));
+  }
+  else if(hasChosenExportFolder){
+    recording = true;
+    vidRecorder.setup(exportDir+"/"+ofGetTimestampString()+".mov", imgOut.getHeight(), imgOut.getWidth(), 30);
+    vidRecorder.start();
+    recordButton->setLabel("STOP RECORDING");
+    recordButton->setStripeColor(ofColor(255,0,0));
+  }
 }
