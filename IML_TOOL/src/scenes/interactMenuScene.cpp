@@ -96,9 +96,9 @@ void InteractMenuScene::draw(){
 
 void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-    BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
-    scene->refresh();
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
   }
   else if(e.target == exploreLatentSpaceButton){
       BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::EXPLORE_LATENT);
@@ -115,11 +115,15 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_EXPORT_GIF);
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_EXPORT_GIF);
-
   }
   else if (e.target == drawButton){
-    BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_DRAW_P2P);
-    scene->refresh();
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_DRAW_P2P);
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_DRAW_P2P);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_DRAW_P2P);
+  }
+  else if (e.target == webcamInputButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_WEBCAM_P2P);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_WEBCAM_P2P);
   }
 }

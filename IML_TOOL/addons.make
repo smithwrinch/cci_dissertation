@@ -8,3 +8,4 @@ ofxDirList
 ofxThreadedImageLoader
 ofxOpenCv
 ofxVideoRecorder
+ofxCv

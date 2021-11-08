@@ -105,6 +105,8 @@ void ofApp::setup(){
   sceneManager->addScene(&exportGifScene);
   drawP2PScene.setup();
   sceneManager->addScene(&drawP2PScene);
+  webcamP2PScene.setup();
+  sceneManager->addScene(&webcamP2PScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);

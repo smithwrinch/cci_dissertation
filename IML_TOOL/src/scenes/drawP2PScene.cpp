@@ -98,8 +98,6 @@ void DrawP2PScene::stopThread(){
 
 void DrawP2PScene::update() {
 
-  backButton->update();
-
 	// start & stop the model
 	if(!autoRun && model.isThreadRunning()) {
 		model.stopThread();

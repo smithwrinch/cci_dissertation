@@ -23,7 +23,7 @@
 #include "scenes/syncMusicScene.h"
 #include "scenes/exportGifScene.h"
 #include "scenes/drawP2PScene.h"
-
+#include "scenes/webcamP2PScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -66,11 +66,10 @@ class ofApp : public ofBaseApp{
 		SyncMusicScene syncMusicScene;
 		ExportGifScene exportGifScene;
 		DrawP2PScene drawP2PScene;
-
+		WebcamP2PScene webcamP2PScene;
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
-
 
 		ofxDatGuiButton* menuButton;
 		ofxDatGuiButton* architectureButton;
