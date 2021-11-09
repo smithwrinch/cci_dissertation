@@ -2,6 +2,7 @@
 
 #include "trainScene.h"
 
+
 //
 void TrainingScene::refresh(){
 
@@ -19,71 +20,85 @@ void TrainingScene::refresh(){
     // imageLoader.startThread();
     ModelManager * model = ModelManager::getInstance();
 
-    lossLoader.setup(&graph, "data/saved_models/" + model->getModelName() +"/saved_networks/" );
+    lossLoader.setup(&graph, &msg, "data/saved_models/" + model->getModelName() +"/saved_networks/");
 
-    int img_width = model->getImgWidth();
-    int img_height = model->getImgHeight();
-    int input_channel = model->getInputChannel();
-    // int output_channel = model->getOutputChannel();
-    int learning_rateX = model->getLearningRateX();
-    int learning_rateY = model->getLearningRateY();
-    int max_epochs = model->getMaxEpochs();
-    int batch_size = model->getBatchSize();
-    int num_layers = model->getNumLayers();
-    int kernel_size = model->getKernelSize();
-    float beta = model->getBeta();
-    int lambda = model->getLambda();
-    string dataset_dir = model->getDatasetDir();
-    int latent_vector = model->getLatentVector();
+    refreshTraining();
 
-    float disc_noise = model->getDiscriminatorNoise();
-    bool random_horizontal = model->getRandomHorizontal();
-    bool random_vertical = model->getRandomVertical();
-    int random_crop = model->getRandomCrop();
-    float random_brightness = ofToFloat(model->getRandomBrightness());
-    float random_contrast = ofToFloat(model->getRandomContrast());
-    cout << random_contrast << endl;
-    string pythonFile;
+}
 
-    //TODO create custom python files
-    if(model->getModelType() == MODEL_TYPE::PIX2PIX){
-      pythonFile = "python ../src/python/pix2pix_train.py ";
-    }
-    else if(model->getModelType() == MODEL_TYPE::GAN){
-      pythonFile = "python ../src/python/dcgan.py ";
-    }
 
-    trainingThread.setup(pythonFile,
-      img_width,
-      img_height,
-      input_channel,
-      // output_channel,
-      learning_rateX,
-      learning_rateY,
-      max_epochs,
-      batch_size,
-      num_layers,
-      kernel_size,
-      beta,
-      lambda,
-      latent_vector,
-      dataset_dir,
-      disc_noise,
-      random_horizontal,
-      random_vertical,
-      random_crop,
-      random_brightness,
-      random_contrast
-      );
+void TrainingScene::refreshTraining(){
 
-    epochLabel->setLabel(ofToString(model->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
+  ModelManager * model = ModelManager::getInstance();
+  int img_width = model->getImgWidth();
+  int img_height = model->getImgHeight();
+  int input_channel = model->getInputChannel();
+  // int output_channel = model->getOutputChannel();
+  int learning_rateX = model->getLearningRateX();
+  int learning_rateY = model->getLearningRateY();
+  int max_epochs = model->getMaxEpochs();
+  int batch_size = model->getBatchSize();
+  int num_layers = model->getNumLayers();
+  int kernel_size = model->getKernelSize();
+  float beta = model->getBeta();
+  int lambda = model->getLambda();
+  string dataset_dir = model->getDatasetDir();
+  int latent_vector = model->getLatentVector();
 
-    learningRateSlider->setValue(learning_rateX);
-    learningRateSlider2->setValue(-learning_rateY);
-    batchSizeSlider->setValue(batch_size);
-    maxEpochsSlider->setValue(max_epochs);
-    maxEpochsSlider->setMin(model->getEpochsTrained());
+  float disc_noise = ofToFloat(model->getDiscriminatorNoise());
+  bool random_horizontal = model->getRandomHorizontal();
+  bool random_vertical = model->getRandomVertical();
+  int random_crop = model->getRandomCrop();
+  float random_brightness = ofToFloat(model->getRandomBrightness());
+  float random_contrast = ofToFloat(model->getRandomContrast());
+  cout << random_contrast << endl;
+  string pythonFile;
 
+  //TODO create custom python files
+  if(model->getModelType() == MODEL_TYPE::PIX2PIX){
+    pythonFile = "python ../src/python/pix2pix_train.py ";
+  }
+  else if(model->getModelType() == MODEL_TYPE::GAN){
+    pythonFile = "python ../src/python/dcgan.py ";
+  }
+
+  trainingThread.setup(pythonFile,
+    img_width,
+    img_height,
+    input_channel,
+    // output_channel,
+    learning_rateX,
+    learning_rateY,
+    max_epochs,
+    batch_size,
+    num_layers,
+    kernel_size,
+    beta,
+    lambda,
+    latent_vector,
+    dataset_dir,
+    disc_noise,
+    random_horizontal,
+    random_vertical,
+    random_crop,
+    random_brightness,
+    random_contrast
+    );
+
+  epochLabel->setLabel(ofToString(model->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
+
+  learningRateSlider->setValue(learning_rateX);
+  learningRateSlider2->setValue(-learning_rateY);
+  batchSizeSlider->setValue(batch_size);
+  maxEpochsSlider->setValue(max_epochs);
+  maxEpochsSlider->setMin(model->getEpochsTrained());
+
+  discriminatorNoiseSlider->setValue(ofToFloat(model->getDiscriminatorNoise()));
+  randomHorizontalToggle->setChecked(model->getRandomHorizontal());
+  randomVerticalToggle->setChecked(model->getRandomVertical());
+  cropSlider->setValue(model->getRandomCrop());
+  brightnessSlider->setValue(ofToFloat(model->getRandomBrightness()));
+  contrastSlider->setValue(ofToFloat(model->getRandomContrast()));
 }
 
 void TrainingScene::setup(){
@@ -131,30 +146,56 @@ void TrainingScene::setup(){
   playButton->setPosition(ofGetWidth() / 2 + playButton->getWidth()/2, ofGetHeight() - 100);
   playButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
+  int yControl = 275;
   learningRateSlider = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) X:", 1, 9,  ModelManager::getInstance()->getLearningRateX());
-  learningRateSlider->setPosition(575, 300);
+  learningRateSlider->setPosition(575, yControl);
   learningRateSlider->setWidth(450, 0.5);
   learningRateSlider->setPrecision(0);
 
   learningRateSlider2 = new ofxDatGuiSlider("LEARNING RATE (Xe^-Y) Y:", 1, 9, -( ModelManager::getInstance()->getLearningRateY()));
-  learningRateSlider2->setPosition(575, 300 + learningRateSlider->getHeight());
+  learningRateSlider2->setPosition(575, yControl + learningRateSlider->getHeight());
   learningRateSlider2->setWidth(450, 0.5);
   learningRateSlider2->setPrecision(0);
 
 
   batchSizeSlider = new ofxDatGuiSlider("BATCH SIZE", 1, 256,  ModelManager::getInstance()->getBatchSize());
-  batchSizeSlider->setPosition(575, 300 + 2*learningRateSlider->getHeight());
+  batchSizeSlider->setPosition(575, yControl + 2*learningRateSlider->getHeight());
   batchSizeSlider->setWidth(450, 0.5);
   batchSizeSlider->setPrecision(0);
 
   maxEpochsSlider = new ofxDatGuiSlider("MAX EPOCHS", 1, 50000,  ModelManager::getInstance()->getMaxEpochs());
-  maxEpochsSlider->setPosition(575, 300 + 3*learningRateSlider->getHeight());
+  maxEpochsSlider->setPosition(575, yControl + 3*learningRateSlider->getHeight());
   maxEpochsSlider->setWidth(450, 0.5);
   maxEpochsSlider->setPrecision(0);
   maxEpochsSlider->setMin(ModelManager::getInstance()->getEpochsTrained());
 
+  discriminatorNoiseSlider = new ofxDatGuiSlider("Discriminator Noise", 0, 1, 0);
+  discriminatorNoiseSlider->setPosition(575, yControl + 4*learningRateSlider->getHeight());
+  discriminatorNoiseSlider->setWidth(450, 0.5);
 
-  
+  randomHorizontalToggle = new ofxDatGuiToggle("RANDOM HORIZONTAL FLIP");
+  randomHorizontalToggle->setPosition(575, yControl + 5*learningRateSlider->getHeight());
+  randomHorizontalToggle->setWidth(450);
+
+  randomVerticalToggle = new ofxDatGuiToggle("RANDOM VERTICAL FLIP");
+  randomVerticalToggle->setPosition(575, yControl + 6*learningRateSlider->getHeight());
+  randomVerticalToggle->setWidth(450);
+
+  cropSlider = new ofxDatGuiSlider("RANDOM CROP AMOUNT (%)", 0, 50, 0);
+  cropSlider->setPosition(575, yControl + 7*learningRateSlider->getHeight());
+  cropSlider->setPrecision(0);
+  cropSlider->setWidth(450, 0.5);
+
+  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS DELTA", 0, 0.5, 0);
+  brightnessSlider->setPosition(575, yControl + 8*learningRateSlider->getHeight());
+  brightnessSlider->setWidth(450, 0.5);
+  // brightnessSlider->setPrecision(0);
+
+  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST DELTA", 0, 0.5, 0);
+  contrastSlider->setPosition(575, yControl + 9*learningRateSlider->getHeight());
+  contrastSlider->setWidth(450, 0.5);
+
+
   toggleGraphButton->setPosition(701, 525);
   toggleGraphButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
@@ -181,6 +222,12 @@ void TrainingScene::update(){
     batchSizeSlider->update();
     maxEpochsSlider->update();
     restartTrainingButton->update();
+    discriminatorNoiseSlider->update();
+    randomHorizontalToggle->update();
+    randomVerticalToggle->update();
+    cropSlider->update();
+    brightnessSlider->update();
+    contrastSlider->update();
   }
   else if(state == 1){
     stopTrainingButton->update();
@@ -199,6 +246,7 @@ void TrainingScene::update(){
 //--------------------------------------------------------------
 void TrainingScene::draw(){
   graph.draw();
+  ofFill();
   // cout << graph.getX() << endl;
   // cout << graph.getY() << endl;
   // cout << graph.getWidth() << endl;
@@ -206,10 +254,6 @@ void TrainingScene::draw(){
   // ofDrawBitmapString(ofToString(ModelManager::getInstance()->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()),
   // 500, 450);
   training_img.draw(100, 50, 400, 400);
-  if(state != 2){
-    backButton->draw();
-    playButton->draw();
-  }
   if(state == 0){
     if(ModelManager::getInstance()->getEpochsTrained() == 0){
       startTrainingButton->draw();
@@ -217,17 +261,28 @@ void TrainingScene::draw(){
     else{
       resumeTrainingButton->draw();
     }
+    backButton->draw();
+    playButton->draw();
     restartTrainingButton->draw();
     learningRateSlider->draw();
     learningRateSlider2->draw();
     batchSizeSlider->draw();
     maxEpochsSlider->draw();
+    discriminatorNoiseSlider->draw();
+    randomHorizontalToggle->draw();
+    randomVerticalToggle->draw();
+    cropSlider->draw();
+    brightnessSlider->draw();
+    contrastSlider->draw();
   }
+  // training
   else if(state == 1){
     graph_img.draw(522, 275, 450, 250);
     toggleGraphButton->draw();
     stopTrainingButton->draw();
     saveModelButton->draw();
+
+    ofDrawBitmapString(msg, 100, 500);
   }
   else if(state == 2){
     confirmButton->draw();
@@ -240,18 +295,24 @@ void TrainingScene::draw(){
 void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
   if(e.target == startTrainingButton || e.target == resumeTrainingButton){
-    trainingThread.startThread();
-    lossLoader.startThread();
-    epochManager.startThread();
-
-    SceneManager::getInstance()->setShowNavBar(false);
-
     ModelManager::getInstance()->setLearningRateX(learningRateSlider->getValue());
     ModelManager::getInstance()->setLearningRateY(-learningRateSlider2->getValue());
     ModelManager::getInstance()->setMaxEpochs(maxEpochsSlider->getValue());
     ModelManager::getInstance()->setBatchSize(batchSizeSlider->getValue());
 
+    ModelManager::getInstance()->setDiscriminatorNoise(discriminatorNoiseSlider->getValue());
+    ModelManager::getInstance()->setRandomHorizontal(randomHorizontalToggle->getChecked());
+    ModelManager::getInstance()->setRandomVertical(randomVerticalToggle->getChecked());
+    ModelManager::getInstance()->setRandomCrop(cropSlider->getValue());
+    ModelManager::getInstance()->setRandomBrightness(brightnessSlider->getValue());
+    ModelManager::getInstance()->setRandomContrast(contrastSlider->getValue());
     ModelManager::getInstance()->save();
+    refreshTraining();
+    trainingThread.startThread();
+    lossLoader.startThread();
+    epochManager.startThread();
+
+    SceneManager::getInstance()->setShowNavBar(false);
     state = 1;
   }
 

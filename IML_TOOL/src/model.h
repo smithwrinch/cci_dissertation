@@ -224,10 +224,8 @@ class ModelManager{
     string getDatasetDir(){
       return config.getValue("config:dataset_dir", "ERROR");
     }
-
-
-    float getDiscriminatorNoise(){
-      return config.getValue("config:disc_noise", 0);
+    string getDiscriminatorNoise(){
+      return config.getValue("config:disc_noise", "0");
     }
     bool getRandomHorizontal(){
 

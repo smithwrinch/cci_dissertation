@@ -36,7 +36,7 @@ void ArchitectureBasicBuilderScene::refresh(){
   betaSlider->setValue(model->getBeta());
   lambdaSlider->setValue(model->getLambda());
 
-  discriminatorNoiseSlider->setValue(model->getDiscriminatorNoise());
+  discriminatorNoiseSlider->setValue(ofToFloat(model->getDiscriminatorNoise()));
   randomHorizontalToggle->setChecked(model->getRandomHorizontal());
   randomVerticalToggle->setChecked(model->getRandomVertical());
   cropSlider->setValue(model->getRandomCrop());

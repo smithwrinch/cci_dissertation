@@ -78,7 +78,7 @@ static pid_t system2(const char * command, int * infp, int * outfp)
     return pid;
 }
 
-
+// gets loss and also out text
 class LossLoader: public ofThread{
 		public:
 			// int fd_gen;
@@ -86,14 +86,17 @@ class LossLoader: public ofThread{
 			// int MAX_BUF = 100;
 			// char *genfifo = "/tmp/gen";
 			// char * discfifo = "/tmp/disc";
-			void setup(ofxGraph* graph, string rootDir){
+			void setup(ofxGraph* graph, string* msg, string rootDir){
 			    this->graph = graph;
           this->rootDir = rootDir;
+          this->msg = msg;
           ofFile f1;
           ofFile f2;
+          ofFile f3;
 
           f1.removeFile(rootDir+"gen.txt");
           f2.removeFile(rootDir+"disc.txt");
+          f2.removeFile(rootDir+"log.txt");
 
 			}
       // string line;
@@ -107,11 +110,11 @@ class LossLoader: public ofThread{
 				while(isThreadRunning()){
           ofFile fileGen;
           ofFile fileDisc;
+          ofFile fileMsg;
           cout << rootDir+"gen.txt" << endl;
           if(fileGen.open(rootDir+"gen.txt") && fileDisc.open(rootDir+"disc.txt")){
             buffGen = fileGen.readToBuffer();
             buffDisc = fileDisc.readToBuffer();
-            cout << buffGen.getText() << endl;
 
             string gen = (buffGen.getText()).c_str();
             string disc = (buffDisc.getText()).c_str();
@@ -122,6 +125,10 @@ class LossLoader: public ofThread{
               values.push_back(stof(buffDisc));
               graph->add(values);
             }
+          }
+          if(fileMsg.open(rootDir+"log.txt")){
+            buffMsg = fileMsg.readToBuffer();
+            *msg = (buffMsg.getText()).c_str();
           }
           sleep(4000);
           fileGen.close();
@@ -206,8 +213,10 @@ class LossLoader: public ofThread{
     private:
       ofBuffer buffGen;
       ofBuffer buffDisc;
+      ofBuffer buffMsg;
       string rootDir;
 			ofxGraph * graph;
+      string *msg;
 };
 
 // essentially gets epoch info
@@ -444,6 +453,7 @@ class TrainingScene : public BaseScene {
   private:
 
       void saveModelAtCurrentEpoch();
+      void refreshTraining();
 
       LossLoader lossLoader;
       TrainingThread trainingThread;
@@ -453,6 +463,7 @@ class TrainingScene : public BaseScene {
 
       ofxGraph graph;
       float current_loss = 0.0;
+      string msg;
 
       int num_images;
 			int state = 0; // 0 = not training, 1 = training, 2 = restarting
@@ -485,7 +496,12 @@ class TrainingScene : public BaseScene {
       ofxDatGuiSlider* learningRateSlider2;
       ofxDatGuiSlider* batchSizeSlider;
       ofxDatGuiSlider* maxEpochsSlider;
-
+      ofxDatGuiSlider* discriminatorNoiseSlider;
+      ofxDatGuiToggle* randomHorizontalToggle;
+      ofxDatGuiToggle* randomVerticalToggle;
+      ofxDatGuiSlider* cropSlider;
+      ofxDatGuiSlider* brightnessSlider;
+      ofxDatGuiSlider* contrastSlider;
 
 
 };
