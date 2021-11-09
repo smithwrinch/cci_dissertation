@@ -21,9 +21,14 @@ void DatasetBuilderScene::setup(){
   imagesAlreadyPaired->setWidth(400, 0.5);
   imagesAlreadyPaired->setPosition(ofGetWidth()/2 - imagesAlreadyPaired->getWidth()/2, loadFromFolderButton->getY() + imagesAlreadyPaired->getHeight());
 
+  buildImageProcessingButton = new ofxDatGuiButton("BUILD WITH IMAGE PROCESSING");
+  buildImageProcessingButton->setWidth(400, 0.5);
+  buildImageProcessingButton->setPosition(ofGetWidth()/2 - buildImageProcessingButton->getWidth()/2, loadFromFolderButton->getY() + buildImageProcessingButton->getHeight()*4);
+  buildImageProcessingButton->onButtonEvent(this, &DatasetBuilderScene::onButtonEvent);
+
   buildButton = new ofxDatGuiButton("BUILD");
   buildButton->setWidth(400, 0.5);
-  buildButton->setPosition(ofGetWidth()/2 - buildButton->getWidth()/2, loadFromFolderButton->getY() + buildButton->getHeight()*4);
+  buildButton->setPosition(ofGetWidth()/2 - buildButton->getWidth()/2, buildImageProcessingButton->getY() + buildImageProcessingButton->getHeight()*4);
   buildButton->onButtonEvent(this, &DatasetBuilderScene::onButtonEvent);
 
 
@@ -38,6 +43,10 @@ void DatasetBuilderScene::update(){
   imagesAlreadyPaired->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     imagesAlreadyPaired->update();
+
+    if(!imagesAlreadyPaired->getChecked()){
+      buildImageProcessingButton->update();
+    }
   }
   else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
   }
@@ -46,6 +55,9 @@ void DatasetBuilderScene::update(){
 void DatasetBuilderScene::draw(){
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     imagesAlreadyPaired->draw();
+    if(!imagesAlreadyPaired->getChecked()){
+      buildImageProcessingButton->draw();
+    }
   }
   else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
   }
@@ -69,27 +81,49 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
             ofDirectory dir_ = ofDirectory(dir);
             dir_.copyTo("saved_datasets/"+datasetNameInput->getText()+"/");
             ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
-
+            ModelManager::getInstance()->setStatus(2);
+            ModelManager::getInstance()->save();
             BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
             scene->refresh();
-            ModelManager::getInstance()->setStatus(2);
             SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
         }
         else{
-          ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+dir);
-          BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);
+          ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
+          ModelManager::getInstance()->set("temp_dataset", dir);
+          ModelManager::getInstance()->setStatus(1); // 1 because it hasn't been made yet
+          ModelManager::getInstance()->save();
+          BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_BUILDER_PIX2PIX_MANUAL);
           scene->refresh();
-          SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);
+          SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER_PIX2PIX_MANUAL);
         }
       }
       else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
         ofDirectory dir_ = ofDirectory(dir);
         dir_.copyTo("saved_datasets/"+datasetNameInput->getText()+"/");
-        ModelManager::getInstance()->setDatasetDir(datasetNameInput->getText());
+        ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
+        ModelManager::getInstance()->setStatus(2);
+        ModelManager::getInstance()->save();
         BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
         scene->refresh();
-        ModelManager::getInstance()->setStatus(2);
         SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+      }
+    }
+  }
+  if(e.target == buildImageProcessingButton){
+    //TODO: remove
+    dir = "/home/hans/uni/diss/nicholas_cage/Nicolas_Cage/Dataset/train/class1";
+
+    if(checkTextValid() && checkFnameNew() && checkDir()){
+      if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+        if(!imagesAlreadyPaired->getChecked()){
+          ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
+          ModelManager::getInstance()->set("temp_dataset", dir);
+          ModelManager::getInstance()->setStatus(1); // 1 because it hasn't been made yet
+          ModelManager::getInstance()->save();
+          BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);
+          scene->refresh();
+          SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_BUILDER_PIX2PIX);
+        }
       }
     }
   }
@@ -121,16 +155,17 @@ bool DatasetBuilderScene::checkFnameNew(){
 }
 
 bool DatasetBuilderScene::checkDir(){
-  if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
-    return true;
-  }
-  else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
-    if(dir== ""){
-        errorLabel->setLabel("CHOOSE A FOLDER FIRST!");
-        return false;
+  // if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
+  //   return true;
+  // }
+  // else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
+  if(dir== ""){
+      errorLabel->setLabel("CHOOSE A FOLDER FIRST!");
+      return false;
     }
-    return true;
-  }
-  return false;
+  return true;
+  //   return true;
+  // }
+  // return false;
 
 }

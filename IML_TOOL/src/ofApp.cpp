@@ -93,6 +93,9 @@ void ofApp::setup(){
   sceneManager->addScene(&datasetBuilderScene);
   datasetPix2PixBuilderScene.setup();
   sceneManager->addScene(&datasetPix2PixBuilderScene);
+  datasetManualBuilderScene.setup();
+  sceneManager->addScene(&datasetManualBuilderScene);
+
 
 
   interactMenuScene.setup();

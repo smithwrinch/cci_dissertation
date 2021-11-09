@@ -9,3 +9,4 @@ ofxThreadedImageLoader
 ofxOpenCv
 ofxVideoRecorder
 ofxCv
+ofxImageSequenceRecorder

@@ -18,6 +18,7 @@
 #include "scenes/datasetSelectorScene.h"
 #include "scenes/datasetBuilderScene.h"
 #include "scenes/datasetPix2PixBuilderScene.h"
+#include "scenes/datasetManualBuilderScene.h"
 #include "scenes/interactMenuScene.h"
 #include "scenes/exploreLatentSpaceScene.h"
 #include "scenes/syncMusicScene.h"
@@ -61,6 +62,7 @@ class ofApp : public ofBaseApp{
 		DatasetMainScene datasetMainScene;
 		DatasetBuilderScene datasetBuilderScene;
 		DatasetPix2PixBuilderScene datasetPix2PixBuilderScene;
+		DatasetManualBuilderScene datasetManualBuilderScene;
 		InteractMenuScene interactMenuScene;
 		ExploreLatentSpaceScene exploreLatentSpaceScene;
 		SyncMusicScene syncMusicScene;

@@ -197,6 +197,12 @@ class ModelManager{
       return config.getValue("config:dataset_dir", "ERROR");
     }
 
+    // all purpose get (useful for temp variables)
+    // only used by dataset creation screen atm to store portential dataset
+    string get(string val){
+        return config.getValue("config:"+val, "ERROR");
+    }
+
 
   private:
     ofxXmlSettings config;

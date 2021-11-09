@@ -18,6 +18,7 @@ class DatasetBuilderScene : public BaseScene {
     bool checkDir();
     ofxDatGuiButton * loadFromFolderButton;
     ofxDatGuiButton * buildButton;
+    ofxDatGuiButton * buildImageProcessingButton;
     ofxDatGuiTextInput * datasetNameInput;
     ofxDatGuiLabel * errorLabel;
     ofxDatGuiToggle * imagesAlreadyPaired;
