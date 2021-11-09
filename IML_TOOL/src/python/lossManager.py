@@ -7,8 +7,8 @@ class LossManager():
 
     def __init__(self, rootDir):
         self.rootDir = rootDir
-        self.lossesG = np.array([0])
-        self.lossesD = np.array([0])
+        self.lossesG = np.array([])
+        self.lossesD = np.array([])
         self.lossesG = np.expand_dims(self.lossesG, axis=0)
         self.lossesD = np.expand_dims(self.lossesD, axis=0)
         if not os.path.exists(rootDir):

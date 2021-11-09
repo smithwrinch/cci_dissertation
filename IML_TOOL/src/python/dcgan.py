@@ -52,12 +52,17 @@ def generator_loss(fake_output):
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
-def train_step(images, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size):
+def train_step(images, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size, DISC_NOISE):
     noise = tf.random.normal([batch_size, latent_dim])
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
       generated_images = generator(noise, training=True)
 
-      real_output = discriminator(images, training=True)
+      disc_input = images
+
+      if(DISC_NOISE > 0):
+          disc_input = tf.keras.layers.GaussianNoise(DISC_NOISE)(disc_input)
+
+      real_output = discriminator(disc_input, training=True)
       fake_output = discriminator(generated_images, training=True)
 
       gen_loss = generator_loss(fake_output)
@@ -78,7 +83,7 @@ DISC_NOISE):
     generator_optimizer = tf.keras.optimizers.Adam(learning_rate)
     discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
-    gan = GAN(img_size, img_channel, kernel_size, latent_dim, DISC_NOISE)
+    gan = GAN(img_size, img_channel, kernel_size, latent_dim)
     generator = gan.generator
     discriminator = gan.discriminator
 
@@ -151,7 +156,7 @@ DISC_NOISE):
             image_batch = apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
 
             # print(n)
-            g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size)
+            g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size, DISC_NOISE)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
             gen_msg.send_message(str(g_loss)[:5] + "\n")

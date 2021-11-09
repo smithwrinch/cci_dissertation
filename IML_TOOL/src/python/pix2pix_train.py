@@ -125,12 +125,19 @@ def discriminator_loss(disc_real_output, disc_generated_output):
 TRAINING ---------------------------------------------------------------------------
 """
 @tf.function
-def train_step(input_image, target, generator_optimizer, discriminator_optimizer, gen_loss_, disc_loss_, LAMBDA, generator, discriminator):
+def train_step(input_image, target, generator_optimizer, discriminator_optimizer, gen_loss_, disc_loss_, LAMBDA, generator, discriminator, DISC_NOISE):
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         gen_output = generator(input_image, training=False)
 
-        disc_real_output = discriminator([input_image, target], training=False)
+        disc_input = input_image
+        disc_target = target
+
+        if(DISC_NOISE > 0):
+            disc_input = tf.keras.layers.GaussianNoise(DISC_NOISE)(disc_input)
+            disc_target = tf.keras.layers.GaussianNoise(DISC_NOISE)(disc_target)
+
+        disc_real_output = discriminator([disc_input, disc_target], training=False)
         disc_generated_output = discriminator([input_image, gen_output], training=False)
 
         gen_total_loss, gen_gan_loss, gen_l1_loss = gen_loss_(disc_generated_output, gen_output, target, LAMBDA)
@@ -154,7 +161,8 @@ def train_step(input_image, target, generator_optimizer, discriminator_optimizer
 
 def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA,
  ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc, log_msg,
-  RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST):
+  RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST,
+  DISC_NOISE):
 
     save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
     epochs = 0
@@ -239,7 +247,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
         for (input_image, target) in train_ds:
             input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
-            g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
+            g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc, DISC_NOISE)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
             # val = np.format_float_positional(val, precision=precision, unique=False, fractional=False, trim='k')
@@ -393,7 +401,7 @@ if __name__ == '__main__':
     log_msg.send("Initialising...")
 
     gen = GeneratorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
-    disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS, DISC_NOISE)
+    disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
     generator = gen.build()
     discriminator = disc.build()
 
@@ -407,4 +415,5 @@ if __name__ == '__main__':
         log_msg.send("Found " + str(len(train_dataset)) + " images...")
     train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS,
     LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator,
-     log_msg, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
+     log_msg, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST,
+     DISC_NOISE)

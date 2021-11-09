@@ -11,6 +11,15 @@ class DatasetManualBuilderScene : public BaseScene {
     void onButtonEvent(ofxDatGuiButtonEvent e);
 
   private:
+
+    vector <ofxDatGuiComponent*> gui;
     ofxDatGuiButton * buildButton;
-    ofxDatGuiButton * selectButton;
+    ofxDatGuiButton * manualButton;
+    ofxDatGuiButton * backButton;
+
+    ofxDatGuiLabel * label1;
+    ofxDatGuiLabel * label2;
+
+    ofxDatGuiTextInput * inputText;
+    ofxDatGuiTextInput * outputText;
 };
