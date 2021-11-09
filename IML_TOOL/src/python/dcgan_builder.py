@@ -88,13 +88,16 @@ def make_generator_model(img_size, img_channel = 3, latent_vector = 128, kernel_
 
 
 
-def make_discriminator_model(img_size, img_channel=3, kernel_size=5):
+def make_discriminator_model(img_size, img_channel=3, kernel_size=5, disc_noise=0):
 
 
     model = tf.keras.Sequential()
     if(img_size == 28):
         model.add(layers.Conv2D(64, kernel_size, strides=(2, 2), padding='same',
                                          input_shape=[28, 28, img_channel]))
+
+        if(disc_noise!=0):
+            model.add(layers.GaussianNoise(disc_noise))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
 
@@ -108,13 +111,16 @@ def make_discriminator_model(img_size, img_channel=3, kernel_size=5):
     elif(img_size == 64):
         model.add(layers.Conv2D(64, kernel_size, strides=(2, 2), padding='same',
                                          input_shape=[64, 64, img_channel]))
+
+        if(disc_noise!=0):
+            model.add(layers.GaussianNoise(disc_noise))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
 
         model.add(layers.Conv2D(128, kernel_size, strides=(2, 2), padding='same'))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
-        
+
         model.add(layers.Conv2D(128, kernel_size, strides=(2, 2), padding='same'))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
@@ -125,9 +131,9 @@ def make_discriminator_model(img_size, img_channel=3, kernel_size=5):
 
 
 class GAN():
-    def __init__(self, img_size, img_channel, kernel_size, latent_dim):
+    def __init__(self, img_size, img_channel, kernel_size, latent_dim,DISC_NOISE):
         self.generator = make_generator_model(img_size, img_channel, latent_dim, kernel_size)
-        self.discriminator = make_discriminator_model(img_size, img_channel, kernel_size)
+        self.discriminator = make_discriminator_model(img_size, img_channel, kernel_size, DISC_NOISE)
 
 
 

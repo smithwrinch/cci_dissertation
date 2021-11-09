@@ -50,6 +50,14 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     ofxDatGuiSlider * imgSizeSlider;
     ofxDatGuiSlider * latentDimSlider;
 
+
+    ofxDatGuiSlider* discriminatorNoiseSlider;
+    ofxDatGuiToggle* randomHorizontalToggle;
+    ofxDatGuiToggle* randomVerticalToggle;
+    ofxDatGuiSlider* cropSlider;
+    ofxDatGuiSlider* brightnessSlider;
+    ofxDatGuiSlider* contrastSlider;
+
     ofxDatGuiButton * showAdvanced;
     bool showingAdvanced = false;
 

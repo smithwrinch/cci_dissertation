@@ -323,6 +323,12 @@ class TrainingThread: public ofThread{
     int lambda;
 		int latent_vector;
     string dataset_dir;
+    float disc_noise;
+    bool random_horizontal;
+    bool random_vertical;
+    int random_crop;
+    float random_brightness;
+    float random_contrast;
 
     //lol massive
     void setup(string python_file,
@@ -339,7 +345,13 @@ class TrainingThread: public ofThread{
     int beta,
     int lambda,
 		int latent_vector,
-    string dataset_dir){
+    string dataset_dir,
+    float disc_noise,
+    bool random_horizontal,
+    bool random_vertical,
+    int random_crop,
+    float random_brightness,
+    float random_contrast){
       this->python_file = python_file;
       this->img_width = img_width;
       this->img_height = img_height;
@@ -355,6 +367,12 @@ class TrainingThread: public ofThread{
       this->lambda = lambda;
 			this->latent_vector = latent_vector;
       this->dataset_dir = dataset_dir;
+      this->disc_noise = disc_noise;
+      this->random_horizontal = random_horizontal;
+      this->random_vertical = random_vertical;
+      this->random_crop = random_crop;
+      this->random_brightness = random_brightness;
+      this->random_contrast = random_contrast;
     }
 
   	void threadedFunction(){
@@ -389,6 +407,13 @@ class TrainingThread: public ofThread{
 			out += " --checkpoint_save_dir " + base_dir + "saved_networks/";
 			out += " --dataset_dir " + dataset_dir;
       out += " --kernel_size " + to_string(kernel_size);
+
+      out += " --disc_noise " + to_string(disc_noise);
+      out += " --random_horizontal " + random_horizontal ? "1" : "0";
+      out += " --random_vertical " + random_vertical ? "1" : "0";
+      out += " --random_crop " + to_string(random_crop);
+      out += " --random_brightness " + to_string(random_brightness);
+      out += " --random_contrast " + to_string(random_contrast);
 			if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
 				out += " --image_width " + to_string(img_width);
 				out += " --image_height " + to_string(img_height);
@@ -396,7 +421,7 @@ class TrainingThread: public ofThread{
 				out += " --output_channel " + to_string(input_channel);
 				out += " --num_layers " + to_string(num_layers);
 				out += " --beta " + to_string(beta);
-				out += " --lambda " + to_string(lambda);
+				out += " --lambda_ " + to_string(lambda);
 			}
 			else if (ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
         out += " --img_channel " + to_string(input_channel);// + to_string(input_channel);

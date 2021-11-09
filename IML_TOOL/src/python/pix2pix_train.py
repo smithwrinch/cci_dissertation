@@ -13,6 +13,7 @@ from lossManager import LossManager
 from lossWriter import Messager
 from logger import LogManager
 import shutil
+from math import floor
 
 
 """
@@ -23,16 +24,16 @@ DATASET ------------------------------------------------------------------------
 def load(image):
     # - one with a real building facade image
     # - one with an architecture label image
-    print(image.shape)
+    # print(image.shape)
     w = tf.shape(image)[1]
     w = w // 2
 
     w = image.shape[2] // 2
-    print(w)
+    # print(w)
     input_image = image[:, :, w:, :]
     real_image = image[:, :, :w, :]
 
-    print(input_image.shape)
+    # print(input_image.shape)
 
 
     # Convert both images to float32 tensors
@@ -151,20 +152,9 @@ def train_step(input_image, target, generator_optimizer, discriminator_optimizer
     #     tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
     #     tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
-def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc, log_msg):
-
-    # checkpoint.restore(manager.latest_checkpoint)
-    # epochs = 0
-    # if manager.latest_checkpoint:
-    #     print(manager.latest_checkpoint.split("/")[-1][1:])
-    #
-    #     epochs =int(manager.latest_checkpoint.split("/")[-1][1:])
-    #
-    #     print("Restored from {}".format(manager.latest_checkpoint))
-    # else:
-    #     print("Initializing from scratch.")
-
-
+def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMBDA,
+ ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, gen, disc, log_msg,
+  RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST):
 
     save_dir = ROOT_CHECKPOINT_SAVE+"ckpt"
     epochs = 0
@@ -221,10 +211,6 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
         generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
         plt.savefig(ROOT_IMG_SAVE + str(epochs) +".png")
 
-        print(example_input)
-        print(example_target2)
-
-
 
         gen.save(save_dir+"/-" +str(epochs)+"_generator")
         disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
@@ -252,8 +238,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
         lossD = []
 
         for (input_image, target) in train_ds:
-
-            print(input_image)
+            input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
             g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
@@ -286,6 +271,26 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
 
     plt.close()
+
+# relies on square images atm.. TODO: add img width and height
+def apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST):
+    if(RANDOM_HORIZONTAL):
+        image_batch = tf.image.random_flip_left_right(image_batch)
+    if(RANDOM_VERTICAL):
+        image_batch = tf.image.random_flip_up_down(image_batch)
+    if(RANDOM_CROP > 0):
+        new_size = (image_batch.shape[0], floor(image_batch.shape[1]*(1-RANDOM_CROP)), floor(image_batch.shape[2]*(1-RANDOM_CROP)), image_batch.shape[3])
+        old_width = image_batch.shape[1]
+        old_height = image_batch.shape[2]
+        image_batch = tf.image.random_crop(image_batch, new_size)
+        image_batch = tf.image.resize(image_batch, (old_width, old_height))
+    if(RANDOM_BRIGHTNESS > 0):
+        image_batch = tf.image.random_brightness(image_batch, RANDOM_BRIGHTNESS)
+    if(RANDOM_CONTRAST > 0):
+        image_batch = tf.image.random_contrast(image_batch, 0, RANDOM_CONTRAST)
+
+    return image_batch
+
 
 def generate_images(model, i1, t1, i2, t2, i3, t3, ROOT_IMG_SAVE, num=1):
     p1 = model(i1, training=False)
@@ -345,6 +350,12 @@ if __name__ == '__main__':
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
     parser.add_argument("--dataset_dir", help="Location of dataset", required=True)
+    parser.add_argument("--disc_noise", help="Noise applied to discrininator", type=float, default = 0, required=False)
+    parser.add_argument("--random_horizontal", help="Random horizontal flip?", type =int, default = 0, required=False)
+    parser.add_argument("--random_vertical", help="Random vertical flip?",  type =int, default = 0, required=False)
+    parser.add_argument("--random_crop", help="Random crop amount (%)",  type =int, default = 0, required=False)
+    parser.add_argument("--random_brightness", help="Random brightness amount",  type =float, default = 0, required=False)
+    parser.add_argument("--random_contrast", help="Random contrast amount",  type =float, default = 0, required=False)
 
     args = parser.parse_args()
     DATASET_DIR = args.dataset_dir
@@ -366,6 +377,13 @@ if __name__ == '__main__':
     BETA = args.beta /100
     LAMBDA = args.lambda_
 
+    DISC_NOISE =args.disc_noise
+    RANDOM_HORIZONTAL = args.random_horizontal == 1
+    RANDOM_VERTICAL = args.random_vertical == 1
+    RANDOM_CROP = args.random_crop / 100
+    RANDOM_BRIGHTNESS = args.random_brightness
+    RANDOM_CONTRAST = args.random_contrast
+
     GEN_LOSS = generator_loss
     DISC_LOSS = discriminator_loss
 
@@ -375,7 +393,7 @@ if __name__ == '__main__':
     log_msg.send("Initialising...")
 
     gen = GeneratorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
-    disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS)
+    disc = DiscriminatorTemplate(IMG_WIDTH, IMG_HEIGHT, INPUT_CHANNEL, OUTPUT_CHANNEL, KERNEL_SIZE, NUM_LAYERS, DISC_NOISE)
     generator = gen.build()
     discriminator = disc.build()
 
@@ -387,4 +405,6 @@ if __name__ == '__main__':
         exit(0)
     else:
         log_msg.send("Found " + str(len(train_dataset)) + " images...")
-    train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS, LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator, log_msg)
+    train(train_dataset, MAX_EPOCHS, LEARNING_RATE, BETA, GEN_LOSS, DISC_LOSS,
+    LAMBDA, ROOT_IMG_SAVE, ROOT_CHECKPOINT_SAVE, steps_per_epoch, generator, discriminator,
+     log_msg, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)

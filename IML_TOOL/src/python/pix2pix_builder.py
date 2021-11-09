@@ -306,13 +306,16 @@ class GeneratorTemplate():
 Building DISCRIMINATOR ---------------------------------------------------------------------------------
 """
 
-def Discriminator(img_width, img_height, input_channel, output_channel, kernel_size, num_layers):
+def Discriminator(img_width, img_height, input_channel, output_channel, kernel_size, num_layers,disc_noise=0):
     initializer = tf.random_normal_initializer(0., 0.02)
 
     inp = tf.keras.layers.Input(shape=[img_width, img_height, input_channel], name='input_image')
     tar = tf.keras.layers.Input(shape=[img_width, img_height, output_channel], name='target_image')
 
-    x = tf.keras.layers.concatenate([inp, tar])  # (batch_size, 256, 256, channels*2)
+    if(disc_noise > 0):
+        xx = tf.keras.layers.GaussianNoise(disc_noise)(inp)
+
+    x = tf.keras.layers.concatenate([xx, tar])  # (batch_size, 256, 256, channels*2)
 
 
     # down = downsample(64, kernel_size, False)(x)  # (batch_size, 128, 128, 64)
@@ -344,18 +347,20 @@ def Discriminator(img_width, img_height, input_channel, output_channel, kernel_s
     return tf.keras.Model(inputs=[inp, tar], outputs=last)
 
 class DiscriminatorTemplate():
-    def __init__(self, img_width, img_height, input_channel, output_channel, kernel_size, num_layers):
+    def __init__(self, img_width, img_height, input_channel, output_channel, kernel_size, num_layers, disc_noise):
         self.img_width = img_width
         self.img_height = img_height
         self.input_channel = input_channel
         self.output_channel = output_channel
         self.num_layers = num_layers
         self.kernel_size = kernel_size
+        self.disc_noise = disc_noise
 
     def build(self):
         print("Building Discriminator")
         self.discriminator = Discriminator(self.img_width, self.img_height,
-            self.input_channel, self.output_channel, self.kernel_size, self.num_layers)
+            self.input_channel, self.output_channel, self.kernel_size, self.num_layers,
+            self.disc_noise)
         return self.discriminator
     def __str__(self):
         self.discriminator.summary()

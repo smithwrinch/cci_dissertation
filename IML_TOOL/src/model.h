@@ -89,8 +89,36 @@ class ModelManager{
     void setDatasetDir(string dir){
       config.setValue("config:dataset_dir", dir);
     }
+    void setDiscriminatorNoise(float f){
+      config.setValue("config:disc_noise", f);
+    }
+    void setRandomHorizontal(bool b){
+      int out = 0;
+      if(b){
+        out = 1;
+      }
+      config.setValue("config:random_horizontal", out);
+    }
+    void setRandomVertical(bool b){
+      int out = 0;
+      if(b){
+        out = 1;
+      }
+      config.setValue("config:random_vertical", out);
+    }
+    void setRandomCrop(int i){
+      config.setValue("config:random_crop", i);
+    }
+    void setRandomBrightness(float f){
+      config.setValue("config:random_brightness", f);
+    }
+
+    void setRandomContrast(float f){
+      config.setValue("config:random_contrast", f);
+    }
+
     // all purpose set
-    // wrote everything else out as I thought it would be safer
+    // wrote everything else out to be more robust to refactor
     void set(string key, string i){
         config.setValue("config:"+key, i);
     }
@@ -195,6 +223,30 @@ class ModelManager{
     }
     string getDatasetDir(){
       return config.getValue("config:dataset_dir", "ERROR");
+    }
+
+
+    float getDiscriminatorNoise(){
+      return config.getValue("config:disc_noise", 0);
+    }
+    bool getRandomHorizontal(){
+
+      int i = config.getValue("config:random_horizontal", 0);
+      return i == 1;
+    }
+    bool getRandomVertical(){
+      int i = config.getValue("config:random_vertical", 0);
+      return i == 1;
+    }
+    int getRandomCrop(){
+      return config.getValue("config:random_crop", 0);
+    }
+    string getRandomBrightness(){
+      return config.getValue("config:random_brightness", "0");
+    }
+
+    string getRandomContrast(){
+      return config.getValue("config:random_contrast", "0");
     }
 
     // all purpose get (useful for temp variables)

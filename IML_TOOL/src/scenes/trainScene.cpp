@@ -34,9 +34,18 @@ void TrainingScene::refresh(){
     float beta = model->getBeta();
     int lambda = model->getLambda();
     string dataset_dir = model->getDatasetDir();
-
     int latent_vector = model->getLatentVector();
+
+    float disc_noise = model->getDiscriminatorNoise();
+    bool random_horizontal = model->getRandomHorizontal();
+    bool random_vertical = model->getRandomVertical();
+    int random_crop = model->getRandomCrop();
+    float random_brightness = ofToFloat(model->getRandomBrightness());
+    float random_contrast = ofToFloat(model->getRandomContrast());
+    cout << random_contrast << endl;
     string pythonFile;
+
+    //TODO create custom python files
     if(model->getModelType() == MODEL_TYPE::PIX2PIX){
       pythonFile = "python ../src/python/pix2pix_train.py ";
     }
@@ -57,7 +66,15 @@ void TrainingScene::refresh(){
       kernel_size,
       beta,
       lambda,
-      latent_vector, dataset_dir);
+      latent_vector,
+      dataset_dir,
+      disc_noise,
+      random_horizontal,
+      random_vertical,
+      random_crop,
+      random_brightness,
+      random_contrast
+      );
 
     epochLabel->setLabel(ofToString(model->getEpochsTrained()) + "/" + ofToString(ModelManager::getInstance()->getMaxEpochs()));
 
@@ -137,6 +154,7 @@ void TrainingScene::setup(){
   maxEpochsSlider->setMin(ModelManager::getInstance()->getEpochsTrained());
 
 
+  
   toggleGraphButton->setPosition(701, 525);
   toggleGraphButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 

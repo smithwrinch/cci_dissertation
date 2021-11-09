@@ -10,7 +10,7 @@ import PIL
 from tensorflow.keras import layers
 import time
 import argparse
-
+from math import floor
 from IPython import display
 
 from piper import Piper
@@ -70,12 +70,15 @@ def train_step(images, generator, discriminator, generator_optimizer, discrimina
 
     return gen_loss, disc_loss
 
-def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size, batch_size, learning_rate, root_checkpoint_save, root_img_save, log_msg):
+def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
+batch_size, learning_rate, root_checkpoint_save, root_img_save, log_msg,
+RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST,
+DISC_NOISE):
 
     generator_optimizer = tf.keras.optimizers.Adam(learning_rate)
     discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
-    gan = GAN(img_size, img_channel, kernel_size, latent_dim)
+    gan = GAN(img_size, img_channel, kernel_size, latent_dim, DISC_NOISE)
     generator = gan.generator
     discriminator = gan.discriminator
 
@@ -145,6 +148,8 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
         start = time.time()
 
         for n, image_batch in enumerate(dataset):
+            image_batch = apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
+
             # print(n)
             g_loss, d_loss = train_step(image_batch, generator, discriminator, generator_optimizer, discriminator_optimizer, latent_dim, batch_size)
             g_loss = g_loss.numpy()
@@ -169,6 +174,27 @@ def train(dataset, epochs, seed, img_size, img_channel, latent_dim, kernel_size,
     # Generate after the final epoch
     display.clear_output(wait=True)
     # generate_and_save_images(generator, epochs, seed)
+
+
+# relies on square images atm.. TODO: add img width and height
+def apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST):
+    if(RANDOM_HORIZONTAL):
+        image_batch = tf.image.random_flip_left_right(image_batch)
+    if(RANDOM_VERTICAL):
+        image_batch = tf.image.random_flip_up_down(image_batch)
+    if(RANDOM_CROP > 0):
+        new_size = (image_batch.shape[0], floor(image_batch.shape[1]*(1-RANDOM_CROP)), floor(image_batch.shape[2]*(1-RANDOM_CROP)), image_batch.shape[3])
+        old_width = image_batch.shape[1]
+        old_height = image_batch.shape[2]
+        image_batch = tf.image.random_crop(image_batch, new_size)
+        image_batch = tf.image.resize(image_batch, (old_width, old_height))
+    if(RANDOM_BRIGHTNESS > 0):
+        image_batch = tf.image.random_brightness(image_batch, RANDOM_BRIGHTNESS)
+    if(RANDOM_CONTRAST > 0):
+        image_batch = tf.image.random_contrast(image_batch, 0, RANDOM_CONTRAST)
+
+    return image_batch
+
 
 def generate_and_save_images(model, test_input,filepath='../bin/data/images_/current', img_channel=1):
   # Notice `training` is set to False.
@@ -229,8 +255,12 @@ if __name__ == '__main__':
     parser.add_argument("--img_save_dir", help="Directory to save images to", default="data/default_save/", required=False)
     parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="data/default_save/", required=False)
     parser.add_argument("--dataset_dir", help="Location of dataset", required=True)
-
-
+    parser.add_argument("--disc_noise", help="Noise applied to discrininator", type=float, default = 0, required=False)
+    parser.add_argument("--random_horizontal", help="Random horizontal flip?", type =int, default = 0, required=False)
+    parser.add_argument("--random_vertical", help="Random vertical flip?",  type =int, default = 0, required=False)
+    parser.add_argument("--random_crop", help="Random crop amount (%)",  type =int, default = 0, required=False)
+    parser.add_argument("--random_brightness", help="Random brightness amount",  type =float, default = 0, required=False)
+    parser.add_argument("--random_contrast", help="Random contrast amount",  type =float, default = 0, required=False)
 
     args = parser.parse_args()
     ROOT_IMG_SAVE = args.img_save_dir
@@ -249,6 +279,13 @@ if __name__ == '__main__':
     KERNEL_SIZE = args.kernel_size
     LATENT_DIM = args.latent_dim
 
+    DISC_NOISE =args.disc_noise
+    RANDOM_HORIZONTAL = args.random_horizontal == 1
+    RANDOM_VERTICAL = args.random_vertical == 1
+    RANDOM_CROP = args.random_crop / 100
+    RANDOM_BRIGHTNESS = args.random_brightness
+    RANDOM_CONTRAST = args.random_contrast
+
     log_msg = LogManager(ROOT_CHECKPOINT_SAVE+"log.txt")
     log_msg.send("Initialising...")
 
@@ -263,4 +300,7 @@ if __name__ == '__main__':
     else:
         log_msg.send("Found " + str(len(train_dataset)) + " images...")
 
-    train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM, KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE, log_msg)
+    train(train_dataset, MAX_EPOCHS, seed, IMG_SIZE, IMG_CHANNEL, LATENT_DIM,
+    KERNEL_SIZE, BATCH_SIZE, LEARNING_RATE, ROOT_CHECKPOINT_SAVE, ROOT_IMG_SAVE,
+    log_msg, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS,
+    RANDOM_CONTRAST, DISC_NOISE)

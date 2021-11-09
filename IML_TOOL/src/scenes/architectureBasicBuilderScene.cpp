@@ -36,6 +36,13 @@ void ArchitectureBasicBuilderScene::refresh(){
   betaSlider->setValue(model->getBeta());
   lambdaSlider->setValue(model->getLambda());
 
+  discriminatorNoiseSlider->setValue(model->getDiscriminatorNoise());
+  randomHorizontalToggle->setChecked(model->getRandomHorizontal());
+  randomVerticalToggle->setChecked(model->getRandomVertical());
+  cropSlider->setValue(model->getRandomCrop());
+  brightnessSlider->setValue(ofToFloat(model->getRandomBrightness()));
+  contrastSlider->setValue(ofToFloat(model->getRandomContrast()));
+
   cout << "LEARNING RATE X " << model->getLearningRateX() << endl;
   cout << "LEARNING RATE Y " << model->getLearningRateY() << endl;
 }
@@ -52,11 +59,11 @@ void ArchitectureBasicBuilderScene::setup(){
   ModelManager * model = ModelManager::getInstance();
 
   backButton = new ofxDatGuiButton("BACK<-");
-  backButton->setPosition(btnBuffer, ofGetHeight() - 200);
+  backButton->setPosition(btnBuffer, ofGetHeight() - 100);
   backButton->onButtonEvent(this, &ArchitectureBasicBuilderScene::onButtonEvent);
 
   continueButton = new ofxDatGuiButton("CONTINUE");
-  continueButton->setPosition(ofGetWidth() - backButton->getWidth() - btnBuffer, ofGetHeight() - 200);
+  continueButton->setPosition(ofGetWidth() - backButton->getWidth() - btnBuffer, ofGetHeight() - 100);
   continueButton->onButtonEvent(this, &ArchitectureBasicBuilderScene::onButtonEvent);
   //
   // imgWidthSlider = new ofxDatGuiSlider("IMAGE WIDTH: ", 32, 1024, model->getImgWidth());
@@ -172,12 +179,32 @@ void ArchitectureBasicBuilderScene::setup(){
   kernelSizeSlider->setPrecision(0);
 
   betaSlider = new ofxDatGuiSlider("BETA (*10^-2)", 0, 100, model->getBeta());
-  betaSlider->setPosition(centreX, kernelSizeSlider->getY()+kernelSizeSlider->getHeight());
+  betaSlider->setPosition(centreX, numLayersSlider->getY()+numLayersSlider->getHeight());
   betaSlider->setPrecision(0);
 
   lambdaSlider = new ofxDatGuiSlider("LAMBDA", 0, model->getLambda());
   lambdaSlider->setPosition(centreX, betaSlider->getY()+betaSlider->getHeight());
   lambdaSlider->setPrecision(0);
+
+  discriminatorNoiseSlider = new ofxDatGuiSlider("Discriminator Noise", 0, 1, 0);
+  discriminatorNoiseSlider->setPosition(centreX, lambdaSlider->getY()+lambdaSlider->getHeight());
+
+  randomHorizontalToggle = new ofxDatGuiToggle("RANDOM HORIZONTAL FLIP");
+  randomHorizontalToggle->setPosition(centreX, discriminatorNoiseSlider->getY()+discriminatorNoiseSlider->getHeight());
+
+  randomVerticalToggle = new ofxDatGuiToggle("RANDOM VERTICAL FLIP");
+  randomVerticalToggle->setPosition(centreX, randomHorizontalToggle->getY()+randomHorizontalToggle->getHeight());
+
+  cropSlider = new ofxDatGuiSlider("RANDOM CROP AMOUNT (%)", 0, 50, 0);
+  cropSlider->setPosition(centreX, randomVerticalToggle->getY()+randomVerticalToggle->getHeight());
+  cropSlider->setPrecision(0);
+
+  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS DELTA", 0, 0.5, 0);
+  brightnessSlider->setPosition(centreX, cropSlider->getY()+cropSlider->getHeight());
+  // brightnessSlider->setPrecision(0);
+
+  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST DELTA", 0, 0.5, 0);
+  contrastSlider->setPosition(centreX, brightnessSlider->getY()+brightnessSlider->getHeight());
 
   // imgWidthSlider->setWidth(width, label_width);
   // imgHeightSlider->setWidth(width, label_width);
@@ -192,7 +219,13 @@ void ArchitectureBasicBuilderScene::setup(){
   kernelSizeSlider->setWidth(width, label_width);
   betaSlider->setWidth(width, label_width);
   lambdaSlider->setWidth(width, label_width);
-
+  //
+  discriminatorNoiseSlider->setWidth(width, label_width);
+  randomHorizontalToggle->setWidth(width);
+  randomVerticalToggle->setWidth(width);
+  cropSlider->setWidth(width, label_width);
+  brightnessSlider->setWidth(width, label_width);
+  contrastSlider->setWidth(width, label_width);
 
   // imgSizeSlider->setWidth(width, label_width);
   latentDimSlider->setWidth(width, label_width);
@@ -204,11 +237,17 @@ void ArchitectureBasicBuilderScene::update(){
   learningRateSlider2->update();
   maxEpochsSlider->update();
   batchSizeSlider->update();
+  showAdvanced->update();
   if(showingAdvanced){
-    // kernelSizeSlider->update();
+
+      discriminatorNoiseSlider->update();
+      randomHorizontalToggle->update();
+      randomVerticalToggle->update();
+      cropSlider->update();
+      brightnessSlider->update();
+      contrastSlider->update();
   }
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
-    showAdvanced->update();
     // outputRGBToggle->update();
     // imgWidthSlider->update();
     // imgHeightSlider->update();
@@ -240,12 +279,18 @@ void ArchitectureBasicBuilderScene::draw(){
   learningRateSlider2->draw();
   maxEpochsSlider->draw();
   batchSizeSlider->draw();
+  showAdvanced->draw();
 
   if(showingAdvanced){
-    // kernelSizeSlider->draw();
+      discriminatorNoiseSlider->draw();
+      randomHorizontalToggle->draw();
+      randomVerticalToggle->draw();
+      cropSlider->draw();
+      brightnessSlider->draw();
+      contrastSlider->draw();
   }
+
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
-    showAdvanced->draw();
 
     if(showingAdvanced){
       betaSlider->draw();
@@ -322,6 +367,19 @@ void ArchitectureBasicBuilderScene::setModel(){
   model->setMaxEpochs(maxEpochsSlider->getValue());
   model->setBatchSize(batchSizeSlider->getValue());
   model->setKernelSize(kernelSizeSlider->getValue());
+
+  model->setDiscriminatorNoise(discriminatorNoiseSlider->getValue());
+  model->setRandomHorizontal(randomHorizontalToggle->getChecked());
+  model->setRandomVertical(randomVerticalToggle->getChecked());
+  model->setRandomCrop(cropSlider->getValue());
+  model->setRandomBrightness(brightnessSlider->getValue());
+  model->setRandomContrast(contrastSlider->getValue());
+  // discriminatorNoiseSlider->update();
+  // randomHorizontalToggle->update();
+  // randomVerticalToggle->update();
+  // cropSlider->update();
+  // brightnessSlider->update();
+  // contrastSlider->update();
   int channels = 3;
   if(inputRGBToggle->getChecked()){
     channels = 1;
