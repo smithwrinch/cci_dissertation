@@ -621,7 +621,8 @@ obj/linux64/Release/src/scenes/exploreLatentSpaceScene.o: \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/libs/cppflow/include/cppflow/defer.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/libs/cppflow/include/cppflow/raw_ops.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/libs/cppflow/include/cppflow/ops.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/src/ofxTensorFlow2Utils.h
+ /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/src/ofxTensorFlow2Utils.h \
+ /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxVideoRecorder/src/ofxVideoRecorder.h
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/exploreLatentSpaceScene.h:
 
@@ -1900,3 +1901,5 @@ obj/linux64/Release/src/scenes/exploreLatentSpaceScene.o: \
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/libs/cppflow/include/cppflow/ops.h:
 
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxTensorFlow2/src/ofxTensorFlow2Utils.h:
+
+/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxVideoRecorder/src/ofxVideoRecorder.h:

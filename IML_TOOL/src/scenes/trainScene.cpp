@@ -205,18 +205,17 @@ void TrainingScene::setup(){
 void TrainingScene::update(){
   // cout << "LOL" <<"\n";
   /* open, read, and display the message from the FIFO */
-  if(state != 2){
-    backButton->update();
-    playButton->update();
-  }
+
   if(state == 0){
     if(ModelManager::getInstance()->getEpochsTrained() == 0){
       startTrainingButton->update();
     }
     else{
       resumeTrainingButton->update();
+      playButton->update();
     }
 
+    backButton->update();
     learningRateSlider->update();
     learningRateSlider2->update();
     batchSizeSlider->update();
@@ -259,10 +258,10 @@ void TrainingScene::draw(){
       startTrainingButton->draw();
     }
     else{
+      playButton->draw();
       resumeTrainingButton->draw();
     }
     backButton->draw();
-    playButton->draw();
     restartTrainingButton->draw();
     learningRateSlider->draw();
     learningRateSlider2->draw();
@@ -373,6 +372,17 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
         break;
     }
     threadedImageLoader.loadFromDisk(graph_img, "saved_models/" + ModelManager::getInstance()->getModelName()+"/saved_networks/losses/"+name);
+  }
+  else if(e.target == backButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_MENU);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
+  }
+
+  else if(e.target == playButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_MENU);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
 
 }

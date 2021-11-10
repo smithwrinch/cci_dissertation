@@ -9,6 +9,7 @@
 #include "ofxTensorFlow2.h"
 #include "ofxGui.h"
 #include <math.h>
+#include "ofxVideoRecorder.h"
 
 class ExploreLatentSpaceScene : public BaseScene {
     public:
@@ -49,6 +50,7 @@ class ExploreLatentSpaceScene : public BaseScene {
       void setLatentVector();
       void updateLatentVector();
       void resetSpeedVector();
+      void record();
 
       SceneManager * sceneManager = SceneManager::getInstance();
       vector<float> latentVector;
@@ -57,6 +59,7 @@ class ExploreLatentSpaceScene : public BaseScene {
       bool dirWidget = false; // direction widgets
 
 
+      ofxVideoRecorder vidRecorder;
       // ofxPanel gui;
       // ofxIntSlider latentVectorSelect;
       // ofxFloatSlider latentVectorSet;
@@ -70,6 +73,9 @@ class ExploreLatentSpaceScene : public BaseScene {
       ofxDatGuiButton* setAllButton;
       ofxDatGuiButton* resetSpeedButton;
       ofxDatGuiSlider* speedSlider;
+      ofxDatGuiButton* recordButton;
+      ofxDatGuiButton* setExportFolderButton;
+      ofxDatGuiButton* exportPictureButton;
 
       DialWidget dialWidget;
       LatentGraphWidget latentGraphWidget;
@@ -78,5 +84,10 @@ class ExploreLatentSpaceScene : public BaseScene {
       LatentGraphWidget speedLatentGraphWidget;
 
       vector <ofxDatGuiComponent*> gui;
+
+
+      bool hasChosenExportFolder = false;
+      bool recording = false;
+      string exportDir;
 
 };

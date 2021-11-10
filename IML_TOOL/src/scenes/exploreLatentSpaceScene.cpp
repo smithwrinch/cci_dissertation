@@ -4,11 +4,9 @@
 void ExploreLatentSpaceScene::refresh(){
   // neural network setup, bail out on error
   // the default model is edges2shoes and accepts [None, None, None, 3]
-  resetSpeedVector();
-  randomiseLatentVector();
   ModelManager * modelManager = ModelManager::getInstance();
 
-
+  SceneManager::getInstance()->setShowNavBar(false);
 
   if(modelManager->getModelType() != MODEL_TYPE::GAN){
       cout << "Should not have gone here..." << endl;
@@ -19,6 +17,8 @@ void ExploreLatentSpaceScene::refresh(){
   nnHeight = modelManager->getImgHeight();
   latentDim = modelManager->getLatentVector();
 
+  resetSpeedVector();
+  randomiseLatentVector();
   latentVectorSelectSlider->setMax(latentDim);
 
   string modelDir = "saved_models/"+modelManager->getModelName()+
@@ -41,6 +41,10 @@ void ExploreLatentSpaceScene::refresh(){
 
   }
 
+
+  vidRecorder.setVideoCodec("mpeg4");
+  vidRecorder.setVideoBitrate("800k");
+
   // allocate fbo and images with correct dimensions, no alpha channel
   ofLogVerbose() << "Allocating fbo and images ("
                  << nnWidth << ", " << nnHeight << ")";
@@ -62,6 +66,8 @@ void ExploreLatentSpaceScene::refresh(){
   // start the model background thread
   model.startThread();
 
+  hasChosenExportFolder = false;
+  recording = false;
   autoRun = true;
   dirWidget = false;
   dialWidget.setLatentVector(&latentVector);
@@ -110,6 +116,10 @@ void ExploreLatentSpaceScene::update(){
     latentGraphWidget.update();
     dialWidget.update();
   }
+  if(hasChosenExportFolder){
+    recordButton->update();
+    exportPictureButton->update();
+  }
 
   // start & stop the model
   if(!autoRun && model.isThreadRunning()) {
@@ -152,6 +162,13 @@ void ExploreLatentSpaceScene::update(){
     ofxTF2::tensorToImage(output, imgOut);
     imgOut.update();
 
+    if(recording){
+      bool success = vidRecorder.addFrame(imgOut.getPixels());
+      if (!success) {
+         ofLogWarning("Frame was not added!");
+      }
+    }
+
     // start new measurement
     start = std::chrono::system_clock::now();
   }
@@ -172,7 +189,10 @@ void ExploreLatentSpaceScene::draw(){
       dialWidget.draw();
     }
 
-
+    if(hasChosenExportFolder){
+      recordButton->draw();
+      exportPictureButton->draw();
+    }
     std::stringstream str;
   	ofPushMatrix();
   		// just to check fbo is reading correctly
@@ -191,6 +211,7 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
     stopThread();
     update();
+    SceneManager::getInstance()->setShowNavBar(true);
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
   else if(e.target == randomiseButton){
@@ -208,6 +229,19 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
     }
     latentVectorSlider->setValue(0);
   }
+  else if(e.target == setExportFolderButton){
+    ofFileDialogResult result = ofSystemLoadDialog("select output dir", true);
+    if (result.bSuccess) {
+      exportDir = result.getPath();
+      hasChosenExportFolder = true;
+    }
+  }
+  else if(e.target == recordButton){
+    record();
+  }
+  else if(e.target == exportPictureButton){
+    ofSaveImage(imgOut,exportDir+"/"+ofGetTimestampString()+".png");
+  }
 }
 
 void ExploreLatentSpaceScene::randomiseLatentVector(){
@@ -224,7 +258,6 @@ void ExploreLatentSpaceScene::updateLatentVector(){
 
   for (int i =0; i < latentDim; i++){
       latentVector[i] += (speedVector[i] * (speedSlider->getValue())/100.f);
-      cout << speedVector[i] << endl;
       if(latentVector[i] > 1){
         latentVector[i] = 1;
       }
@@ -278,6 +311,22 @@ bool ExploreLatentSpaceScene::drawImage(const T& img, string label, int width, i
 	return false;
 }
 
+void ExploreLatentSpaceScene::record(){
+  if(recording){
+      recording = false;
+      vidRecorder.close();
+      recordButton->setLabel("START RECORDING");
+      recordButton->setStripeColor(ofColor(0,255,0));
+  }
+  else if(hasChosenExportFolder){
+    recording = true;
+    vidRecorder.setup(exportDir+"/"+ofGetTimestampString()+".mov", imgOut.getHeight(), imgOut.getWidth(), 30);
+    vidRecorder.start();
+    recordButton->setLabel("STOP RECORDING");
+    recordButton->setStripeColor(ofColor(255,0,0));
+  }
+}
+
 void ExploreLatentSpaceScene::addGui(){
   int width = 350;
   int buffer = 25;
@@ -306,7 +355,7 @@ void ExploreLatentSpaceScene::addGui(){
   toggleWidgetsButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
   toggleWidgetsButton->setWidth(width);
 
-  speedSlider = new ofxDatGuiSlider("Traversal speed", 0, 3);
+  speedSlider = new ofxDatGuiSlider("Traversal speed", 0, 1);
   speedSlider->setPosition(0, buffer+toggleWidgetsButton->getY());
   speedSlider->setWidth(width, 0.5);
 
@@ -319,17 +368,34 @@ void ExploreLatentSpaceScene::addGui(){
   backButton->setPosition(100, ofGetHeight()-50);
   backButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
 
+  setExportFolderButton = new ofxDatGuiButton("SET EXPORT FOLDER");
+  setExportFolderButton->setPosition(ofGetWidth() - width - 50, ofGetHeight() - 100);
+  setExportFolderButton->setWidth(width);
+  setExportFolderButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+
+  recordButton = new ofxDatGuiButton("START RECORDING");
+  recordButton->setStripeColor(ofColor(0,255,0));
+  recordButton->setPosition(ofGetWidth() - width - 50, ofGetHeight() - 150);
+  recordButton->setWidth(width);
+  recordButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+
+
+  exportPictureButton = new ofxDatGuiButton("EXPORT IMAGE");
+  exportPictureButton->setWidth(imWidth);
+  exportPictureButton->setPosition(ofGetWidth()/2, ofGetHeight()/2 - imHeight/2 + imHeight);
+  exportPictureButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+
+
   gui.push_back(backButton);
   gui.push_back(latentVectorSelectSlider);
   gui.push_back(latentVectorSlider);
   gui.push_back(randomiseButton);
   gui.push_back(toggleWidgetsButton);
   gui.push_back(setAllButton);
+  gui.push_back(setExportFolderButton);
 
   dialWidget.setup(150, 360, 125, ofColor(255, 255, 255), true);
   latentGraphWidget.setup(50, 520, 350, 175, ofColor(255, 255, 255), true);
-  dialWidget.setLatentVector(&latentVector);
-  latentGraphWidget.setLatentVector(&latentVector);
 
 
   speedDialWidget.setup(150, 360, 125, ofColor(250, 218, 94), true);

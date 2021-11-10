@@ -27,6 +27,9 @@ void WebcamP2PScene::refresh(){
   nnWidth = modelManager->getImgWidth();
   nnHeight = modelManager->getImgHeight();
 
+
+  ofImage imgOut;
+
   drawWidth = 400;
   drawHeight = 400;
 
@@ -588,7 +591,7 @@ void WebcamP2PScene::updateContourImage(){
   grayDiff.absDiff(grayBg, imgInGray);
   grayDiff.threshold(contourThresholdSlider->getValue());
   contourFinder.findContours(grayDiff, minContourSlider->getValue(),
-   maxContourSlider->getValue(), blobsToConsiderSlider->getValue(), true, true);
+  maxContourSlider->getValue(), blobsToConsiderSlider->getValue(), true, true);
 
   contourFbo.readToPixels(contourImg.getPixels());
 }

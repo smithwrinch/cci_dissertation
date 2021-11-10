@@ -13,4 +13,6 @@ class DatasetMainScene : public BaseScene {
   private:
     ofxDatGuiButton * buildButton;
     ofxDatGuiButton * selectButton;
+    ofxDatGuiButton * backButton;
+    ofxDatGuiButton * playButton;
 };
