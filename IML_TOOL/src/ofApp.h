@@ -25,6 +25,7 @@
 #include "scenes/exportGifScene.h"
 #include "scenes/drawP2PScene.h"
 #include "scenes/webcamP2PScene.h"
+#include "scenes/motionDetectionScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -69,6 +70,7 @@ class ofApp : public ofBaseApp{
 		ExportGifScene exportGifScene;
 		DrawP2PScene drawP2PScene;
 		WebcamP2PScene webcamP2PScene;
+		MotionDetectionScene motionDetectionScene;
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);

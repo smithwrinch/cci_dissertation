@@ -64,6 +64,10 @@ void ExploreLatentSpaceScene::refresh(){
 
   autoRun = true;
   dirWidget = false;
+  dialWidget.setLatentVector(&latentVector);
+  latentGraphWidget.setLatentVector(&latentVector);
+  speedDialWidget.setLatentVector(&speedVector);
+  speedLatentGraphWidget.setLatentVector(&speedVector);
 }
 
 void ExploreLatentSpaceScene::setup(){
@@ -100,6 +104,7 @@ void ExploreLatentSpaceScene::update(){
       speedLatentGraphWidget.update();
       speedDialWidget.update();
       speedSlider->update();
+      resetSpeedButton->update();
   }
   else{
     latentGraphWidget.update();
@@ -160,6 +165,7 @@ void ExploreLatentSpaceScene::draw(){
         speedLatentGraphWidget.draw();
         speedDialWidget.draw();
         speedSlider->draw();
+        resetSpeedButton->draw();
     }
     else{
       latentGraphWidget.draw();
@@ -173,7 +179,7 @@ void ExploreLatentSpaceScene::draw(){
   		//if(!drawImage(imgIn, "imgIn")) {
   		//	str << "imgIn not allocated !!" << srd::endl;
   		//}
-  		if(!drawImage(imgOut, "imgOut")) {
+  		if(!drawImage(imgOut, "imgOut", imWidth, imHeight)) {
   			cout << "imgOut not allocated !!" << std::endl;
   		}
   	ofPopMatrix();
@@ -185,7 +191,7 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
     stopThread();
     update();
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
   else if(e.target == randomiseButton){
     randomiseLatentVector();
@@ -193,13 +199,22 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   else if(e.target == toggleWidgetsButton){
     dirWidget = !dirWidget;
   }
+  else if (e.target == resetSpeedButton){
+    resetSpeedVector();
+  }
+  else if (e.target == setAllButton){
+    for(int i =0; i < latentVector.size(); i++){
+      latentVector[i] = 0;
+    }
+    latentVectorSlider->setValue(0);
+  }
 }
 
 void ExploreLatentSpaceScene::randomiseLatentVector(){
 
   latentVector.clear();
   for (int i =0; i < latentDim; i++){
-      float b = (float)rand() / (float)RAND_MAX;
+      float b = ofRandom(-1.f, 1.f);
       latentVector.push_back(b);
   }
 
@@ -208,12 +223,13 @@ void ExploreLatentSpaceScene::randomiseLatentVector(){
 void ExploreLatentSpaceScene::updateLatentVector(){
 
   for (int i =0; i < latentDim; i++){
-      latentVector[i] += speedVector[i]/ 100.f;
+      latentVector[i] += (speedVector[i] * (speedSlider->getValue())/100.f);
+      cout << speedVector[i] << endl;
       if(latentVector[i] > 1){
         latentVector[i] = 1;
       }
-      else if (latentVector[i] < 0){
-        latentVector[i] = 0;
+      else if (latentVector[i] < -1){
+        latentVector[i] = -1;
       }
   }
 
@@ -237,22 +253,22 @@ void ExploreLatentSpaceScene::setLatentVector(){
 
 // private -------------------------------------------------------------
 template <typename T>
-bool ExploreLatentSpaceScene::drawImage(const T& img, string label) {
+bool ExploreLatentSpaceScene::drawImage(const T& img, string label, int width, int height) {
 	if(img.isAllocated()) {
 		ofSetColor(255);
 		ofFill();
 
 		// draw image
-		img.draw(ofGetWidth()/2 - nnWidth/2, ofGetHeight()/2 - nnHeight/2);
+		img.draw(ofGetWidth()/2, ofGetHeight()/2 - height/2, width, height);
 
 		// draw border
 		ofNoFill();
 		ofSetColor(200);
 		ofSetLineWidth(1);
-		ofDrawRectangle(ofGetWidth()/2 - nnWidth/2, ofGetHeight()/2 - nnHeight/2, img.getWidth(), img.getHeight());
+		ofDrawRectangle(ofGetWidth()/2, ofGetHeight()/2 - height/2, width, height);
 
 		// draw label
-		ofDrawBitmapString(label, 10, img.getHeight() + 15);
+		ofDrawBitmapString(label, 10, height + 15);
 
 		// next position
 		ofTranslate(img.getWidth(), 0);
@@ -270,23 +286,34 @@ void ExploreLatentSpaceScene::addGui(){
   latentVectorSelectSlider->setPrecision(0);
   latentVectorSelectSlider->setWidth(width, 0.5);
 
-  latentVectorSlider = new ofxDatGuiSlider("Latent vector value", 0, 1);
-  latentVectorSlider->setPosition(0, buffer+latentVectorSelectSlider->getHeight());
+  latentVectorSlider = new ofxDatGuiSlider("Latent vector value", -1, 1);
+  latentVectorSlider->setPosition(0, buffer+latentVectorSelectSlider->getY());
   latentVectorSlider->setWidth(width, 0.5);
+
 
   randomiseButton = new ofxDatGuiButton("RANDOMISE");
   randomiseButton->setPosition(0, buffer+latentVectorSlider->getY());
   randomiseButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
   randomiseButton->setWidth(width);
 
+  setAllButton = new ofxDatGuiButton("SET ALL");
+  setAllButton->setPosition(0, buffer+randomiseButton->getY());
+  setAllButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+  setAllButton->setWidth(width);
+
   toggleWidgetsButton = new ofxDatGuiButton("TOGGLE MODE");
-  toggleWidgetsButton->setPosition(0, buffer+randomiseButton->getY());
+  toggleWidgetsButton->setPosition(0, buffer+setAllButton->getY());
   toggleWidgetsButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
   toggleWidgetsButton->setWidth(width);
 
-  speedSlider = new ofxDatGuiSlider("Traversal speed", 0, 1);
+  speedSlider = new ofxDatGuiSlider("Traversal speed", 0, 3);
   speedSlider->setPosition(0, buffer+toggleWidgetsButton->getY());
   speedSlider->setWidth(width, 0.5);
+
+  resetSpeedButton = new ofxDatGuiButton("RESET SPEED");
+  resetSpeedButton->setPosition(0, buffer+speedSlider->getY());
+  resetSpeedButton->onButtonEvent(this, &ExploreLatentSpaceScene::onButtonEvent);
+  resetSpeedButton->setWidth(width);
 
   backButton = new ofxDatGuiButton("BACK<-");
   backButton->setPosition(100, ofGetHeight()-50);
@@ -297,9 +324,10 @@ void ExploreLatentSpaceScene::addGui(){
   gui.push_back(latentVectorSlider);
   gui.push_back(randomiseButton);
   gui.push_back(toggleWidgetsButton);
+  gui.push_back(setAllButton);
 
-  dialWidget.setup(150, 360, 125, ofColor(255, 255, 255));
-  latentGraphWidget.setup(50, 520, 350, 175, ofColor(250, 255, 255));
+  dialWidget.setup(150, 360, 125, ofColor(255, 255, 255), true);
+  latentGraphWidget.setup(50, 520, 350, 175, ofColor(255, 255, 255), true);
   dialWidget.setLatentVector(&latentVector);
   latentGraphWidget.setLatentVector(&latentVector);
 

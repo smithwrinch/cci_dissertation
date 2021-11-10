@@ -110,6 +110,8 @@ void ofApp::setup(){
   sceneManager->addScene(&drawP2PScene);
   webcamP2PScene.setup();
   sceneManager->addScene(&webcamP2PScene);
+  motionDetectionScene.setup();
+  sceneManager->addScene(&motionDetectionScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
@@ -243,6 +245,8 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e){
       sceneManager->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
     }
     if(e.target == datasetButton){
+      BaseScene * scene = sceneManager->getScene(SCENE_TYPE::DATASET_MENU);
+      scene->refresh();
       sceneManager->changeSceneTo(SCENE_TYPE::DATASET_MENU);
     }
     if(e.target == trainButton){

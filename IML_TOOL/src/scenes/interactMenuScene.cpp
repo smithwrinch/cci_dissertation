@@ -126,4 +126,10 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_WEBCAM_P2P);
   }
+  else if (e.target == motionDetectionButton){
+
+        BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_MOTION);
+        scene->refresh();
+        SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MOTION);
+  };
 }

@@ -8,6 +8,7 @@
 
 #include "ofxTensorFlow2.h"
 #include "ofxGui.h"
+#include <math.h>
 
 class ExploreLatentSpaceScene : public BaseScene {
     public:
@@ -28,6 +29,8 @@ class ExploreLatentSpaceScene : public BaseScene {
   		int nnHeight = 512; // smaller = faster processing but lower resolution
       int latentDim = 512;
 
+      const int imWidth = 400;
+      const int imHeight = 400;
   		// draw
   		ofFbo fbo;
   		ofImage imgOut;
@@ -39,7 +42,7 @@ class ExploreLatentSpaceScene : public BaseScene {
 
     private:
       template <typename T>
-      bool drawImage(const T& img, std::string label);
+      bool drawImage(const T& img, std::string label, int w, int h);
 
       void addGui();
       void randomiseLatentVector();
@@ -64,6 +67,8 @@ class ExploreLatentSpaceScene : public BaseScene {
       ofxDatGuiSlider* latentVectorSlider;
       ofxDatGuiButton* randomiseButton;
       ofxDatGuiButton* toggleWidgetsButton;
+      ofxDatGuiButton* setAllButton;
+      ofxDatGuiButton* resetSpeedButton;
       ofxDatGuiSlider* speedSlider;
 
       DialWidget dialWidget;

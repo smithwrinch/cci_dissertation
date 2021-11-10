@@ -111,7 +111,7 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
   }
   if(e.target == buildImageProcessingButton){
     //TODO: remove
-    dir = "/home/hans/uni/diss/nicholas_cage/Nicolas_Cage/Dataset/train/class1";
+    // dir = "/home/hans/uni/diss/nicholas_cage/Nicolas_Cage/Dataset/train/class1";
 
     if(checkTextValid() && checkFnameNew() && checkDir()){
       if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){

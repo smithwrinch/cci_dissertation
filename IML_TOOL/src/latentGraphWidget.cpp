@@ -28,6 +28,7 @@ void LatentGraphWidget::draw(){
    ofDrawRectangle(x_, y_, width_, height_);
 
    if(isHalf_){
+     // center line
      ofSetColor(127, 127, 127);
      ofDrawLine(x_, y_+height_/2, x_+width_, y_+height_/2);
      ofSetColor(colour_);

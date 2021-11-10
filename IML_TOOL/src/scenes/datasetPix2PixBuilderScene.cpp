@@ -123,8 +123,8 @@ void DatasetPix2PixBuilderScene::draw(){
   else{
         ofDrawBitmapString(outMsg, imgX-150, imgY+height+75);
         outFbo.begin();
-        im1.draw(im1.getWidth(),0);
-        colorImg.draw(0,0);
+        im1.draw(0,0);
+        colorImg.draw(im1.getWidth(),0);
         outFbo.end();
   }
 
@@ -152,7 +152,7 @@ void DatasetPix2PixBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
     isApplying = true;
     string rootDir = ModelManager::getInstance()->getDatasetDir();
     recorder.setPrefix(rootDir + "/"); // this directory must already exist
-    recorder.setFormat("jpg"); // png is really slow but high res, bmp is fast but big, jpg is just right
+    recorder.setFormat("png"); // png is really slow but high res, bmp is fast but big, jpg is just right
     recorder.startThread();
     for(int idx =0; idx<d.getFiles().size(); idx++){
 
@@ -161,12 +161,12 @@ void DatasetPix2PixBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
       update();
       draw();
       outMsg = ofToString(idx) + " IMAGES COMPLETED OF " + ofToString(d.getFiles().size());
-      ofSleepMillis(10);
+      ofSleepMillis(50);
       update();
       draw();
+      cout << idx << endl;
       outFbo.readToPixels(outImg.getPixels());
       recorder.addFrame(outImg);
-      idx++;
     }
     isApplying = false;
     recorder.stopThread();
@@ -194,6 +194,10 @@ void DatasetPix2PixBuilderScene::updateNormalImage(){
   }
   colorImg.blurGaussian(blurSlider->getValue());
 
+  if(grayscaleToggle->getChecked()){
+    imgInGray = colorImg;
+    colorImg = imgInGray;
+  }
   colorImg.flagImageChanged();
 
 }

@@ -216,9 +216,9 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
         log_msg.send("Epoch " + str(epochs))
         clear_output(wait=True)
-        generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
+        fig = generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
         plt.savefig(ROOT_IMG_SAVE + str(epochs) +".png")
-
+        plt.close(fig)
 
         gen.save(save_dir+"/-" +str(epochs)+"_generator")
         disc.save(save_dir+"/-" +str(epochs)+"_discriminator")
@@ -228,8 +228,8 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
         epochs += 1
 
         if epoch != 0:
-            print(f'Time taken for 1 epoch: {time.time()-start:.2f} sec\n')
-
+            print(f'Time taken for epoch {epochs}: {time.time()-start:.2f} sec\n')
+            log_msg.send(f'Time taken for epoch {epochs}: {time.time()-start:.2f} sec\n')
             start = time.time()
 
 
@@ -246,7 +246,10 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
         lossD = []
 
         for (input_image, target) in train_ds:
-            input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST)
+            seed = tf.random.uniform(shape=(2,), minval =1, maxval=9999999, dtype=tf.int32)
+
+            input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, 0, 0, seed)
+            input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST, seed)
             g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc, DISC_NOISE)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()
@@ -281,21 +284,21 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     plt.close()
 
 # relies on square images atm.. TODO: add img width and height
-def apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST):
+def apply_augmentations(image_batch, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST, seed):
     if(RANDOM_HORIZONTAL):
-        image_batch = tf.image.random_flip_left_right(image_batch)
+        image_batch = tf.image.stateless_random_flip_left_right(image_batch, seed)
     if(RANDOM_VERTICAL):
-        image_batch = tf.image.random_flip_up_down(image_batch)
+        image_batch = tf.image.stateless_random_flip_up_down(image_batch, seed)
     if(RANDOM_CROP > 0):
         new_size = (image_batch.shape[0], floor(image_batch.shape[1]*(1-RANDOM_CROP)), floor(image_batch.shape[2]*(1-RANDOM_CROP)), image_batch.shape[3])
         old_width = image_batch.shape[1]
         old_height = image_batch.shape[2]
-        image_batch = tf.image.random_crop(image_batch, new_size)
+        image_batch = tf.image.stateless_random_crop(image_batch, new_size, seed)
         image_batch = tf.image.resize(image_batch, (old_width, old_height))
     if(RANDOM_BRIGHTNESS > 0):
-        image_batch = tf.image.random_brightness(image_batch, RANDOM_BRIGHTNESS)
+        image_batch = tf.image.stateless_random_brightness(image_batch, RANDOM_BRIGHTNESS, seed)
     if(RANDOM_CONTRAST > 0):
-        image_batch = tf.image.random_contrast(image_batch, 0, RANDOM_CONTRAST)
+        image_batch = tf.image.stateless_random_contrast(image_batch, 0, RANDOM_CONTRAST, seed)
 
     return image_batch
 

@@ -199,11 +199,11 @@ void ArchitectureBasicBuilderScene::setup(){
   cropSlider->setPosition(centreX, randomVerticalToggle->getY()+randomVerticalToggle->getHeight());
   cropSlider->setPrecision(0);
 
-  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS DELTA", 0, 0.5, 0);
+  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS DELTA", -0.3, 0.3, 0);
   brightnessSlider->setPosition(centreX, cropSlider->getY()+cropSlider->getHeight());
   // brightnessSlider->setPrecision(0);
 
-  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST DELTA", 0, 0.5, 0);
+  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST FACTOR", 0, 2, 0);
   contrastSlider->setPosition(centreX, brightnessSlider->getY()+brightnessSlider->getHeight());
 
   // imgWidthSlider->setWidth(width, label_width);
