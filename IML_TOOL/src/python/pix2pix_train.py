@@ -249,7 +249,7 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
             seed = tf.random.uniform(shape=(2,), minval =1, maxval=9999999, dtype=tf.int32)
 
             input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, 0, 0, seed)
-            input_image = apply_augmentations(input_image, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST, seed)
+            target = apply_augmentations(target, RANDOM_HORIZONTAL, RANDOM_VERTICAL, RANDOM_CROP, RANDOM_BRIGHTNESS, RANDOM_CONTRAST, seed)
             g_loss, d_loss = train_step(input_image, target, g_opt, d_opt, gen_loss_, disc_loss_, LAMBDA, gen, disc, DISC_NOISE)
             g_loss = g_loss.numpy()
             d_loss = d_loss.numpy()

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../baseScene.h"
 #include "../sceneManager.h"
 #include "../model.h"

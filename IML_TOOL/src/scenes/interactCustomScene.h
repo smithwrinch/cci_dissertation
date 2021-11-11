@@ -23,6 +23,7 @@ class InteractCustomScene : public BaseScene {
     ofxDatGuiSlider * latentDimSlider;
     ofxDatGuiSlider * imgWidthSlider;
     ofxDatGuiSlider * imgHeightSlider;
+    ofxDatGuiToggle * normaliseOutputToggle;
 
     ofxDatGuiToggle * grayscaleToggle;
     ofxDatGuiButton * continueButton;

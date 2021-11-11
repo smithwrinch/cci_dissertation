@@ -27,6 +27,7 @@
 #include "scenes/webcamP2PScene.h"
 #include "scenes/motionDetectionScene.h"
 #include "scenes/interactCustomScene.h"
+#include "interactP2PVideoScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -73,6 +74,7 @@ class ofApp : public ofBaseApp{
 		WebcamP2PScene webcamP2PScene;
 		MotionDetectionScene motionDetectionScene;
 		InteractCustomScene interactCustomScene;
+		InteractP2PVideoScene videoP2PScene;
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);

@@ -115,6 +115,8 @@ void ofApp::setup(){
   sceneManager->addScene(&webcamP2PScene);
   motionDetectionScene.setup();
   sceneManager->addScene(&motionDetectionScene);
+  videoP2PScene.setup();
+  sceneManager->addScene(&videoP2PScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);

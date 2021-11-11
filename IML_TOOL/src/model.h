@@ -117,6 +117,11 @@ class ModelManager{
       config.setValue("config:random_contrast", f);
     }
 
+    void setNormalise(bool b ){
+      int out = b ? 1 : 0;
+      config.setValue("config:normalise", out);
+    }
+
     // all purpose set
     // wrote everything else out to be more robust to refactor
     void set(string key, string i){
@@ -247,6 +252,10 @@ class ModelManager{
       return config.getValue("config:random_contrast", "0");
     }
 
+    bool getNormalise(){
+      int in = config.getValue("config:normalise", 1);
+      return in == 1;
+    }
     // all purpose get (useful for temp variables)
     // only used by dataset creation screen atm to store portential dataset
     string get(string val){

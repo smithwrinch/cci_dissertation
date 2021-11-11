@@ -159,7 +159,10 @@ void ExploreLatentSpaceScene::update(){
 
     // pull output from model
     output = model.getOutput();
-    output = (output *127.5f ) + 127.5f;
+
+    if(ModelManager::getInstance()->getNormalise()){
+      output = (output *127.5f ) + 127.5f;
+    }
     // output = cppflow::cast(input, TF_UINT8, TF_FLOAT);
     // write tensor to ofImage
     ofxTF2::tensorToImage(output, imgOut);

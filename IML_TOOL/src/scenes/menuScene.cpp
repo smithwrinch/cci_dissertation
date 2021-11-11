@@ -1,4 +1,5 @@
 #include "menuScene.h"
+
 void MenuScene::setup(){
   setID(SCENE_TYPE::MENU);
   newModelButton = new ofxDatGuiButton("NEW MODEL");
@@ -14,7 +15,7 @@ void MenuScene::setup(){
   interactButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
   playButton = new ofxDatGuiButton("PLAY");
-  playButton->setPosition(loadModelButton->getX(), interactButton->getY() + interactButton->getHeight() + 50);
+  playButton->setPosition(loadModelButton->getX(), interactButton->getY() + interactButton->getHeight() + 20);
   playButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
   // state 1
@@ -234,9 +235,7 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     scrollContinueButton->setVisible(false);
   }
   else if(e.target == playButton){
-
     sceneManager->changeSceneTo(SCENE_TYPE::PLAY_MODEL_SELECT);
-
     cout << "PLAYING" << endl;
   }
   else if(e.target == interactButton){

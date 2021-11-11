@@ -102,9 +102,13 @@ void InteractMenuScene::draw(){
 
 void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
-      scene->refresh();
+    if(ModelManager::getInstance()->getStatus() == -10){
+      // custom loaded
+      SceneManager::getInstance()->setShowNavBar(false);
+    }
+    else{
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
+    }
   }
   else if(e.target == exploreLatentSpaceButton){
       BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::EXPLORE_LATENT);
@@ -133,9 +137,13 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_WEBCAM_P2P);
   }
   else if (e.target == motionDetectionButton){
-
-        BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_MOTION);
-        scene->refresh();
-        SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MOTION);
-  };
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_MOTION);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MOTION);
+  }
+  else if(e.target = videoInputButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_P2P_VIDEO);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_P2P_VIDEO);
+  }
 }

@@ -46,11 +46,21 @@ void InteractCustomScene::setup(){
   //gan
   imgSizeSlider = new ofxDatGuiSlider("OUTPUT IMAGE SIZE", 28, 2048);
   latentDimSlider = new ofxDatGuiSlider("LATENT DIMENSION", 1, 2048);
+  normaliseOutputToggle = new ofxDatGuiToggle("NORMALISE OUTPUT");
 
-  imgSizeSlider->setPosition(ofGetWidth()/2 - width/2, 250);
-  imgSizeSlider->setWidth(width, 0.5);
+  normaliseOutputToggle->setChecked(true);
+
   latentDimSlider->setPosition(ofGetWidth()/2 - width/2, 225);
   latentDimSlider->setWidth(width, 0.5);
+  latentDimSlider->setPrecision(0);
+  imgSizeSlider->setPosition(ofGetWidth()/2 - width/2, 250);
+  imgSizeSlider->setWidth(width, 0.5);
+  imgSizeSlider->setPrecision(0);
+
+  normaliseOutputToggle->setPosition(ofGetWidth()/2 - width/2, 275);
+  normaliseOutputToggle->setWidth(width);
+
+
   //pix2pix
   //TODO DO FOR DIFFERENT INPUT/OUTPUT SIZES
   imgWidthSlider = new ofxDatGuiSlider("INPUT IMAGE WIDTH", 28, 2048);
@@ -58,8 +68,12 @@ void InteractCustomScene::setup(){
 
   imgWidthSlider->setPosition(ofGetWidth()/2 - width/2, 225);
   imgWidthSlider->setWidth(width, 0.5);
+  imgWidthSlider->setPrecision(0);
+
   imgHeightSlider->setPosition(ofGetWidth()/2 - width/2, 250);
   imgHeightSlider->setWidth(width, 0.5);
+  imgHeightSlider->setPrecision(0);
+
 }
 
 void InteractCustomScene::update(){
@@ -118,6 +132,7 @@ void InteractCustomScene::toInteract(){
     model->setImgWidth(imgSizeSlider->getValue());
     model->setImgHeight(imgSizeSlider->getValue());
     model->setLatentVector(latentDimSlider->getValue());
+    model->setNormalise(normaliseOutputToggle->getChecked());
     model->setModelType(MODEL_TYPE::GAN);
   }
   else if(state == 2){
