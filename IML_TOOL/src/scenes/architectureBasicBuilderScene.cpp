@@ -1,19 +1,5 @@
 #include "architectureBasicBuilderScene.h"
 
-// parser.add_argument("--max_epochs", help="epochs to train for", type=int, default=10000, required=False)
-// parser.add_argument("--batch_size", help="batch size", type=int, default=1, required=False)
-// parser.add_argument("--learning_rate", help="learning rate for discriminator and generator", type=float, default=2e-4, required=False)
-// parser.add_argument("--image_width", help="image width for input and output", type=int, default=256, required=False)
-// parser.add_argument("--image_height", help="image height for input and output", type=int, default=256, required=False)
-// parser.add_argument("--input_channel", help="number of channels for input image", type=int, default=3, required=False)
-// parser.add_argument("--output_channel", help="number of channels for output image", type=int, default=3, required=False)
-// parser.add_argument("--num_layers", help="[advanced] number of layers in generator decoder and encoder", type=int, default=7, required=False)
-// parser.add_argument("--kernel_size", help="[advanced] kernel size for convolutional layers", type=int, default=4, required=False)
-// parser.add_argument("--beta", help="[advanced] momentum for ADAM optimiser", type=float, default=0.5, required=False)
-// parser.add_argument("--lambda_", help="[advanced] variable to improve structural loss", type=int, default=100, required=False)
-// parser.add_argument("--img_save_dir", help="Directory to save images to", default="../../bin/data/default_save/", required=False)
-// parser.add_argument("--checkpoint_save_dir", help="Directory to save checkpoints to", default="../../bin/data/default_save/", required=False)
-
 void ArchitectureBasicBuilderScene::refresh(){
   ModelManager * model = ModelManager::getInstance();
   showingAdvanced = false;

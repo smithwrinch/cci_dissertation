@@ -13,6 +13,7 @@ class MenuScene : public BaseScene{
     ofxDatGuiButton* newModelButton;
     ofxDatGuiButton* loadModelButton;
     ofxDatGuiButton* playButton;
+    ofxDatGuiButton* interactButton;
 
     ofxDatGuiTextInput* modelNameInput;
     ofxDatGuiButton* createModelButton;

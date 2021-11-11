@@ -77,6 +77,9 @@ void ofApp::setup(){
   sceneManager->addScene(&inputPix2PixScene);
   inputGANScene.setup();
   sceneManager->addScene(&inputGANScene);
+  interactCustomScene.setup();
+  sceneManager->addScene(&interactCustomScene);
+
   trainingScene.setup();
   sceneManager->addScene(&trainingScene);
 

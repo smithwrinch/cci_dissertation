@@ -1,8 +1,14 @@
 #include "interactMenuScene.h"
 
 void InteractMenuScene::refresh(){
+    if(ModelManager::getInstance()->getStatus() == -10){
+      // custom loaded
+      SceneManager::getInstance()->setShowNavBar(false);
+    }
+    else{
+      SceneManager::getInstance()->setShowNavBar(true);
+    }
 
-    SceneManager::getInstance()->setShowNavBar(true);
 
 }
 

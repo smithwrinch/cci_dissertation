@@ -100,14 +100,14 @@ class WebcamP2PScene : public BaseScene {
 
       ofxDatGuiButton* toggleModeButton;
 
-      //0 -- normal mode
+      //normal mode
       ofxDatGuiToggle* grayscaleToggle;
       ofxDatGuiToggle* invertToggle;
       ofxDatGuiSlider* blurSlider;
       ofxDatGuiSlider* contrastSlider;
       ofxDatGuiSlider* brightnessSlider;
 
-      //1 -- contours mode
+      //contours mode
       ofxDatGuiButton* getBackgroundButton;
       ofxDatGuiSlider* contourThresholdSlider;
       ofxDatGuiSlider* minContourSlider;
@@ -118,7 +118,7 @@ class WebcamP2PScene : public BaseScene {
       // ofxDatGuiToggle* findHolesToggle;
       // ofxDatGuiToggle* useApproximationToggle;
 
-      //2 -- canny mode
+      //canny mode
       ofxDatGuiToggle* invertToggleCanny;
       ofxDatGuiSlider* minThresholdSlider;
       ofxDatGuiSlider* maxThresholdSlider;

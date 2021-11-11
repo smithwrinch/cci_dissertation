@@ -9,9 +9,12 @@ void MenuScene::setup(){
   loadModelButton->setPosition(newModelButton->getX(), newModelButton->getY() + newModelButton->getHeight() + 20);
   loadModelButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
+  interactButton = new ofxDatGuiButton("IMTERACT");
+  interactButton->setPosition(loadModelButton->getX(), loadModelButton->getY() + loadModelButton->getHeight() + 50);
+  interactButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
   playButton = new ofxDatGuiButton("PLAY");
-  playButton->setPosition(loadModelButton->getX(), loadModelButton->getY() + loadModelButton->getHeight() + 50);
+  playButton->setPosition(loadModelButton->getX(), interactButton->getY() + interactButton->getHeight() + 50);
   playButton->onButtonEvent(this, &MenuScene::onButtonEvent);
 
   // state 1
@@ -97,6 +100,7 @@ void MenuScene::update(){
     newModelButton->update();
     loadModelButton->update();
     playButton->update();
+    interactButton->update();
   }
   if(state == 1){
     createModelButton->update();
@@ -131,6 +135,7 @@ void MenuScene::draw(){
     newModelButton->draw();
     loadModelButton->draw();
     playButton->draw();
+    interactButton->draw();
   }
   if(state == 1){
     createModelButton->draw();
@@ -164,13 +169,13 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
         // newModelButton->setLabel("NEW MODEL....");
         state = 1;
     }
-  if (e.target == loadModelButton){
+  else if (e.target == loadModelButton){
         // loadModelButton->setLabel("LOADING MODEL...");
         populateScroll();
         state = 2;
         refreshScroll();
     }
-  if (e.target == createModelButton){
+  else if (e.target == createModelButton){
         // createModelButton->setLabel("SAVING MODEL...");
         if(checkTextValid() && checkFnameNew()){
           cout << "yeah" << endl;
@@ -178,25 +183,26 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
         }
     }
 
-  if (e.target == backButton){
+  else if (e.target == backButton){
       ModelManager::getInstance()->reset();
       scrollDeleteButton->setVisible(false);
       scrollContinueButton->setVisible(false);
       state = 0;
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
     }
-  if(e.target == ganButton){
+  else if(e.target == ganButton){
     createModel(MODEL_TYPE::GAN);
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
     state = 0;
 
   }
-  if(e.target == pix2pixButton){
+  else if(e.target == pix2pixButton){
     createModel(MODEL_TYPE::PIX2PIX); // TODO this is causing error
     state = 0;
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::ARCHITECTURE_MENU);
   }
 
-  if(e.target == scrollContinueButton){
+  else if(e.target == scrollContinueButton){
     cout << "WE WILL NOW LOAD TO " << currentScroll << endl;
     state = 0;
     ModelManager::getInstance()->load(currentScroll);
@@ -218,7 +224,7 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     }
 
   }
-  if(e.target == scrollDeleteButton){
+  else if(e.target == scrollDeleteButton){
     cout << "WE WILL NOW DELETE " << currentScroll << endl;
     deleteModel(currentScroll);
     populateScroll();
@@ -227,12 +233,18 @@ void MenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     scrollDeleteButton->setVisible(false);
     scrollContinueButton->setVisible(false);
   }
-  if(e.target == playButton){
+  else if(e.target == playButton){
 
     sceneManager->changeSceneTo(SCENE_TYPE::PLAY_MODEL_SELECT);
 
-    cout << sceneManager->getNumScenesAdded() << endl;
     cout << "PLAYING" << endl;
+  }
+  else if(e.target == interactButton){
+
+    SceneManager::getInstance()->setShowNavBar(false);
+    sceneManager->changeSceneTo(SCENE_TYPE::INTERACT_CUSTOM);
+
+    cout << "INTERACTING" << endl;
   }
 }
 

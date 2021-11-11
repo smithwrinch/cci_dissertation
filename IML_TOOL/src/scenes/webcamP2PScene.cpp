@@ -27,9 +27,6 @@ void WebcamP2PScene::refresh(){
   nnWidth = modelManager->getImgWidth();
   nnHeight = modelManager->getImgHeight();
 
-
-  ofImage imgOut;
-
   drawWidth = 400;
   drawHeight = 400;
 
@@ -438,7 +435,7 @@ void WebcamP2PScene::setupGui(){
   //normal mode
   grayscaleToggle = new ofxDatGuiToggle("GRAYSCALE");
   invertToggle = new ofxDatGuiToggle("INVERT");
-  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, nnWidth, 0);
+  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 10, 0);
   contrastSlider = new ofxDatGuiSlider("CONTRAST", -1, 1, 0);
   brightnessSlider = new ofxDatGuiSlider("BRIGHTNESS", -1, 1, 0);
 
@@ -564,11 +561,8 @@ void WebcamP2PScene::record(){
 void WebcamP2PScene::updateNormalImage(){
   if(invertToggle->getChecked()){
     imgInCV.invert();
+    imgInCV.flagImageChanged();
   }
-  if(int(blurSlider->getValue()) % 2 == 0){
-    blurSlider->setValue(blurSlider->getValue()+1);
-  }
-  imgInCV.blurGaussian(blurSlider->getValue());
 
   imgInCV.convertToGrayscalePlanarImages(r, g, b);
 
@@ -578,8 +572,6 @@ void WebcamP2PScene::updateNormalImage(){
 
 
   imgInCV.setFromGrayscalePlanarImages(r, g, b);
-  imgInCV.flagImageChanged();
-
 }
 
 void WebcamP2PScene::updateContourImage(){
@@ -591,7 +583,7 @@ void WebcamP2PScene::updateContourImage(){
   grayDiff.absDiff(grayBg, imgInGray);
   grayDiff.threshold(contourThresholdSlider->getValue());
   contourFinder.findContours(grayDiff, minContourSlider->getValue(),
-  maxContourSlider->getValue(), blobsToConsiderSlider->getValue(), true, true);
+   maxContourSlider->getValue(), blobsToConsiderSlider->getValue(), true, true);
 
   contourFbo.readToPixels(contourImg.getPixels());
 }

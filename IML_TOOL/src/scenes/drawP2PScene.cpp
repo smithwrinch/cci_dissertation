@@ -10,6 +10,11 @@ void DrawP2PScene::refresh(){
   string modelDir = "saved_models/"+modelManager->getModelName()+
   "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained())+"_generator";
 
+  if(modelManager->getStatus() == -10){
+    // custom loaded
+    modelDir = modelManager->getModelName();
+  }
+
   model.clear();
   if(!model.load(modelDir)) {
 
@@ -17,7 +22,7 @@ void DrawP2PScene::refresh(){
       "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained()+1)+"_generator";
       // May have not updated getEpochsTrained
       if(!model.load(newModelDir)) {
-        cout << "couldn't load model" << endl;
+        cout << "ERROR couldn't load model" << endl;
         std::exit(EXIT_FAILURE);
       }
       else{

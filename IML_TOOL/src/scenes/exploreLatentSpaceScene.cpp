@@ -23,7 +23,10 @@ void ExploreLatentSpaceScene::refresh(){
 
   string modelDir = "saved_models/"+modelManager->getModelName()+
   "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained())+"_generator";
-
+  if(modelManager->getStatus() == -10){
+    // custom loaded
+    modelDir = modelManager->getModelName();
+  }
   model.clear();
   if(!model.load(modelDir)) {
 
