@@ -219,6 +219,7 @@ void MotionDetectionScene::draw(){
 
 void MotionDetectionScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
+    vidGrabber.close();
     stopThread();
     update();
     SceneManager::getInstance()->setShowNavBar(true);

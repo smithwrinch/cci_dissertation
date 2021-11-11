@@ -125,6 +125,12 @@ void InteractCustomScene::toInteract(){
     model->setImgHeight(imgHeightSlider->getValue());
     model->setModelType(MODEL_TYPE::PIX2PIX);
   }
+  if(grayscaleToggle->getChecked()){
+    model->setInputChannel(1);
+  }
+  else{
+    model->setInputChannel(3);
+  }
   model->setStatus(-10);
   model->setModelName(dir);
   model->save();
@@ -132,7 +138,9 @@ void InteractCustomScene::toInteract(){
 
 void InteractCustomScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
+    state = 0;
+    msg = "";
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
   }
   else if (e.target == ganButton){
     state = 1;

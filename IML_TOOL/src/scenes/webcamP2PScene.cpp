@@ -6,9 +6,13 @@ void WebcamP2PScene::refresh(){
   SceneManager::getInstance()->setShowNavBar(false);
 
   ModelManager * modelManager = ModelManager::getInstance();
+
   string modelDir = "saved_models/"+modelManager->getModelName()+
   "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained())+"_generator";
-
+  if(modelManager->getStatus() == -10){
+    // custom loaded
+    modelDir = modelManager->getModelName();
+  }
   model.clear();
   if(!model.load(modelDir)) {
 
@@ -329,6 +333,7 @@ void WebcamP2PScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
     stopThread();
     update();
+    vidGrabber.close();
     SceneManager::getInstance()->setShowNavBar(true);
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
@@ -435,7 +440,7 @@ void WebcamP2PScene::setupGui(){
   //normal mode
   grayscaleToggle = new ofxDatGuiToggle("GRAYSCALE");
   invertToggle = new ofxDatGuiToggle("INVERT");
-  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 10, 0);
+  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 100, 0);
   contrastSlider = new ofxDatGuiSlider("CONTRAST", -1, 1, 0);
   brightnessSlider = new ofxDatGuiSlider("BRIGHTNESS", -1, 1, 0);
 
@@ -563,6 +568,11 @@ void WebcamP2PScene::updateNormalImage(){
     imgInCV.invert();
     imgInCV.flagImageChanged();
   }
+
+  if(int(blurSlider->getValue()) % 2 == 0){
+    blurSlider->setValue(blurSlider->getValue()+1);
+  }
+  imgInCV.blurGaussian(blurSlider->getValue());
 
   imgInCV.convertToGrayscalePlanarImages(r, g, b);
 
