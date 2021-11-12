@@ -1,12 +1,13 @@
 #include "latentGraphWidget.h"
 
-void LatentGraphWidget::setup(int x, int y, int w, int h, ofColor c, bool half){
+void LatentGraphWidget::setup(int x, int y, int w, int h, ofColor c, bool half, int max){
   x_ = x;
   y_ = y;
   width_ = w;
   height_ = h;
   colour_ = c;
   isHalf_ = half;
+  max_ = max;
 }
 
 void LatentGraphWidget::update(){
@@ -24,6 +25,9 @@ void LatentGraphWidget::setLatentVector(vector<float> *vec){
 void LatentGraphWidget::draw(){
 
     ofSetColor(colour_);
+    ofDrawBitmapString("0", x_ -15, y_ + height_/2);
+    ofDrawBitmapString(ofToString(max_), x_ -15, y_);
+    ofDrawBitmapString(ofToString(-max_), x_ -15, y_ + height_- 5);
 
    ofDrawRectangle(x_, y_, width_, height_);
 
@@ -40,11 +44,11 @@ void LatentGraphWidget::draw(){
      float x = i*width_/size;
 
      if(isHalf_){
-      ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (0.5-radius_/2) * height_);
+      ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (0.5-radius_/(2*max_)) * height_);
      }
      else{
 
-     ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (1-radius_) * height_);
+     ofDrawLine(x + x_, y_ +height_ , x+x_, y_ + (1-(radius_/max_)) * height_);
       }
 
    }
@@ -86,12 +90,12 @@ void LatentGraphWidget::setLatentVectorFromMouse(){
               new_idx2 = size - 1;
             }
             if(isHalf_){
-              latentVector->at(new_idx) = ((1- new_y)* 2) - 1;
-              latentVector->at(new_idx2) = ((1- new_y)* 2) - 1;
+              latentVector->at(new_idx) = ((1- new_y)* 2*max_) - max_;
+              latentVector->at(new_idx2) = ((1- new_y)* 2*max_) - max_;
             }
             else{
-              latentVector->at(new_idx) = 1- new_y;
-              latentVector->at(new_idx2) = 1- new_y;
+              latentVector->at(new_idx) = (1- new_y);
+              latentVector->at(new_idx2) = (1- new_y);
             }
 
         }

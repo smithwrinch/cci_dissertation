@@ -37,7 +37,7 @@ void InteractMenuScene::setup(){
   ganButtons.push_back(musicSyncButton);
   ganButtons.push_back(motionDetectionButton);
   ////////////////////////////////////////////////
-  mlInputButton = new ofxDatGuiButton("ML INPUT");
+  mlInputButton = new ofxDatGuiButton("GAN INPUT");
   mlInputButton->onButtonEvent(this, &InteractMenuScene::onButtonEvent);
   mlInputButton->setPosition(centreX, topY - bufferY );
 
@@ -72,7 +72,9 @@ void InteractMenuScene::setup(){
 
 void InteractMenuScene::update(){
   backButton->update();
-  exportTrainingGifButton->update();
+  if(ModelManager::getInstance()->getStatus() != -10){
+    exportTrainingGifButton->update();
+  }
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     for(int i =0; i < p2pButtons.size(); i++){
       p2pButtons[i]->update();
@@ -87,7 +89,9 @@ void InteractMenuScene::update(){
 
 void InteractMenuScene::draw(){
   backButton->draw();
-  exportTrainingGifButton->draw();
+  if(ModelManager::getInstance()->getStatus() != -10){
+    exportTrainingGifButton->draw();
+  }
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     for(int i =0; i < p2pButtons.size(); i++){
       p2pButtons[i]->draw();
@@ -105,6 +109,7 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
     if(ModelManager::getInstance()->getStatus() == -10){
       // custom loaded
       SceneManager::getInstance()->setShowNavBar(false);
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::MENU);
     }
     else{
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::TRAIN);
@@ -141,9 +146,15 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MOTION);
   }
-  else if(e.target = videoInputButton){
+  else if(e.target == videoInputButton){
       BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_P2P_VIDEO);
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_P2P_VIDEO);
+  }
+  else if(e.target == mlInputButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_ML_P2P);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_ML_P2P);
+
   }
 }

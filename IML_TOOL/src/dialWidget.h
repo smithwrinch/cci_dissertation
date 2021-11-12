@@ -1,10 +1,12 @@
+#pragma once
+
 #include <vector>
 #include "math.h"
 #include "ofMain.h"
 using std::vector;
 class DialWidget {
   public:
-    void setup(int x, int y, int radius, ofColor colour= ofColor(255,255,255), bool isHalf = false);
+    void setup(int x, int y, int radius, ofColor colour= ofColor(255,255,255), bool isHalf = false, int max=1);
     void update();
     void draw();
     void reset();
@@ -12,7 +14,7 @@ class DialWidget {
   private:
     void setLatentVectorFromMouse();
 
-    int centreX, centreY, radius;
+    int centreX, centreY, radius, max;
     bool isHalf;
     vector <float> * latentVector;
     float startTheta;

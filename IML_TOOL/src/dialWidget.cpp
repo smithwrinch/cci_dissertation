@@ -1,11 +1,12 @@
 #include "dialWidget.h"
 
-void DialWidget::setup(int x, int y, int r, ofColor c, bool half){
+void DialWidget::setup(int x, int y, int r, ofColor c, bool half, int m){
   centreX = x;
   centreY = y;
   radius = r;
   colour = c;
   isHalf = half;
+  max = m;
 
   offsetIndex = 0;
 
@@ -75,13 +76,13 @@ void DialWidget::draw(){
      float angle = (theta * i);
 
      if(isHalf){
-        float x = radius * (0.5 + radius_/2) * cos(angle);
-        float y = radius * (0.5 + radius_/2) * sin(angle);
+        float x = (radius/max) * (0.5 + radius_/2) * cos(angle);
+        float y = (radius/max) * (0.5 + radius_/2) * sin(angle);
         ofDrawLine(centreX,centreY, x+centreX, y+centreY);
      }
      else{
-      float x = radius * radius_ * cos(angle);
-      float y = radius * radius_ * sin(angle);
+      float x = (radius/max) * radius_ * cos(angle);
+      float y = (radius/max) * radius_ * sin(angle);
       ofDrawLine(centreX,centreY, x+centreX, y+centreY);
      }
    }

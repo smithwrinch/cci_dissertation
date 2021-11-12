@@ -4,6 +4,7 @@
 void ExploreLatentSpaceScene::refresh(){
   // neural network setup, bail out on error
   // the default model is edges2shoes and accepts [None, None, None, 3]
+  model.stopThread();
   ModelManager * modelManager = ModelManager::getInstance();
 
   SceneManager::getInstance()->setShowNavBar(false);
@@ -20,6 +21,10 @@ void ExploreLatentSpaceScene::refresh(){
   resetSpeedVector();
   randomiseLatentVector();
   latentVectorSelectSlider->setMax(latentDim);
+  latentVectorSelectSlider->update();
+  input = ofxTF2::vectorToTensor<float>(latentVector, {1, ModelManager::getInstance()->getLatentVector()});
+
+  cout << latentDim << endl;
 
   string modelDir = "saved_models/"+modelManager->getModelName()+
   "/saved_networks/ckpt/-"+ofToString(modelManager->getEpochsTrained())+"_generator";
@@ -68,6 +73,7 @@ void ExploreLatentSpaceScene::refresh(){
 
   // start the model background thread
   model.startThread();
+  update();
 
   hasChosenExportFolder = false;
   recording = false;
@@ -142,9 +148,11 @@ void ExploreLatentSpaceScene::update(){
   if(model.readyForInput()) {
 
 
-    input = ofxTF2::vectorToTensor<float>(latentVector, {1, latentDim});
+    input = ofxTF2::vectorToTensor<float>(latentVector, {1, ModelManager::getInstance()->getLatentVector()});
+    cout << latentDim << endl;
     // auto input_ = cppflow::fill({1, 512}, 0.5f);
     // feed input into model
+    cout << input.shape() << endl;
     model.update(input);
 
     // end measurment
@@ -217,7 +225,10 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
     stopThread();
     update();
-    SceneManager::getInstance()->setShowNavBar(true);
+    //TODO should be switch statement
+    if(modelManager->getStatus() != -10){
+      SceneManager::getInstance()->setShowNavBar(true);
+    }
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
   else if(e.target == randomiseButton){
@@ -251,24 +262,22 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
 }
 
 void ExploreLatentSpaceScene::randomiseLatentVector(){
-
   latentVector.clear();
   for (int i =0; i < latentDim; i++){
-      float b = ofRandom(-1.f, 1.f);
+      float b = ofRandom(-2.f, 2.f);
       latentVector.push_back(b);
   }
-
 }
 
 void ExploreLatentSpaceScene::updateLatentVector(){
 
   for (int i =0; i < latentDim; i++){
       latentVector[i] += (speedVector[i] * (speedSlider->getValue())/100.f);
-      if(latentVector[i] > 1){
-        latentVector[i] = 1;
+      if(latentVector[i] > 2){
+        latentVector[i] = 2;
       }
-      else if (latentVector[i] < -1){
-        latentVector[i] = -1;
+      else if (latentVector[i] < -2){
+        latentVector[i] = -2;
       }
   }
 
@@ -400,8 +409,8 @@ void ExploreLatentSpaceScene::addGui(){
   gui.push_back(setAllButton);
   gui.push_back(setExportFolderButton);
 
-  dialWidget.setup(150, 360, 125, ofColor(255, 255, 255), true);
-  latentGraphWidget.setup(50, 520, 350, 175, ofColor(255, 255, 255), true);
+  dialWidget.setup(150, 360, 125, ofColor(255, 255, 255), true, 2);
+  latentGraphWidget.setup(50, 520, 350, 175, ofColor(255, 255, 255), true, 2);
 
 
   speedDialWidget.setup(150, 360, 125, ofColor(250, 218, 94), true);

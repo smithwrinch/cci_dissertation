@@ -28,6 +28,7 @@
 #include "scenes/motionDetectionScene.h"
 #include "scenes/interactCustomScene.h"
 #include "interactP2PVideoScene.h"
+#include "interactMLInputScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -75,6 +76,7 @@ class ofApp : public ofBaseApp{
 		MotionDetectionScene motionDetectionScene;
 		InteractCustomScene interactCustomScene;
 		InteractP2PVideoScene videoP2PScene;
+		InteractMLInputScene interactMLScene;
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);

@@ -96,6 +96,8 @@ void MenuScene::setup(){
 }
 
 void MenuScene::update(){
+
+  SceneManager::getInstance()->setShowNavBar(true);
   //TODO should be switch statement
   if(state == 0){
     newModelButton->update();

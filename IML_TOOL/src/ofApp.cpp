@@ -117,6 +117,8 @@ void ofApp::setup(){
   sceneManager->addScene(&motionDetectionScene);
   videoP2PScene.setup();
   sceneManager->addScene(&videoP2PScene);
+  interactMLScene.setup();
+  sceneManager->addScene(&interactMLScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);
