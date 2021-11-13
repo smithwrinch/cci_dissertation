@@ -226,7 +226,7 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
     stopThread();
     update();
     //TODO should be switch statement
-    if(modelManager->getStatus() != -10){
+    if(ModelManager::getInstance()->getStatus() != -10){
       SceneManager::getInstance()->setShowNavBar(true);
     }
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);

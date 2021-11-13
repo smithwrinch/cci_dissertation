@@ -3,6 +3,7 @@
 #include "../sceneManager.h"
 #include "../model.h"
 #include "../sceneTypes.h"
+#include "../helpWidget.h"
 #include "trainScene.h"
 #include<cmath>
 
@@ -46,7 +47,6 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     ofxDatGuiSlider* betaSlider;
     ofxDatGuiSlider* lambdaSlider;
 
-
     ofxDatGuiSlider * imgSizeSlider;
     ofxDatGuiSlider * latentDimSlider;
 
@@ -57,6 +57,23 @@ class ArchitectureBasicBuilderScene : public BaseScene {
     ofxDatGuiSlider* cropSlider;
     ofxDatGuiSlider* brightnessSlider;
     ofxDatGuiSlider* contrastSlider;
+
+
+    vector<HelpWidget*> helpWidgetsP2P;
+    vector<HelpWidget*> helpWidgetsGAN;
+
+    HelpWidget batchSizeHelp;
+    HelpWidget numLayersHelp;
+    HelpWidget betaHelp;
+    HelpWidget lambdaRateHelp;
+    HelpWidget latentDimHelp;
+    HelpWidget discriminatorNoiseHelp;
+    HelpWidget randomHorizontalHelp;
+    HelpWidget randomVerticalHelp;
+    HelpWidget randomCropHelp;
+    HelpWidget randomBrightessHelp;
+    HelpWidget randomContrastHelp;
+    HelpWidget learningRateHelp;
 
     ofxDatGuiButton * showAdvanced;
     bool showingAdvanced = false;

@@ -6,6 +6,8 @@
 #include "ofxGraph.h"
 #include "ofxDirList.h"
 #include "ofxThreadedImageLoader.h"
+#include "../helpWidget.h"
+
 
 #include <fcntl.h>
 #include <iostream>
@@ -503,5 +505,15 @@ class TrainingScene : public BaseScene {
       ofxDatGuiSlider* brightnessSlider;
       ofxDatGuiSlider* contrastSlider;
 
+      vector<HelpWidget*> helpWidgets;
+
+      HelpWidget batchSizeHelp;
+      HelpWidget discriminatorNoiseHelp;
+      HelpWidget randomHorizontalHelp;
+      HelpWidget randomVerticalHelp;
+      HelpWidget randomCropHelp;
+      HelpWidget randomBrightessHelp;
+      HelpWidget randomContrastHelp;
+      HelpWidget learningRateHelp;
 
 };

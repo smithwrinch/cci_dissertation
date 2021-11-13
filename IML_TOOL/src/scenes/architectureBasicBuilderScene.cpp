@@ -53,7 +53,6 @@ void ArchitectureBasicBuilderScene::setup(){
   continueButton->onButtonEvent(this, &ArchitectureBasicBuilderScene::onButtonEvent);
   //
   // imgWidthSlider = new ofxDatGuiSlider("IMAGE WIDTH: ", 32, 1024, model->getImgWidth());
-  int centreX = ofGetWidth()/2 - width / 2;
   // imgWidthSlider->setPosition(centreX, startY);
   // imgWidthSlider->setPrecision(0);
   //
@@ -84,7 +83,7 @@ void ArchitectureBasicBuilderScene::setup(){
 
 
   button32 = new ofxDatGuiToggle("32x32");
-  button32->setWidth(100);
+  button32->setWidth(width/6);
   button32->setPosition(ofGetWidth() / 2 - width / 2, startY);
   button32->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
@@ -95,22 +94,22 @@ void ArchitectureBasicBuilderScene::setup(){
   button64->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
   button128 = new ofxDatGuiToggle("128x128");
-  button128->setWidth(100);
+  button128->setWidth(width/6);
   button128->setPosition(ofGetWidth() / 2 + 2*width/6 - width / 2, startY);
   button128->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
   button256 = new ofxDatGuiToggle("256x256");
-  button256->setWidth(100);
+  button256->setWidth(width/6);
   button256->setPosition(ofGetWidth() / 2 + 3*width/6 - width / 2, startY);
   button256->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
   button512 = new ofxDatGuiToggle("512x512");
-  button512->setWidth(100);
+  button512->setWidth(width/6);
   button512->setPosition(ofGetWidth() / 2 + 4*width/6 - width / 2, startY);
   button512->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
   button1024 = new ofxDatGuiToggle("1024x1024");
-  button1024->setWidth(100);
+  button1024->setWidth(width/6);
   button1024->setPosition(ofGetWidth() / 2 + 5*width/6 - width / 2, startY);
   button1024->onToggleEvent(this, &ArchitectureBasicBuilderScene::onToggleEvent);
 
@@ -121,9 +120,11 @@ void ArchitectureBasicBuilderScene::setup(){
   pix2pixButtons.push_back(button512);
   pix2pixButtons.push_back(button1024);
 
+  width = 450;
+  int centreX = ofGetWidth()/2 - width/2;
 
   inputRGBToggle = new ofxDatGuiToggle("IMAGE GRAYSCALE");
-  inputRGBToggle->setPosition(centreX, button32->getY() + button32->getHeight());
+  inputRGBToggle->setPosition(ofGetWidth()/2 - 300, button32->getY() + button32->getHeight());
 
 
   latentDimSlider = new ofxDatGuiSlider("LATENT DIM SIZE: ", 28, 1024, model->getLatentVector());
@@ -168,9 +169,9 @@ void ArchitectureBasicBuilderScene::setup(){
   betaSlider->setPosition(centreX, numLayersSlider->getY()+numLayersSlider->getHeight());
   betaSlider->setPrecision(0);
 
-  lambdaSlider = new ofxDatGuiSlider("LAMBDA", 0, model->getLambda());
+  lambdaSlider = new ofxDatGuiSlider("LAMBDA", 0, 3, model->getLambda());
   lambdaSlider->setPosition(centreX, betaSlider->getY()+betaSlider->getHeight());
-  lambdaSlider->setPrecision(0);
+  // lambdaSlider->setPrecision(0);
 
   discriminatorNoiseSlider = new ofxDatGuiSlider("Discriminator Noise", 0, 1, 0);
   discriminatorNoiseSlider->setPosition(centreX, lambdaSlider->getY()+lambdaSlider->getHeight());
@@ -185,16 +186,16 @@ void ArchitectureBasicBuilderScene::setup(){
   cropSlider->setPosition(centreX, randomVerticalToggle->getY()+randomVerticalToggle->getHeight());
   cropSlider->setPrecision(0);
 
-  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS DELTA", -0.3, 0.3, 0);
+  brightnessSlider = new ofxDatGuiSlider("RANDOM BRIGHTNESS", 0, 0.7, 0);
   brightnessSlider->setPosition(centreX, cropSlider->getY()+cropSlider->getHeight());
   // brightnessSlider->setPrecision(0);
 
-  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST FACTOR", 0, 2, 0);
+  contrastSlider = new ofxDatGuiSlider("RANDOM CONTRAST", 0, 2, 0);
   contrastSlider->setPosition(centreX, brightnessSlider->getY()+brightnessSlider->getHeight());
 
   // imgWidthSlider->setWidth(width, label_width);
   // imgHeightSlider->setWidth(width, label_width);
-  inputRGBToggle->setWidth(width, label_width);
+  inputRGBToggle->setWidth(600, label_width);
   // outputRGBToggle->setWidth(width, label_width);
   learningRateSlider->setWidth(width, label_width);
   learningRateSlider2->setWidth(width, label_width);
@@ -212,9 +213,56 @@ void ArchitectureBasicBuilderScene::setup(){
   cropSlider->setWidth(width, label_width);
   brightnessSlider->setWidth(width, label_width);
   contrastSlider->setWidth(width, label_width);
-
   // imgSizeSlider->setWidth(width, label_width);
   latentDimSlider->setWidth(width, label_width);
+
+
+  // should take in ofxDatGUiCOmponnent and infer x and y from that but fuck it I dont have time
+  batchSizeHelp.setup(batchSizeSlider->getX() + width, batchSizeSlider->getY(),
+"The batch size is the amount of images that are fed into the network before the weights are updated.");
+
+numLayersHelp.setup(numLayersSlider->getX() + width, numLayersSlider->getY(),
+"This controls the number of layers in the architecture. A deeper network means more features can be learned but it will increase running time. This hyperparameter is set automatically with respect to the image dimensions.");
+
+  betaHelp.setup(betaSlider->getX() + width, betaSlider->getY(),
+"This is the momentum hyperparameter for the ADAM optimiser. This can provide a push to cross a local minima. This value should be set close to 1.0 (100) on problems with a sparse gradient.");
+
+  lambdaRateHelp.setup(lambdaSlider->getX() + width, lambdaSlider->getY(),
+"This hyperparameter controls the extent in which the generator loss is regularised with respect to the target input image (it is multiplied by the L1 loss) instead of with respect to the target output image. If this is set to 0 there is no regularisation. If this is set to 10, the L1 loss is given 10 times more importance than the adversarial loss");
+
+  latentDimHelp.setup(latentDimSlider->getX() + width, latentDimSlider->getY(),
+"A GAN takes as input a vector and outputs an image according to that vectors values. This hyperparameter sets the dimension (number of values) of that input vector. A larger dimension might yield more distinct results but may be unnessary for smaller networks. A typical value is 100.");
+
+  discriminatorNoiseHelp.setup(discriminatorNoiseSlider->getX() + width, discriminatorNoiseSlider->getY(),
+"This hyperparameter determines the amount of noise is applied to the image that is fed into the discriminator. This is useful to prevent mode collapse (where one or some of the outputs are always identical). Increase this if the discriminator trains too well too early (its loss goes straight to zero)");
+
+  randomHorizontalHelp.setup(randomHorizontalToggle->getX() + width, randomHorizontalToggle->getY(),
+"This can be useful to pseudo increase the dataset size. If a horizontal flip won't affect the ground truths feasibility it is reccomended to check this.");
+
+  randomVerticalHelp.setup(randomVerticalToggle->getX() + width, randomVerticalToggle->getY(),
+"This can be useful to pseudo increase the dataset size. If a vertical flip won't affect the ground truths feasibility it is reccomended to check this.");
+
+  randomCropHelp.setup(cropSlider->getX() + width, cropSlider->getY(),
+"This can be useful to pseudo increase the dataset size. It randomly 'jitters' the image by the supplied percentage.");
+
+  randomBrightessHelp.setup(brightnessSlider->getX() + width, brightnessSlider->getY(),
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which brightness values can be chosen.");
+
+  randomContrastHelp.setup(contrastSlider->getX() + width, contrastSlider->getY(),
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which contrast images are chosen.");
+
+  learningRateHelp.setup(learningRateSlider->getX() + width, learningRateSlider->getY(),
+"The learning rate is the most important hyperparameter and has the largest influence on the model. It determines how fast the model learns. A lower learning rate increases the training time. If it is too low the network may fail to find the global minimum (and find a local minima intead) and also may cause overfitting. A higher learning decreases training time. If it is too high, it may 'jump past' any minimum entirely and never converge. It is generally reccomended to start with a low learning rate and increase it over time.");
+
+helpWidgetsGAN.push_back(&batchSizeHelp);
+helpWidgetsGAN.push_back(&latentDimHelp);
+helpWidgetsGAN.push_back(&learningRateHelp);
+
+helpWidgetsP2P.push_back(&learningRateHelp);
+helpWidgetsP2P.push_back(&batchSizeHelp);
+
+
+
 }
 
 void ArchitectureBasicBuilderScene::update(){
@@ -274,6 +322,12 @@ void ArchitectureBasicBuilderScene::draw(){
       cropSlider->draw();
       brightnessSlider->draw();
       contrastSlider->draw();
+      randomContrastHelp.draw();
+      randomBrightessHelp.draw();
+      randomCropHelp.draw();
+      randomVerticalHelp.draw();
+      randomHorizontalHelp.draw();
+      discriminatorNoiseHelp.draw();
   }
 
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
@@ -281,10 +335,15 @@ void ArchitectureBasicBuilderScene::draw(){
     if(showingAdvanced){
       betaSlider->draw();
       lambdaSlider->draw();
+      betaHelp.draw();
+      lambdaRateHelp.draw();
       numLayersSlider->draw();
     }
     for(int i = 0; i < pix2pixButtons.size(); i++){
       pix2pixButtons[i]->draw();
+    }
+    for(int i = 0; i < helpWidgetsP2P.size(); i++){
+      helpWidgetsP2P[i]->draw();
     }
   }
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
@@ -293,6 +352,9 @@ void ArchitectureBasicBuilderScene::draw(){
 
     for(int i = 0; i < ganButtons.size(); i++){
       ganButtons[i]->draw();
+    }
+    for(int i = 0; i < helpWidgetsGAN.size(); i++){
+      helpWidgetsGAN[i]->draw();
     }
   }
 

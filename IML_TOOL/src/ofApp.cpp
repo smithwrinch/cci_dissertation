@@ -167,11 +167,11 @@ void ofApp::draw(){
             if(id <=SCENE_TYPE::DATASET_SELECTOR ){
               topGuiSelected[1]->draw();
             }
-            else if(id <= SCENE_TYPE::ARCHITECTURE_MENU){
+            else if(id <= SCENE_TYPE::ARCHITECTURE_SELECT){
                 topGuiSelected[0]->draw();
             }
 
-            else if(id <= SCENE_TYPE::TRAIN){
+            else if(id == SCENE_TYPE::TRAIN){
                 topGuiSelected[2]->draw();
             }
 

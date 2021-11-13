@@ -199,6 +199,40 @@ void TrainingScene::setup(){
   toggleGraphButton->setPosition(701, 525);
   toggleGraphButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
+
+  batchSizeHelp.setup(batchSizeSlider->getX() - 25, batchSizeSlider->getY(),
+"The batch size is the amount of images that are fed into the network before the weights are updated.");
+
+  discriminatorNoiseHelp.setup(discriminatorNoiseSlider->getX() - 25, discriminatorNoiseSlider->getY(),
+"This hyperparameter determines the amount of noise is applied to the image that is fed into the discriminator. This is useful to prevent mode collapse (where one or some of the outputs are always identical). Increase this if the discriminator trains too well too early (its loss goes straight to zero)");
+
+  randomHorizontalHelp.setup(randomHorizontalToggle->getX() - 25, randomHorizontalToggle->getY(),
+"This can be useful to pseudo increase the dataset size. If a horizontal flip won't affect the ground truths feasibility it is reccomended to check this.");
+
+  randomVerticalHelp.setup(randomVerticalToggle->getX() - 25, randomVerticalToggle->getY(),
+"This can be useful to pseudo increase the dataset size. If a vertical flip won't affect the ground truths feasibility it is reccomended to check this.");
+
+  randomCropHelp.setup(cropSlider->getX() - 25, cropSlider->getY(),
+"This can be useful to pseudo increase the dataset size. It randomly 'jitters' the image by the supplied percentage.");
+
+  randomBrightessHelp.setup(brightnessSlider->getX() - 25, brightnessSlider->getY(),
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which brightness values can be chosen.");
+
+  randomContrastHelp.setup(contrastSlider->getX() - 25, contrastSlider->getY(),
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which contrast images are chosen.");
+
+  learningRateHelp.setup(learningRateSlider->getX() - 25, learningRateSlider->getY(),
+"The learning rate is the most important hyperparameter and has the largest influence on the model. It determines how fast the model learns. A lower learning rate increases the training time. If it is too low the network may fail to find the global minimum (and find a local minima intead) and also may cause overfitting. A higher learning decreases training time. If it is too high, it may 'jump past' any minimum entirely and never converge. It is generally reccomended to start with a low learning rate and increase it over time.");
+
+  helpWidgets.push_back(&randomContrastHelp);
+  helpWidgets.push_back(&randomBrightessHelp);
+  helpWidgets.push_back(&randomCropHelp);
+  helpWidgets.push_back(&randomVerticalHelp);
+  helpWidgets.push_back(&randomHorizontalHelp);
+  helpWidgets.push_back(&discriminatorNoiseHelp);
+  helpWidgets.push_back(&batchSizeHelp);
+  helpWidgets.push_back(&learningRateHelp);
+
 }
 
 //--------------------------------------------------------------
@@ -273,6 +307,9 @@ void TrainingScene::draw(){
     cropSlider->draw();
     brightnessSlider->draw();
     contrastSlider->draw();
+    for(int i = 0; i < helpWidgets.size(); i++){
+      helpWidgets[i]->draw();
+    }
   }
   // training
   else if(state == 1){

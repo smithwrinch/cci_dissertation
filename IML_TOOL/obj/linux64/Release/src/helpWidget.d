@@ -1,7 +1,6 @@
-obj/linux64/Release/src/scenes/architectureTypeSelectorScene.o: \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureTypeSelectorScene.cpp \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureTypeSelectorScene.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../baseScene.h \
+obj/linux64/Release/src/helpWidget.o: \
+ /home/hans/uni/diss/main/IML_TOOL/src/helpWidget.cpp \
+ /home/hans/uni/diss/main/IML_TOOL/src/helpWidget.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/ofMain.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/utils/ofConstants.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/tess2/include/tesselator.h \
@@ -559,55 +558,9 @@ obj/linux64/Release/src/scenes/architectureTypeSelectorScene.o: \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/video/ofGstVideoPlayer.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/of3dUtils.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/ofCamera.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGui.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxToggle.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxBaseGui.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxSlider.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxInputField.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGuiUtils.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxSliderGroup.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGuiGroup.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxButton.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxLabel.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxColorPicker.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxPanel.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/ofxDatGui.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiGroups.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiLabel.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiComponent.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiIntObject.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/themes/ofxDatGuiThemes.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/themes/ofxDatGuiTheme.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiEvents.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiConstants.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiButton.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiSlider.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTextInputField.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTextInput.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiFRM.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGui2dPad.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiColorPicker.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiMatrix.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTimeGraph.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiScrollView.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiControls.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneTypes.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../model.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/src/ofxXmlSettings.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/libs/tinyxml.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneManager.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureBasicBuilderScene.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../helpWidget.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/trainScene.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGraph/src/ofxGraph.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDirList/src/ofxDirList.h \
- /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxThreadedImageLoader/src/ofxThreadedImageLoader.h
+ /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h
 
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureTypeSelectorScene.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/../baseScene.h:
+/home/hans/uni/diss/main/IML_TOOL/src/helpWidget.h:
 
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/ofMain.h:
 
@@ -1758,91 +1711,3 @@ obj/linux64/Release/src/scenes/architectureTypeSelectorScene.o: \
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/ofCamera.h:
 
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGui.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxToggle.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxBaseGui.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxSlider.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxInputField.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGuiUtils.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxSliderGroup.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxGuiGroup.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxButton.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxLabel.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxColorPicker.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGui/src/ofxPanel.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/ofxDatGui.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiGroups.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiLabel.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiComponent.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiIntObject.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/themes/ofxDatGuiThemes.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/themes/ofxDatGuiTheme.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiEvents.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/core/ofxDatGuiConstants.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiButton.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiSlider.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTextInputField.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTextInput.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiFRM.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGui2dPad.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiColorPicker.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiMatrix.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiTimeGraph.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiScrollView.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDatGui/src/components/ofxDatGuiControls.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneTypes.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/../model.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/src/ofxXmlSettings.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxXmlSettings/libs/tinyxml.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/../sceneManager.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/architectureBasicBuilderScene.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/../helpWidget.h:
-
-/home/hans/uni/diss/main/IML_TOOL/src/scenes/trainScene.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxGraph/src/ofxGraph.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxDirList/src/ofxDirList.h:
-
-/home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxThreadedImageLoader/src/ofxThreadedImageLoader.h:

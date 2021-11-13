@@ -15,7 +15,7 @@ class HelpWidget {
     string msg_;
     ofImage logo;
 
-    const int width = 200;
-    const int height = 100;
+    const int width = 250;
+    int height = 400;
 
 };
