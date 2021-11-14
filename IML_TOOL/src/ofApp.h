@@ -95,6 +95,7 @@ class ofApp : public ofBaseApp{
 		vector<ofxDatGuiButton*> topGui;
 		vector<ofxDatGuiButton*> topGuiSelected;
 
+
 		int idToHighlight;
 
 		string printModelType(MODEL_TYPE::ID id){

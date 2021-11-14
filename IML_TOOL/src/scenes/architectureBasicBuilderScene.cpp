@@ -222,7 +222,7 @@ void ArchitectureBasicBuilderScene::setup(){
 "The batch size is the amount of images that are fed into the network before the weights are updated.");
 
 numLayersHelp.setup(numLayersSlider->getX() + width, numLayersSlider->getY(),
-"This controls the number of layers in the architecture. A deeper network means more features can be learned but it will increase running time. This hyperparameter is set automatically with respect to the image dimensions.");
+"This controls the number of layers in the architecture. A deeper network means more features can be learned but it will increase running time. This hyperparameter is set to a default value with respect to the image dimensions.");
 
   betaHelp.setup(betaSlider->getX() + width, betaSlider->getY(),
 "This is the momentum hyperparameter for the ADAM optimiser. This can provide a push to cross a local minima. This value should be set close to 1.0 (100) on problems with a sparse gradient.");
@@ -246,10 +246,10 @@ numLayersHelp.setup(numLayersSlider->getX() + width, numLayersSlider->getY(),
 "This can be useful to pseudo increase the dataset size. It randomly 'jitters' the image by the supplied percentage.");
 
   randomBrightessHelp.setup(brightnessSlider->getX() + width, brightnessSlider->getY(),
-"This can be useful to pseudo increase the dataset size. This parameter defines the range in which brightness values can be chosen.");
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which brightness values can be chosen. A value of 0 means no brightness is applied.");
 
   randomContrastHelp.setup(contrastSlider->getX() + width, contrastSlider->getY(),
-"This can be useful to pseudo increase the dataset size. This parameter defines the range in which contrast images are chosen.");
+"This can be useful to pseudo increase the dataset size. This parameter defines the range in which contrast images are chosen. A value of 1 means no contrast is applied.");
 
   learningRateHelp.setup(learningRateSlider->getX() + width, learningRateSlider->getY(),
 "The learning rate is the most important hyperparameter and has the largest influence on the model. It determines how fast the model learns. A lower learning rate increases the training time. If it is too low the network may fail to find the global minimum (and find a local minima intead) and also may cause overfitting. A higher learning decreases training time. If it is too high, it may 'jump past' any minimum entirely and never converge. It is generally reccomended to start with a low learning rate and increase it over time.");
@@ -337,6 +337,7 @@ void ArchitectureBasicBuilderScene::draw(){
       lambdaSlider->draw();
       betaHelp.draw();
       lambdaRateHelp.draw();
+      numLayersHelp.draw();
       numLayersSlider->draw();
     }
     for(int i = 0; i < pix2pixButtons.size(); i++){

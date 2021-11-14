@@ -3,6 +3,7 @@
 #include "../model.h"
 #include "../sceneTypes.h"
 #include "trainScene.h"
+#include "../helpWidget.h"
 #include <filesystem>
 
 class DatasetBuilderScene : public BaseScene {
@@ -18,10 +19,12 @@ class DatasetBuilderScene : public BaseScene {
     bool checkDir();
     ofxDatGuiButton * loadFromFolderButton;
     ofxDatGuiButton * buildButton;
+    ofxDatGuiButton * backButton;
     ofxDatGuiButton * buildImageProcessingButton;
     ofxDatGuiTextInput * datasetNameInput;
     ofxDatGuiLabel * errorLabel;
     ofxDatGuiToggle * imagesAlreadyPaired;
+    HelpWidget alreadyPairedHelp;
     string datasetName;
     string dir = "";
 };

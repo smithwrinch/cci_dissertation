@@ -129,6 +129,11 @@ void TrainingScene::setup(){
   restartTrainingButton->setStripeColor(ofColor(255,0,0));
 
 
+  loadButton->setPosition(ofGetWidth() / 2 - restartTrainingButton->getWidth()/2, ofGetHeight() - 150);
+  loadButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
+
+
+
   saveModelButton->setPosition(ofGetWidth() / 2 - resumeTrainingButton->getWidth()/2, ofGetHeight() - 150);
   saveModelButton->onButtonEvent(this, &TrainingScene::onButtonEvent);
 
@@ -243,9 +248,11 @@ void TrainingScene::update(){
   if(state == 0){
     if(ModelManager::getInstance()->getEpochsTrained() == 0){
       startTrainingButton->update();
+      loadButton->update();
     }
     else{
       resumeTrainingButton->update();
+      restartTrainingButton->update();
       playButton->update();
     }
 
@@ -254,7 +261,6 @@ void TrainingScene::update(){
     learningRateSlider2->update();
     batchSizeSlider->update();
     maxEpochsSlider->update();
-    restartTrainingButton->update();
     discriminatorNoiseSlider->update();
     randomHorizontalToggle->update();
     randomVerticalToggle->update();
@@ -290,13 +296,14 @@ void TrainingScene::draw(){
   if(state == 0){
     if(ModelManager::getInstance()->getEpochsTrained() == 0){
       startTrainingButton->draw();
+      loadButton->draw();
     }
     else{
       playButton->draw();
       resumeTrainingButton->draw();
+      restartTrainingButton->draw();
     }
     backButton->draw();
-    restartTrainingButton->draw();
     learningRateSlider->draw();
     learningRateSlider2->draw();
     batchSizeSlider->draw();
@@ -362,6 +369,15 @@ void TrainingScene::onButtonEvent(ofxDatGuiButtonEvent e){
 
   else if(e.target == restartTrainingButton){
     state = 2;
+  }
+  else if(e.target == loadButton){
+    ofFileDialogResult result = ofSystemLoadDialog("Select Folder With Generator And Discriminator **MUST HAVE SAME ARCHITECTURE**", true);
+    if (result.bSuccess) {
+        string modelDir = result.getPath();
+        ofDirectory modelDirr(modelDir);
+        string basePath = "saved_models/"+ModelManager::getInstance()->getModelName()+"/saved_networks/ckpt/";
+        modelDirr.copyTo(basePath, true, true);
+    }
   }
   else if(e.target == confirmButton){
     // TODO: code for restart

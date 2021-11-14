@@ -4,7 +4,6 @@
 void ofApp::setup(){
   // sceneManager = SceneManager::getInstance();
 
-
   float width = 1024 / 5;
   menuButton = new ofxDatGuiButton("MENU");
   menuButton->setWidth(width, 0.5);
@@ -153,9 +152,9 @@ void ofApp::draw(){
     SCENE_TYPE::ID id = sceneManager->getCurrentSceneID();
     sceneManager->getCurrentScene()->draw();
     ofDrawBitmapString(modelManager->getModelName(), 0, menuButton->getHeight()+12);
-    ofDrawBitmapString(ofToString(modelManager->getStatus()), 0, menuButton->getHeight()+36);
+    // ofDrawBitmapString(ofToString(modelManager->getStatus()), 0, menuButton->getHeight()+36);
     ofDrawBitmapString(printModelType(modelManager->getModelType()), 0, menuButton->getHeight()+24);
-    ofDrawBitmapString(ofToString(sceneManager->getCurrentSceneID()), 0, menuButton->getHeight()+48);
+    // ofDrawBitmapString(ofToString(sceneManager->getCurrentSceneID()), 0, menuButton->getHeight()+48);
 
     if(!(id == SCENE_TYPE::MENU || id == SCENE_TYPE::PLAY_MODEL_SELECT)){
       for(int i = 0; i < topGui.size(); i++){

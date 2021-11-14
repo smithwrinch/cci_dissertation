@@ -36,6 +36,8 @@ class MenuScene : public BaseScene{
     ofxDatGuiButton* scrollContinueButton;
     string currentScroll = "";
 
+    ofImage logoImage;
+
 
     void onScrollViewEvent(ofxDatGuiScrollViewEvent e);
     void populateScroll();

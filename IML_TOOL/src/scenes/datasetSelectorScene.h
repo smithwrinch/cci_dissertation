@@ -10,6 +10,7 @@ class DatasetSelectorScene : public BaseScene {
     void setup();
     void update();
     void draw();
+    void refresh();
     void onButtonEvent(ofxDatGuiButtonEvent e);
 
   private:

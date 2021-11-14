@@ -1,5 +1,9 @@
 #include "datasetSelectorScene.h"
 
+void DatasetSelectorScene::refresh(){
+  refreshScroll();
+}
+
 void DatasetSelectorScene::setup(){
   setID(SCENE_TYPE::DATASET_SELECTOR);
 
@@ -39,12 +43,14 @@ void DatasetSelectorScene::update(){
   scrollContinueButton->update();
   scrollDeleteButton->update();
   datasetScroll->update();
+  backButton->update();
 }
 
 void DatasetSelectorScene::draw(){
   scrollContinueButton->draw();
   scrollDeleteButton->draw();
   datasetScroll->draw();
+  backButton->draw();
 }
 
 void DatasetSelectorScene::onButtonEvent(ofxDatGuiButtonEvent e){

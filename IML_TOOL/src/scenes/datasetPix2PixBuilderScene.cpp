@@ -171,6 +171,11 @@ void DatasetPix2PixBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
     isApplying = false;
     recorder.stopThread();
   }
+  else if(e.target == backButton){
+    BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_MENU);
+    scene->refresh();
+    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
+  }
 }
 
 

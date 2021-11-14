@@ -5,7 +5,7 @@ void DatasetBuilderScene::setup(){
 
   errorLabel = new ofxDatGuiLabel("");
   errorLabel->setWidth(400, 0.5);
-  errorLabel->setPosition(ofGetWidth()/2 - errorLabel->getWidth()/2, ofGetHeight()/2 - errorLabel->getHeight());
+  errorLabel->setPosition(ofGetWidth()/2 - errorLabel->getWidth()/2, ofGetHeight()/2 - errorLabel->getHeight()-100);
   errorLabel->setLabelColor(ofColor(255, 0, 0));
 
   datasetNameInput = new ofxDatGuiTextInput("Dataset Name: ", "");
@@ -14,7 +14,7 @@ void DatasetBuilderScene::setup(){
 
   loadFromFolderButton = new ofxDatGuiButton("Load From Folder");
   loadFromFolderButton->setWidth(400, 0.5);
-  loadFromFolderButton->setPosition(ofGetWidth()/2 - loadFromFolderButton->getWidth()/2, ofGetHeight()/2 + loadFromFolderButton->getHeight());
+  loadFromFolderButton->setPosition(ofGetWidth()/2 - loadFromFolderButton->getWidth()/2, datasetNameInput->getY() + loadFromFolderButton->getHeight());
   loadFromFolderButton->onButtonEvent(this, &DatasetBuilderScene::onButtonEvent);
 
   imagesAlreadyPaired = new ofxDatGuiToggle("Images already paired");
@@ -28,9 +28,15 @@ void DatasetBuilderScene::setup(){
 
   buildButton = new ofxDatGuiButton("BUILD");
   buildButton->setWidth(400, 0.5);
-  buildButton->setPosition(ofGetWidth()/2 - buildButton->getWidth()/2, buildImageProcessingButton->getY() + buildImageProcessingButton->getHeight()*4);
+  buildButton->setPosition(ofGetWidth()/2 - buildButton->getWidth()/2, buildImageProcessingButton->getY() + buildImageProcessingButton->getHeight()*2);
   buildButton->onButtonEvent(this, &DatasetBuilderScene::onButtonEvent);
 
+  backButton = new ofxDatGuiButton("BACK<-");
+  backButton->setPosition(50, ofGetHeight() - 50);
+  backButton->onButtonEvent(this, &DatasetBuilderScene::onButtonEvent);
+
+  alreadyPairedHelp.setup(imagesAlreadyPaired->getX() + 400, imagesAlreadyPaired->getY(),
+  "If the images are already stitched together as TARGET_OUTPUT+INPUT then select this box");
 
 }
 
@@ -41,6 +47,7 @@ void DatasetBuilderScene::update(){
   datasetNameInput->update();
   loadFromFolderButton->update();
   imagesAlreadyPaired->update();
+  backButton->update();
   if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
     imagesAlreadyPaired->update();
 
@@ -57,6 +64,7 @@ void DatasetBuilderScene::draw(){
     imagesAlreadyPaired->draw();
     if(!imagesAlreadyPaired->getChecked()){
       buildImageProcessingButton->draw();
+      alreadyPairedHelp.draw();
     }
   }
   else if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::GAN){
@@ -65,6 +73,7 @@ void DatasetBuilderScene::draw(){
   buildButton->draw();
   errorLabel->draw();
   datasetNameInput->draw();
+  backButton->draw();
 }
 
 void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
@@ -74,14 +83,16 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
       dir = result.getPath();
     }
   }
-  if(e.target == buildButton){
+  else if(e.target == buildButton){
     if(checkTextValid() && checkFnameNew() && checkDir()){
       if(ModelManager::getInstance()->getModelType() == MODEL_TYPE::PIX2PIX){
         if(imagesAlreadyPaired->getChecked()){
             ofDirectory dir_ = ofDirectory(dir);
             dir_.copyTo("saved_datasets/"+datasetNameInput->getText()+"/");
             ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
-            ModelManager::getInstance()->setStatus(2);
+            if(ModelManager::getInstance()->getStatus() < 2){
+              ModelManager::getInstance()->setStatus(2);
+            }
             ModelManager::getInstance()->save();
             BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
             scene->refresh();
@@ -101,7 +112,9 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
         ofDirectory dir_ = ofDirectory(dir);
         dir_.copyTo("saved_datasets/"+datasetNameInput->getText()+"/");
         ModelManager::getInstance()->setDatasetDir("data/saved_datasets/"+datasetNameInput->getText());
-        ModelManager::getInstance()->setStatus(2);
+        if(ModelManager::getInstance()->getStatus() < 2){
+          ModelManager::getInstance()->setStatus(2);
+        }
         ModelManager::getInstance()->save();
         BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::TRAIN);
         scene->refresh();
@@ -109,7 +122,7 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
       }
     }
   }
-  if(e.target == buildImageProcessingButton){
+  else if(e.target == buildImageProcessingButton){
     //TODO: remove
     // dir = "/home/hans/uni/diss/nicholas_cage/Nicolas_Cage/Dataset/train/class1";
 
@@ -126,6 +139,11 @@ void DatasetBuilderScene::onButtonEvent(ofxDatGuiButtonEvent e){
         }
       }
     }
+  }
+  else if(e.target == backButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::DATASET_MENU);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::DATASET_MENU);
   }
 }
 

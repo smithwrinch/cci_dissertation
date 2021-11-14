@@ -93,6 +93,7 @@ void MenuScene::setup(){
   customLabel->setWidth(customButton->getWidth());
   customLabel->setLabelColor(ofColor(150, 150, 150));
 
+  logoImage.load("data/images/logo-placeholder.jpg");
 }
 
 void MenuScene::update(){
@@ -139,6 +140,7 @@ void MenuScene::draw(){
     loadModelButton->draw();
     playButton->draw();
     interactButton->draw();
+    logoImage.draw(ofGetWidth()/2 - 250, 50, 500, 250);
   }
   if(state == 1){
     createModelButton->draw();
