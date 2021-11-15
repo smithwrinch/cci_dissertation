@@ -103,7 +103,7 @@ void MotionDetectionScene::setup(){
   nextImgInGray.allocate(fboWidth, fboHeight);
   lastImgInGray.allocate(fboWidth, fboHeight);
 
-  latentGraphWidget.setup(50, ofGetHeight()/2 , 350, 175, ofColor(255, 255, 255), true);
+  latentGraphWidget.setup(50, ofGetHeight()/2 , 350, 175, ofColor(255, 255, 255), true, 2);
 
 }
 
@@ -226,6 +226,7 @@ void MotionDetectionScene::onButtonEvent(ofxDatGuiButtonEvent e){
     update();
     SceneManager::getInstance()->setShowNavBar(true);
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
+    autoRun = false;
   }
   else if(e.target == randomiseButton){
     randomiseLatentVector();
@@ -249,7 +250,7 @@ void MotionDetectionScene::randomiseLatentVector(){
 
   latentVector.clear();
   for (int i =0; i < latentDim; i++){
-      float b = ofRandom(-1.f, 1.f);
+      float b = ofRandom(-2.f, 2.f);
       latentVector.push_back(b);
   }
 
@@ -284,6 +285,9 @@ void MotionDetectionScene::setLatentVector(){
   // ofPixels p1 = lastImgInGray.getPixels();
   // ofPixels p2 = nextImgInGray.getPixels();
   ofPixels p = imgIn.getPixels();
+  for (int i =0; i < latentDim; i++){
+      latentVector[i] = 0;
+  }
   for(int i =0; i < fboWidth*fboHeight; i++){
     int idx = pixelsToTrack[i];
     int dimIndex = idx % latentDim;
@@ -291,8 +295,15 @@ void MotionDetectionScene::setLatentVector(){
     ofColor c = p.getColor(idx);
 
     float cc = (c.r + c.g + c.b)/3;
-    float newVal = ((cc - 127.5)/127.5);
+    float newVal = ((cc - 127.5)/127.5)*strengthSlider->getValue();
     latentVector[dimIndex] = newVal;
+    if(latentVector[dimIndex] < -2){
+      latentVector[dimIndex] = -2;
+    }
+    else
+    if(latentVector[dimIndex] > 2){
+      latentVector[dimIndex] = 2;
+    }
   }
 }
 
@@ -349,6 +360,9 @@ void MotionDetectionScene::addGui(){
   randomiseButton->onButtonEvent(this, &MotionDetectionScene::onButtonEvent);
   randomiseButton->setWidth(width);
 
+  strengthSlider = new ofxDatGuiSlider("STRENGTH", 0, 4, 2);
+  strengthSlider->setPosition(50, randomiseButton->getY() + randomiseButton->getHeight());
+
 
   setExportFolderButton = new ofxDatGuiButton("SET EXPORT FOLDER");
   setExportFolderButton->setPosition(ofGetWidth() - width - 50, ofGetHeight() - 100);
@@ -373,6 +387,7 @@ void MotionDetectionScene::addGui(){
 
   gui.push_back(backButton);
   gui.push_back(randomiseButton);
+  gui.push_back(strengthSlider);
   gui.push_back(setExportFolderButton);
 
 }

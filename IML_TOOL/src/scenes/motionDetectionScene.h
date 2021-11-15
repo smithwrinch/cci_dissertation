@@ -76,6 +76,7 @@ class MotionDetectionScene : public BaseScene {
       ofxDatGuiButton* recordButton;
       ofxDatGuiButton* setExportFolderButton;
       ofxDatGuiButton* exportPictureButton;
+      ofxDatGuiSlider* strengthSlider;
 
       vector <ofxDatGuiComponent*> gui;
 

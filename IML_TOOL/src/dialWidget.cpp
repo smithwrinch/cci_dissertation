@@ -76,9 +76,18 @@ void DialWidget::draw(){
      float angle = (theta * i);
 
      if(isHalf){
-        float x = (radius/max) * (0.5 + radius_/2) * cos(angle);
-        float y = (radius/max) * (0.5 + radius_/2) * sin(angle);
+        float abs_radius = abs(radius_);
+        float x = (radius/max) * (0.5 + abs_radius/2) * cos(angle);
+        float y = (radius/max) * (0.5 + abs_radius/2) * sin(angle);
+        int coeff = 1;
+        if(radius_ < 0){
+          coeff = -1;
+          ofSetColor(0, 0, 0);
+        }
+        x*= coeff;
+        y*= coeff;
         ofDrawLine(centreX,centreY, x+centreX, y+centreY);
+        ofSetColor(colour);
      }
      else{
       float x = (radius/max) * radius_ * cos(angle);
@@ -87,12 +96,12 @@ void DialWidget::draw(){
      }
    }
 
-   if(isHalf){
-      ofSetColor(127, 127, 127);
-      ofDrawCircle(centreX, centreY, radius/2);
-      ofSetColor(colour);
+   // if(isHalf){
+      // ofSetColor(127, 127, 127);
+      // ofDrawCircle(centreX, centreY, radius/2);
+      // ofSetColor(colour);
 
-   }
+   // }
 
    if(mouseInArea){
       ofSetColor(ofColor(255, 215, 0));

@@ -242,9 +242,9 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
   }
   else if (e.target == setAllButton){
     for(int i =0; i < latentVector.size(); i++){
-      latentVector[i] = 0;
+      latentVector[i] = latentVectorSlider->getValue();
     }
-    latentVectorSlider->setValue(0);
+    // latentVectorSlider->setValue(0);
   }
   else if(e.target == setExportFolderButton){
     ofFileDialogResult result = ofSystemLoadDialog("select output dir", true);
@@ -350,7 +350,7 @@ void ExploreLatentSpaceScene::addGui(){
   latentVectorSelectSlider->setPrecision(0);
   latentVectorSelectSlider->setWidth(width, 0.5);
 
-  latentVectorSlider = new ofxDatGuiSlider("Latent vector value", -1, 1);
+  latentVectorSlider = new ofxDatGuiSlider("Latent vector value", -2, 2);
   latentVectorSlider->setPosition(0, buffer+latentVectorSelectSlider->getY());
   latentVectorSlider->setWidth(width, 0.5);
 

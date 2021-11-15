@@ -1,6 +1,7 @@
 #include "syncMusicScene.h"
 
 void SyncMusicScene::refresh(){
+  SceneManager::getInstance()->setShowNavBar(false);
   state = 0;
   showingAdvanced = false;
   running = false;
@@ -185,7 +186,9 @@ void SyncMusicScene::draw(){
 
 void SyncMusicScene::onButtonEvent(ofxDatGuiButtonEvent e){
   if(e.target == backButton){
-    SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
+  BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_MENU);
+  scene->refresh();
+  SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
   else if(e.target == openMusicButton){
     ofFileDialogResult result = ofSystemLoadDialog("select music", false);
@@ -203,11 +206,13 @@ void SyncMusicScene::onButtonEvent(ofxDatGuiButtonEvent e){
     if(videoDir == "" || musicDir == ""){
       errorLabel->setLabel("video directory or .mp3 missing");
     }
-    if(!checkNameValid()){
+    else if(!checkNameValid()){
       errorLabel->setLabel("VIDEO NAME MUST END IN .MP4");
     }
     else{
-
+      cout <<  videoDir << endl;
+      cout << musicDir << endl;
+      cout << fnameInput->getText() << endl;
       ofFile file;
       file.open(txt_dir);
       file.remove();
