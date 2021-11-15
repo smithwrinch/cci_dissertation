@@ -489,7 +489,7 @@ class TrainingScene : public BaseScene {
       ofxDatGuiButton* confirmButton = new ofxDatGuiButton("CONFIRM RESTART");
       ofxDatGuiButton* unconfirmButton = new ofxDatGuiButton("BACK");
 
-      ofxDatGuiButton* loadButton = new ofxDatGuiButton("LOAD PREVIOUSLY TRAINED");
+      ofxDatGuiButton* loadButton = new ofxDatGuiButton("RESTORE WEIGHTS");
 
       ofxDatGuiButton* backButton = new ofxDatGuiButton("BACK<-");
       ofxDatGuiButton* playButton = new ofxDatGuiButton("CONTINUE");

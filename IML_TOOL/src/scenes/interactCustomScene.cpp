@@ -36,7 +36,7 @@ void InteractCustomScene::setup(){
   continueButton->setPosition(ofGetWidth() - 50 - continueButton->getWidth(), ofGetHeight() - 50);
   continueButton->onButtonEvent(this, &InteractCustomScene::onButtonEvent);
   setFolderButton = new ofxDatGuiButton("SELECT MODEL");
-  setFolderButton->setPosition(ofGetWidth()/2 - width/2, 325);
+  setFolderButton->setPosition(ofGetWidth()/2 - width/2, 350);
   setFolderButton->setWidth(width);
   setFolderButton->onButtonEvent(this, &InteractCustomScene::onButtonEvent);
 
@@ -44,8 +44,8 @@ void InteractCustomScene::setup(){
   grayscaleToggle->setPosition(ofGetWidth()/2 - width/2, 275);
   grayscaleToggle->setWidth(width);
   //gan
-  imgSizeSlider = new ofxDatGuiSlider("OUTPUT IMAGE SIZE", 28, 2048);
-  latentDimSlider = new ofxDatGuiSlider("LATENT DIMENSION", 1, 2048);
+  imgSizeSlider = new ofxDatGuiSlider("OUTPUT IMAGE SIZE", 28, 2048, 512);
+  latentDimSlider = new ofxDatGuiSlider("LATENT DIMENSION", 1, 2048, 128);
   normaliseOutputToggle = new ofxDatGuiToggle("NORMALISE OUTPUT");
 
   normaliseOutputToggle->setChecked(true);
@@ -57,8 +57,11 @@ void InteractCustomScene::setup(){
   imgSizeSlider->setWidth(width, 0.5);
   imgSizeSlider->setPrecision(0);
 
-  normaliseOutputToggle->setPosition(ofGetWidth()/2 - width/2, 275);
+  normaliseOutputToggle->setPosition(ofGetWidth()/2 - width/2, 300);
   normaliseOutputToggle->setWidth(width);
+
+  normaliseHelp.setup(
+  normaliseOutputToggle->getX()+width, normaliseOutputToggle->getY(), "If the output has been normalise to -1 and 1 (tanh activation), check this box. Often if the output is very dark this box has forgotten to be checked.");
 
 
   //pix2pix
@@ -89,6 +92,7 @@ void InteractCustomScene::update(){
     grayscaleToggle->update();
     continueButton->update();
     setFolderButton->update();
+    normaliseOutputToggle->update();
     if(state == 1){
       imgSizeSlider->update();
       latentDimSlider->update();
@@ -114,6 +118,8 @@ void InteractCustomScene::draw(){
     setFolderButton->draw();
     grayscaleToggle->draw();
     continueButton->draw();
+    normaliseHelp.draw();
+    normaliseOutputToggle->draw();
     if(state == 1){
       imgSizeSlider->draw();
       latentDimSlider->draw();

@@ -213,7 +213,7 @@ void ExploreLatentSpaceScene::draw(){
   		//if(!drawImage(imgIn, "imgIn")) {
   		//	str << "imgIn not allocated !!" << srd::endl;
   		//}
-  		if(!drawImage(imgOut, "imgOut", imWidth, imHeight)) {
+  		if(!drawImage(imgOut, "", imWidth, imHeight)) {
   			cout << "imgOut not allocated !!" << std::endl;
   		}
   	ofPopMatrix();
@@ -402,7 +402,7 @@ void ExploreLatentSpaceScene::addGui(){
 
 
   gui.push_back(backButton);
-  gui.push_back(latentVectorSelectSlider);
+  // gui.push_back(latentVectorSelectSlider);
   gui.push_back(latentVectorSlider);
   gui.push_back(randomiseButton);
   gui.push_back(toggleWidgetsButton);

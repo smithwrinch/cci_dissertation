@@ -37,8 +37,6 @@ def load_data(BUFFER_SIZE = 60000, batch_size=100):
 
     return train_dataset
 
-
-
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 def discriminator_loss(real_output, fake_output):
@@ -142,7 +140,6 @@ DISC_NOISE):
     log_msg.send("Beginning training...")
     for epoch in range(epochs):
 
-        log_msg.send("Epoch " + str(epoch+epochs_passed))
         generate_and_save_images(generator, seed, root_img_save+str(epoch+epochs_passed), img_channel)
         files = glob.glob(save_dir+"/*")
         generator.save(save_dir+"/-" +str(epoch+epochs_passed)+"_generator")
@@ -175,6 +172,7 @@ DISC_NOISE):
         # generate_and_save_images(generator, seed)
 
 
+        log_msg.send('Time for epoch {} is {} sec'.format(epoch + 1 + epochs_passed, time.time()-start))
         print ('Time for epoch {} is {} sec'.format(epoch + 1 + epochs_passed, time.time()-start))
     # Generate after the final epoch
     display.clear_output(wait=True)

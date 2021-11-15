@@ -10,8 +10,12 @@ void TrainingScene::refresh(){
     // num_images = DIR.listDir(img_dir);
 
     // training_img.allocate(1600, 1600, OF_IMAGE_COLOR);
-    training_img.load("images/-1.png");
-    graph_img.load("images/-1.png");
+    if(!training_img.load( img_dir+"/"+ofToString(ModelManager::getInstance()->getEpochsTrained())+".png")){
+      training_img.load("images/-1.png");
+    }
+    if(!graph_img.load("saved_models/" + ModelManager::getInstance()->getModelName()+"/saved_networks/losses/graph.png")){
+      graph_img.load("images/-1.png");
+    }
     // training_img.resize(400, 400);
     // threadedImageLoader.loadFromDisk(training_img, img_dir+"/"+ofToString(ModelManager::getInstance()->getEpochsTrained())+".png");
 

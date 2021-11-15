@@ -2,6 +2,7 @@
 #include "../sceneManager.h"
 #include "../model.h"
 #include "../sceneTypes.h"
+#include "../helpWidget.h"
 
 class InteractCustomScene : public BaseScene {
   public:
@@ -29,9 +30,11 @@ class InteractCustomScene : public BaseScene {
     ofxDatGuiButton * continueButton;
     ofxDatGuiButton * setFolderButton;
 
+    HelpWidget normaliseHelp; // we should normalise help tbf
+
     string msg;
     string dir;
 
-    int state = 0; // 0 model type; 1 gan; 2 p2p
+    int state = 0; // 0 model type; 1 gan; 2 p2p -- why not use enum?
 
 };
