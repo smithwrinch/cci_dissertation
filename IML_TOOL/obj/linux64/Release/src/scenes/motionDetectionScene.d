@@ -765,7 +765,8 @@ obj/linux64/Release/src/scenes/motionDetectionScene.o: \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxOpenCv/src/ofxCvShortImage.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxOpenCv/src/ofxCvContourFinder.h \
  /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxOpenCv/src/ofxCvHaarFinder.h \
- /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h \
+ /home/hans/uni/diss/main/IML_TOOL/src/scenes/../helpWidget.h
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/motionDetectionScene.h:
 
@@ -2332,3 +2333,5 @@ obj/linux64/Release/src/scenes/motionDetectionScene.o: \
 /home/hans/OF/of_v0.11.0_linux64gcc6_release/addons/ofxOpenCv/src/ofxCvHaarFinder.h:
 
 /home/hans/uni/diss/main/IML_TOOL/src/scenes/../latentGraphWidget.h:
+
+/home/hans/uni/diss/main/IML_TOOL/src/scenes/../helpWidget.h:

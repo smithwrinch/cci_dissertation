@@ -9,6 +9,7 @@
 #include "ofxVideoRecorder.h"
 #include "ofxOpenCv.h"
 #include "../latentGraphWidget.h"
+#include "../helpWidget.h"
 
 #include <random>
 
@@ -70,6 +71,7 @@ class MotionDetectionScene : public BaseScene {
       SceneManager * sceneManager = SceneManager::getInstance();
       vector<float> latentVector;
       vector<float> pixelsToTrack;
+      vector<float> perturbAmount;
 
       ofxDatGuiButton* backButton;
       ofxDatGuiButton* randomiseButton;
@@ -77,6 +79,10 @@ class MotionDetectionScene : public BaseScene {
       ofxDatGuiButton* setExportFolderButton;
       ofxDatGuiButton* exportPictureButton;
       ofxDatGuiSlider* strengthSlider;
+      ofxDatGuiToggle* frameDifferenceToggle;
+
+      HelpWidget randomiseHelp;
+      HelpWidget frameHelp;
 
       vector <ofxDatGuiComponent*> gui;
 

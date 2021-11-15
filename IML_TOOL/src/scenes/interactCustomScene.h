@@ -19,7 +19,6 @@ class InteractCustomScene : public BaseScene {
     ofxDatGuiLabel * ganLabel;
     ofxDatGuiLabel * modelTypeLabel;
     ofxDatGuiButton * backButton;
-
     ofxDatGuiSlider * imgSizeSlider;
     ofxDatGuiSlider * latentDimSlider;
     ofxDatGuiSlider * imgWidthSlider;

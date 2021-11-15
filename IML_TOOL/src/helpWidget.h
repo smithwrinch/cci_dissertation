@@ -6,8 +6,8 @@
 using std::vector;
 class HelpWidget {
   public:
+    // TODO overload setup to take ofxDatGuiComponent pointer.
     void setup(int x, int y, string msg, int w=25, int h=25);
-    // void update();
     void draw();
     void reset();
   private:

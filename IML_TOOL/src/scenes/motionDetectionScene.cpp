@@ -192,10 +192,13 @@ void MotionDetectionScene::update(){
 
 }
 void MotionDetectionScene::draw(){
+latentGraphWidget.draw();
+  ofFill();
     for(int i = 0; i < gui.size(); i++){
       gui[i]->draw();
     }
-    latentGraphWidget.draw();
+    frameHelp.draw();
+    randomiseHelp.draw();
 
     if(hasChosenExportFolder){
       recordButton->draw();
@@ -249,9 +252,12 @@ void MotionDetectionScene::onButtonEvent(ofxDatGuiButtonEvent e){
 void MotionDetectionScene::randomiseLatentVector(){
 
   latentVector.clear();
+  perturbAmount.clear();
   for (int i =0; i < latentDim; i++){
       float b = ofRandom(-2.f, 2.f);
       latentVector.push_back(b);
+      float c = ofRandom(-0.5f, 0.5f);
+      perturbAmount.push_back(c);
   }
 
   setPixelsToTrack();
@@ -280,8 +286,8 @@ void MotionDetectionScene::setPixelsToTrack(){
 
 void MotionDetectionScene::setLatentVector(){
 
-  // imgDiff.absDiff(lastImgInGray, nextImgInGray);
-  // ofPixels pixels = imgDiff.getPixels();
+  imgDiff.absDiff(lastImgInGray, nextImgInGray);
+  ofPixels pixels = imgDiff.getPixels();
   // ofPixels p1 = lastImgInGray.getPixels();
   // ofPixels p2 = nextImgInGray.getPixels();
   ofPixels p = imgIn.getPixels();
@@ -291,12 +297,24 @@ void MotionDetectionScene::setLatentVector(){
   for(int i =0; i < fboWidth*fboHeight; i++){
     int idx = pixelsToTrack[i];
     int dimIndex = idx % latentDim;
-
-    ofColor c = p.getColor(idx);
+    ofColor c;
+    if(frameDifferenceToggle->getChecked()){
+      c = pixels.getColor(idx);
+    }
+    else{
+      c = p.getColor(idx);
+    }
 
     float cc = (c.r + c.g + c.b)/3;
-    float newVal = ((cc - 127.5)/127.5)*strengthSlider->getValue();
-    latentVector[dimIndex] = newVal;
+    float newVal = ((cc - 127.5)/127.5);
+
+    if(frameDifferenceToggle->getChecked()){
+      newVal +=1;
+      latentVector[dimIndex] += newVal*strengthSlider->getValue()*perturbAmount[dimIndex]/50;
+    }
+    else{
+      latentVector[dimIndex] = newVal*strengthSlider->getValue();
+    }
     if(latentVector[dimIndex] < -2){
       latentVector[dimIndex] = -2;
     }
@@ -360,9 +378,18 @@ void MotionDetectionScene::addGui(){
   randomiseButton->onButtonEvent(this, &MotionDetectionScene::onButtonEvent);
   randomiseButton->setWidth(width);
 
-  strengthSlider = new ofxDatGuiSlider("STRENGTH", 0, 4, 2);
-  strengthSlider->setPosition(50, randomiseButton->getY() + randomiseButton->getHeight());
+  randomiseHelp.setup(randomiseButton->getX() + width, randomiseButton->getY(),
+"Randomises which pixels to track.");
 
+  frameDifferenceToggle = new ofxDatGuiToggle("FRAME DIFFERENCE");
+  frameDifferenceToggle->setPosition(50, randomiseButton->getY() + randomiseButton->getHeight());
+  frameDifferenceToggle->setWidth(width);
+  frameHelp.setup(frameDifferenceToggle->getX() + width, frameDifferenceToggle->getY(),
+"Instead of setting the latent vector from the pixels directly, set from the difference between adjacent frames.");
+
+  strengthSlider = new ofxDatGuiSlider("STRENGTH", 0, 4, 2);
+  strengthSlider->setPosition(50, frameDifferenceToggle->getY() + frameDifferenceToggle->getHeight());
+  strengthSlider->setWidth(width, 0.5);
 
   setExportFolderButton = new ofxDatGuiButton("SET EXPORT FOLDER");
   setExportFolderButton->setPosition(ofGetWidth() - width - 50, ofGetHeight() - 100);
@@ -387,6 +414,7 @@ void MotionDetectionScene::addGui(){
 
   gui.push_back(backButton);
   gui.push_back(randomiseButton);
+  gui.push_back(frameDifferenceToggle);
   gui.push_back(strengthSlider);
   gui.push_back(setExportFolderButton);
 
