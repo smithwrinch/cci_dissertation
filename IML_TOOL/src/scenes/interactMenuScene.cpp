@@ -37,9 +37,14 @@ void InteractMenuScene::setup(){
   ganButtons.push_back(musicSyncButton);
   ganButtons.push_back(motionDetectionButton);
   ////////////////////////////////////////////////
+
   mlInputButton = new ofxDatGuiButton("GAN INPUT");
   mlInputButton->onButtonEvent(this, &InteractMenuScene::onButtonEvent);
-  mlInputButton->setPosition(centreX, topY - bufferY );
+  mlInputButton->setPosition(centreX, topY - bufferY*2 );
+
+  p2pInputButton = new ofxDatGuiButton("Pix2Pix INPUT");
+  p2pInputButton->onButtonEvent(this, &InteractMenuScene::onButtonEvent);
+  p2pInputButton->setPosition(centreX, topY - bufferY );
 
   drawButton = new ofxDatGuiButton("DRAW INPUT");
   drawButton->onButtonEvent(this, &InteractMenuScene::onButtonEvent);
@@ -54,6 +59,7 @@ void InteractMenuScene::setup(){
   videoInputButton->setPosition(centreX, bufferY + webcamInputButton->getY());
 
   p2pButtons.push_back(mlInputButton);
+  p2pButtons.push_back(p2pInputButton);
   p2pButtons.push_back(drawButton);
   p2pButtons.push_back(webcamInputButton);
   p2pButtons.push_back(videoInputButton);
@@ -155,6 +161,10 @@ void InteractMenuScene::onButtonEvent(ofxDatGuiButtonEvent e){
       BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_ML_P2P);
       scene->refresh();
       SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_ML_P2P);
-
+  }
+  else if(e.target == p2pInputButton){
+      BaseScene * scene = SceneManager::getInstance()->getScene(SCENE_TYPE::INTERACT_P2P_P2P);
+      scene->refresh();
+      SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_P2P_P2P);
   }
 }

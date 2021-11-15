@@ -20,6 +20,7 @@ class InteractMenuScene : public BaseScene {
 
     //P2P
     vector <ofxDatGuiButton*> p2pButtons;
+    ofxDatGuiButton * p2pInputButton;
     ofxDatGuiButton * mlInputButton;
     ofxDatGuiButton * drawButton;
     ofxDatGuiButton * webcamInputButton;

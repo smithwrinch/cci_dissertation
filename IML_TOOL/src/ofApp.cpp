@@ -118,6 +118,8 @@ void ofApp::setup(){
   sceneManager->addScene(&videoP2PScene);
   interactMLScene.setup();
   sceneManager->addScene(&interactMLScene);
+  interactP2PInputScene.setup();
+  sceneManager->addScene(&interactP2PInputScene);
 
 
   sceneManager->changeSceneTo(SCENE_TYPE::MENU);

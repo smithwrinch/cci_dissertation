@@ -92,8 +92,8 @@ void InteractCustomScene::update(){
     grayscaleToggle->update();
     continueButton->update();
     setFolderButton->update();
-    normaliseOutputToggle->update();
     if(state == 1){
+      normaliseOutputToggle->update();
       imgSizeSlider->update();
       latentDimSlider->update();
     }
@@ -119,8 +119,8 @@ void InteractCustomScene::draw(){
     grayscaleToggle->draw();
     continueButton->draw();
     normaliseHelp.draw();
-    normaliseOutputToggle->draw();
     if(state == 1){
+      normaliseOutputToggle->draw();
       imgSizeSlider->draw();
       latentDimSlider->draw();
     }

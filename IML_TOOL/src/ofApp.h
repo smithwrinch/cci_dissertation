@@ -29,6 +29,7 @@
 #include "scenes/interactCustomScene.h"
 #include "interactP2PVideoScene.h"
 #include "interactMLInputScene.h"
+#include "interactP2PInputScene.h"
 
 class ofApp : public ofBaseApp{
 
@@ -77,6 +78,7 @@ class ofApp : public ofBaseApp{
 		InteractCustomScene interactCustomScene;
 		InteractP2PVideoScene videoP2PScene;
 		InteractMLInputScene interactMLScene;
+		InteractP2PInputScene interactP2PInputScene;
 
 		void positionButtons();
 		void onButtonEvent(ofxDatGuiButtonEvent e);
