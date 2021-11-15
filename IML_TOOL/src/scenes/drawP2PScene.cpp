@@ -55,6 +55,7 @@ void DrawP2PScene::refresh(){
 
   // search for the drawing tool config files in bin/data/draw
   setupDrawingTool("default_models/draw");
+  loadColourPalette("default_models/draw/palette.txt");
   setupGui();
 
   //video shit
@@ -182,10 +183,11 @@ void DrawP2PScene::update() {
 //--------------------------------------------------------------
 void DrawP2PScene::draw() {
 
+  ofPushStyle();
 	// DISPLAY STUFF
 	std::stringstream str;
-	str << "ENTER : Toggle auto run " << (autoRun ? "(X)" : "( )") << std::endl;
 	str << "DEL   : Clear drawing " << std::endl;
+  str << "m     : Toggle auto run " << (autoRun ? "(X)" : "( )") << std::endl;
 	str << "d     : Toggle draw mode " << (drawMode == 0 ? "(draw)" : "(boxes)") << std::endl;
 	str << "c/v   : Change draw radius (" << drawRadius << ")" << std::endl;
 	str << "z/x   : Change draw color " << std::endl;
@@ -217,7 +219,7 @@ void DrawP2PScene::draw() {
 
   ofDrawBitmapString(ofToString((int)ofGetFrameRate()) + " fps", ofGetWidth() - 54, 30);
   if(controlMode == 0){
-    ofDrawBitmapString(str.str(), drawX, drawY + drawHeight+40);
+    ofDrawBitmapString(str.str(), drawX+25, drawY + drawHeight+40);
   }
   else if(controlMode == 1){
   	// draw colors
@@ -235,7 +237,7 @@ void DrawP2PScene::draw() {
 
   	// draw color palette
   	for(int i = 0; i < colors.size(); i++) {
-  		ofSetColor(colors[i]);
+      ofSetColor(colors[i]);
   		ofDrawCircle(x + paletteDrawSize/2, y + paletteDrawSize/2, paletteDrawSize/2);
 
   		// draw outline if selected color
@@ -256,6 +258,7 @@ void DrawP2PScene::draw() {
   			y += paletteDrawSize;
   		}
   	}
+
 
   }
 
@@ -308,6 +311,13 @@ void DrawP2PScene::draw() {
   if(!recording){
     backButton->draw();
   }
+
+  ofPushStyle();
+  ofNoFill();
+  ofSetColor(255);
+  paletteHelp.draw();
+  ofPopStyle();
+  ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -398,7 +408,7 @@ void DrawP2PScene::keyPressed(int key) {
 			fbo.end();
 			break;
 
-		case OF_KEY_RETURN:
+		case 'm':
 			autoRun ^= true;
 			break;
 	}
@@ -508,6 +518,12 @@ void DrawP2PScene::onButtonEvent(ofxDatGuiButtonEvent e){
   else if(e.target == recordButton){
     record();
   }
+  else if(e.target == loadPaletteButton){
+    ofFileDialogResult result = ofSystemLoadDialog("select palette .txt", false);
+    if (result.bSuccess) {
+      loadColourPalette(result.getPath());
+    }
+  }
 }
 
 // PRIVATE
@@ -531,28 +547,7 @@ void DrawP2PScene::setupDrawingTool(std::string model_dir) {
 	else {
 		ofLogError() << "Test image not found";
 	}
-
-	// load color palette for drawing
-	ofLogVerbose() << "Loading color palette";
-	colors.clear();
-	ofBuffer buf;
-	buf = ofBufferFromFile(ofFilePath::join(model_dir, "/palette.txt"));
-	if(buf.size() > 0) {
-		for(const auto& line : buf.getLines()) {
-			ofLogVerbose() << line;
-			if(line.size() == 6) { // if valid hex code
-				colors.push_back(ofColor::fromHex(ofHexToInt(line)));
-			}
-		}
-		drawColorIndex = 0;
-		if(colors.size() > 0) {
-			drawColor = colors[0];
-		}
-	}
-	else {
-		ofLogError() << "Palette info not found";
-	}
-
+  ofBuffer buf;
 	// load default brush info
 	ofLogVerbose() << "Loading default brush info";
 	buf = ofBufferFromFile(ofFilePath::join(model_dir, "/default_brush.txt"));
@@ -575,6 +570,31 @@ void DrawP2PScene::setupDrawingTool(std::string model_dir) {
 		ofLogError() << "Default brush info not found";
 	}
 }
+
+void DrawP2PScene::loadColourPalette(string s){
+  // load color palette for drawing
+
+  ofLogVerbose() << "Loading color palette";
+  colors.clear();
+  ofBuffer buf;
+  buf = ofBufferFromFile(s);
+  if(buf.size() > 0) {
+    for(const auto& line : buf.getLines()) {
+      ofLogVerbose() << line;
+      if(line.size() == 6) { // if valid hex code
+        colors.push_back(ofColor::fromHex(ofHexToInt(line)));
+      }
+    }
+    drawColorIndex = 0;
+    if(colors.size() > 0) {
+      drawColor = colors[0];
+    }
+  }
+  else {
+    ofLogError() << "Palette info not found";
+  }
+}
+
 
 //--------------------------------------------------------------
 // draw image or fbo etc with border and label
@@ -608,7 +628,7 @@ bool DrawP2PScene::drawImage(const T& img, string label, int x, int y, int width
 void DrawP2PScene::setupGui(){
 
   backButton = new ofxDatGuiButton("BACK<-");
-  backButton->setPosition(100, ofGetHeight()-50);
+  backButton->setPosition(50, ofGetHeight()-30);
   backButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
 
   exportPictureButton = new ofxDatGuiButton("EXPORT PICTURE");
@@ -640,6 +660,10 @@ void DrawP2PScene::setupGui(){
   toggleControlsButton->setPosition(buttonsX, setExportFolderButton->getY()+setExportFolderButton->getHeight());
   toggleControlsButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
 
+  loadPaletteButton = new ofxDatGuiButton("LOAD PALLETTE .TXT");
+  loadPaletteButton->setPosition(buttonsX, toggleControlsButton->getY()+toggleControlsButton->getHeight());
+  loadPaletteButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
+  paletteHelp.setup(buttonsX -25, loadPaletteButton->getY(), "Palettes are loaded from .txt files. Each line represents a colour (in hex without the #)");
 
   brushRadius = new ofxDatGuiSlider("BRUSH RADIUS", 1, 100, 1);
   brushRadius->setPosition(controlsX, drawY+drawHeight+exportPictureButton2->getHeight());
@@ -657,6 +681,7 @@ void DrawP2PScene::setupGui(){
   gui.clear();
   gui.push_back(setExportFolderButton);
   gui.push_back(toggleControlsButton);
+  gui.push_back(loadPaletteButton);
   guiControls.push_back(brushRadius);
   guiControls.push_back(colourPicker);
   guiControls.push_back(addColourButton);

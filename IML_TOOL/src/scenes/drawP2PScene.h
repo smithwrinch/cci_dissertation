@@ -6,6 +6,7 @@
 #include <time.h>
 #include "ofxTensorFlow2.h"
 #include "ofxVideoRecorder.h"
+#include "../helpWidget.h"
 
 class DrawP2PScene : public BaseScene {
     public:
@@ -49,6 +50,8 @@ class DrawP2PScene : public BaseScene {
 			void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
   		template <typename T>
   		bool drawImage(const T& img, std::string label, int x, int y, int width, int height);
+      void loadColourPalette(string s = "default_models/draw/palette.txt");
+
 
 			SceneManager * sceneManager = SceneManager::getInstance();
 
@@ -103,4 +106,6 @@ class DrawP2PScene : public BaseScene {
 			ofxDatGuiSlider* brushRadius;
 			ofxDatGuiColorPicker* colourPicker;
 			ofxDatGuiButton* backButton;
+			ofxDatGuiButton* loadPaletteButton;
+      HelpWidget paletteHelp;
 };
