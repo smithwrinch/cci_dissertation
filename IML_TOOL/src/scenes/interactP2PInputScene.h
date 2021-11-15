@@ -27,6 +27,7 @@ class InteractP2PInputScene : public BaseScene {
 			void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
       void refreshModel2();
+      void updateImage();
 
 			SceneManager * sceneManager = SceneManager::getInstance();
 
@@ -61,7 +62,9 @@ class InteractP2PInputScene : public BaseScene {
 
       ofxCvColorImage imgInCV;
       ofxCvGrayscaleImage imgInGray;
+      ofxCvGrayscaleImage r,g,b;
 
+      
   		bool autoRun = false;   // auto run every frame?
       ofVideoGrabber vidGrabber;
 	    ofxVideoRecorder vidRecorder;
@@ -86,7 +89,13 @@ class InteractP2PInputScene : public BaseScene {
 			ofxDatGuiButton* exportPictureButton2;
 			ofxDatGuiButton* setExportFolderButton;
       ofxDatGuiButton* recordButton;
+
+      ofxDatGuiToggle* grayscaleToggle;
       ofxDatGuiToggle* invertToggle;
+      ofxDatGuiSlider* blurSlider;
+      ofxDatGuiSlider* contrastSlider;
+      ofxDatGuiSlider* brightnessSlider;
+
 			ofxDatGuiButton* backButton;
 
 			ofxDatGuiButton* modelSelectButton;

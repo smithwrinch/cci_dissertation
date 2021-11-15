@@ -47,8 +47,6 @@ void InteractP2PInputScene::refresh(){
     imgOut.allocate(nnWidth, nnHeight, OF_IMAGE_COLOR);
     imgIn2.allocate(nnHeight, nnHeight, OF_IMAGE_COLOR);
   }
-  imgInCV.allocate(nnWidth, nnHeight);
-  imgInGray.allocate(nnWidth, nnHeight);
 
   vidRecorder.setVideoCodec("mpeg4");
   vidRecorder.setVideoBitrate("800k");
@@ -105,6 +103,9 @@ void InteractP2PInputScene::update() {
     vidGrabber.update();
     if(vidGrabber.isFrameNew()){
       fbo.readToPixels(webcamOut.getPixels());
+      imgInCV.setFromPixels(webcamOut.getPixels());
+      updateImage();
+      webcamOut.setFromPixels(imgInCV.getPixels());
     }
 
     if(model2.readyForInput()){
@@ -210,7 +211,7 @@ void InteractP2PInputScene::draw() {
     vidGrabber.draw(0, 0);
     fbo.end();
     ofPushMatrix();
-    if(!drawImage(fbo, "webcam input", 50, 200, 200, 200)) {
+    if(!drawImage(webcamOut, "webcam input", 50, 300, 200, 200)) {
       cout << "fbo not allocated !!" << std::endl;
     }
     if(!drawImage(imgIn, "pix2pix output->pix2pix input", 525 + 3 *drawWidth / 8, drawHeight + 100, drawWidth/4, drawHeight/4)) {
@@ -223,6 +224,8 @@ void InteractP2PInputScene::draw() {
 
     // draw info texts
     ofSetColor(150);
+
+    ofFill();
 
     if(hasChosenExportFolder){
       recordButton->draw();
@@ -338,10 +341,7 @@ void InteractP2PInputScene::setupGui(){
   exportPictureButton2->setWidth(drawWidth/4);
   exportPictureButton2->onButtonEvent(this, &InteractP2PInputScene::onButtonEvent);
 
-  int controlsWidth = 400;
-  int controlsX = 100;
-
-  int buttonsX = ofGetWidth() - controlsWidth;
+  int buttonsX = ofGetWidth() - 400;
 
   recordButton = new ofxDatGuiButton("START RECORDING");
   recordButton->setPosition(buttonsX, 650);
@@ -352,11 +352,36 @@ void InteractP2PInputScene::setupGui(){
   setExportFolderButton->setPosition(buttonsX, recordButton->getY()+recordButton->getHeight()+25);
   setExportFolderButton->onButtonEvent(this, &InteractP2PInputScene::onButtonEvent);
 
+  //normal mode
+  grayscaleToggle = new ofxDatGuiToggle("GRAYSCALE");
   invertToggle = new ofxDatGuiToggle("INVERT");
+  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 100, 0);
+  contrastSlider = new ofxDatGuiSlider("CONTRAST", -1, 1, 0);
+  brightnessSlider = new ofxDatGuiSlider("BRIGHTNESS", -1, 1, 0);
+
+  blurSlider->setPrecision(0);
+
   invertToggle->setPosition(50, 100);
+  grayscaleToggle->setPosition(50, invertToggle->getY() + invertToggle->getHeight());
+  blurSlider->setPosition(50, grayscaleToggle->getY() + grayscaleToggle->getHeight());
+  contrastSlider->setPosition(50, blurSlider->getY() + blurSlider->getHeight());
+  brightnessSlider->setPosition(50, contrastSlider->getY()+ contrastSlider->getHeight());
+
+  invertToggle->setWidth(300);
+  grayscaleToggle->setWidth(300);
+  blurSlider->setWidth(300, 0.5);
+  contrastSlider->setWidth(300, 0.5);
+  brightnessSlider->setWidth(300, 0.5);
+
 
   gui.clear();
+  gui.push_back(grayscaleToggle);
+  gui.push_back(invertToggle);
+  gui.push_back(blurSlider);
+  gui.push_back(contrastSlider);
+  gui.push_back(brightnessSlider);
   gui.push_back(setExportFolderButton);
+
   gui.push_back(invertToggle);
 
   // model select gui
@@ -418,6 +443,11 @@ void InteractP2PInputScene::refreshModel2(){
     }
     webcamOut.allocate(model2Width, model2Height, OF_IMAGE_COLOR);
     fbo.allocate(model2Width, model2Height, GL_RGB);
+    imgInCV.allocate(model2Width, model2Height);
+    imgInGray.allocate(model2Width, model2Height);
+    r.allocate(model2Width, model2Height);
+    g.allocate(model2Width, model2Height);
+    b.allocate(model2Width, model2Height);
 }
 
 void InteractP2PInputScene::record(){
@@ -433,5 +463,31 @@ void InteractP2PInputScene::record(){
     vidRecorder.start();
     recordButton->setLabel("STOP RECORDING");
     recordButton->setStripeColor(ofColor(255,0,0));
+  }
+}
+
+
+void InteractP2PInputScene::updateImage(){
+  if(invertToggle->getChecked()){
+    imgInCV.invert();
+    imgInCV.flagImageChanged();
+  }
+
+  if(int(blurSlider->getValue()) % 2 == 0){
+    blurSlider->setValue(blurSlider->getValue()+1);
+  }
+  imgInCV.blurGaussian(blurSlider->getValue());
+
+  imgInCV.convertToGrayscalePlanarImages(r, g, b);
+
+  r.brightnessContrast(brightnessSlider->getValue(), contrastSlider->getValue());
+  g.brightnessContrast(brightnessSlider->getValue(), contrastSlider->getValue());
+  b.brightnessContrast(brightnessSlider->getValue(), contrastSlider->getValue());
+
+
+  imgInCV.setFromGrayscalePlanarImages(r, g, b);
+  imgInGray = imgInCV;
+  if(grayscaleToggle->getChecked()){
+    imgInCV = imgInGray;
   }
 }
