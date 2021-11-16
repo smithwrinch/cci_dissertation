@@ -172,6 +172,8 @@ void DrawP2PScene::update() {
     recordButton->update();
     exportPictureButton->update();
     exportPictureButton2->update();
+    savePaletteButton->update();
+
   }
   if(!recording){
     backButton->update();
@@ -306,6 +308,7 @@ void DrawP2PScene::draw() {
     recordButton->draw();
     exportPictureButton->draw();
     exportPictureButton2->draw();
+    savePaletteButton->draw();
   }
 
   if(!recording){
@@ -524,6 +527,9 @@ void DrawP2PScene::onButtonEvent(ofxDatGuiButtonEvent e){
       loadColourPalette(result.getPath());
     }
   }
+  else if(e.target == savePaletteButton){
+      saveColourPalette();
+  }
 }
 
 // PRIVATE
@@ -581,9 +587,7 @@ void DrawP2PScene::loadColourPalette(string s){
   if(buf.size() > 0) {
     for(const auto& line : buf.getLines()) {
       ofLogVerbose() << line;
-      if(line.size() == 6) { // if valid hex code
-        colors.push_back(ofColor::fromHex(ofHexToInt(line)));
-      }
+      colors.push_back(ofColor::fromHex(ofHexToInt(line)));
     }
     drawColorIndex = 0;
     if(colors.size() > 0) {
@@ -595,6 +599,20 @@ void DrawP2PScene::loadColourPalette(string s){
   }
 }
 
+void DrawP2PScene::saveColourPalette(){
+  ofFile f;
+  // string out = "";
+  stringstream ss;
+  for (int i; i < colors.size(); i++){
+    int hex = colors[i].getHex();
+    // out << hex << "\n";
+    ss<< std::hex << hex << "\n"; // int decimal_value
+  }
+  string res ( ss.str() );
+  f.open(exportDir+"/palette.txt",ofFile::WriteOnly);
+  f << res;
+  f.close();
+}
 
 //--------------------------------------------------------------
 // draw image or fbo etc with border and label
@@ -664,6 +682,10 @@ void DrawP2PScene::setupGui(){
   loadPaletteButton->setPosition(buttonsX, toggleControlsButton->getY()+toggleControlsButton->getHeight());
   loadPaletteButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
   paletteHelp.setup(buttonsX -25, loadPaletteButton->getY(), "Palettes are loaded from .txt files. Each line represents a colour (in hex without the #)");
+
+  savePaletteButton = new ofxDatGuiButton("EXPORT PALETTE");
+  savePaletteButton->setPosition(buttonsX, loadPaletteButton->getY()+loadPaletteButton->getHeight());
+  savePaletteButton->onButtonEvent(this, &DrawP2PScene::onButtonEvent);
 
   brushRadius = new ofxDatGuiSlider("BRUSH RADIUS", 1, 100, 1);
   brushRadius->setPosition(controlsX, drawY+drawHeight+exportPictureButton2->getHeight());

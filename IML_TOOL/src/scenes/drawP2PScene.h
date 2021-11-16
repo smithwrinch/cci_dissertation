@@ -51,7 +51,7 @@ class DrawP2PScene : public BaseScene {
   		template <typename T>
   		bool drawImage(const T& img, std::string label, int x, int y, int width, int height);
       void loadColourPalette(string s = "default_models/draw/palette.txt");
-
+      void saveColourPalette();
 
 			SceneManager * sceneManager = SceneManager::getInstance();
 
@@ -107,5 +107,6 @@ class DrawP2PScene : public BaseScene {
 			ofxDatGuiColorPicker* colourPicker;
 			ofxDatGuiButton* backButton;
 			ofxDatGuiButton* loadPaletteButton;
+			ofxDatGuiButton* savePaletteButton;
       HelpWidget paletteHelp;
 };
