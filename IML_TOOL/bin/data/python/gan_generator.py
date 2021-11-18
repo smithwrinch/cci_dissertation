@@ -1,6 +1,7 @@
 import imageio
 import argparse
 import glob
+import os
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_dir", help="Input image directory", required=True)
@@ -11,7 +12,8 @@ if __name__ == '__main__':
     INPUT_DIR = args.input_dir
 
     images = []
-    filenames = glob.glob(INPUT_DIR+"/*")
+    filenames = sorted(glob.glob(INPUT_DIR+"/*"), key=os.path.getmtime)
+    print(filenames)
     for filename in filenames:
         images.append(imageio.imread(filename))
 

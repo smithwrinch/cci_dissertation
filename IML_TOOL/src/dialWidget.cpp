@@ -77,12 +77,12 @@ void DialWidget::draw(){
 
      if(isHalf){
         float abs_radius = abs(radius_);
-        float x = (radius/max) * (0.5 + abs_radius/2) * cos(angle);
-        float y = (radius/max) * (0.5 + abs_radius/2) * sin(angle);
+        float x = (radius_*radius/max)  * cos(angle);
+        float y = (radius_*radius/max)  * sin(angle);
         int coeff = 1;
         if(radius_ < 0){
           coeff = -1;
-          ofSetColor(0, 0, 0);
+          ofSetColor(0, 0,0);
         }
         x*= coeff;
         y*= coeff;

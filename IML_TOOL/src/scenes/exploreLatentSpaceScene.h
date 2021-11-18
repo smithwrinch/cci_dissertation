@@ -34,6 +34,7 @@ class ExploreLatentSpaceScene : public BaseScene {
       const int imHeight = 400;
   		// draw
   		ofFbo fbo;
+  		ofFbo fboRadialWidget;
   		ofImage imgOut;
   		bool autoRun = false;   // auto run every frame?
 

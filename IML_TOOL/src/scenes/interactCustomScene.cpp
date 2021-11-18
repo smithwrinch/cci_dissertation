@@ -118,11 +118,11 @@ void InteractCustomScene::draw(){
     setFolderButton->draw();
     grayscaleToggle->draw();
     continueButton->draw();
-    normaliseHelp.draw();
     if(state == 1){
       normaliseOutputToggle->draw();
       imgSizeSlider->draw();
       latentDimSlider->draw();
+      normaliseHelp.draw();
     }
     else if(state == 2){
       imgWidthSlider->draw();

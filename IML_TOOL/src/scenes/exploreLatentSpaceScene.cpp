@@ -189,9 +189,11 @@ void ExploreLatentSpaceScene::update(){
 
 }
 void ExploreLatentSpaceScene::draw(){
+    ofFill();
     for(int i = 0; i < gui.size(); i++){
       gui[i]->draw();
     }
+    ofNoFill();
     if(dirWidget){
         speedLatentGraphWidget.draw();
         speedDialWidget.draw();

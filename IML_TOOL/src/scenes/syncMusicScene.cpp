@@ -22,11 +22,18 @@ void SyncMusicScene::refresh(){
 
   ModelManager * mm = ModelManager::getInstance();
   string base = "data/saved_models/"+mm->getModelName();
+  gan_dir = base+"/saved_networks/ckpt/-"+ofToString(mm->getEpochsTrained())+"_generator";
+
+  if(mm->getStatus() == -10){
+    // custom loaded
+    gan_dir = mm->getModelName();
+    base = "data";
+    // more elegant solution l8er but just outputs to temo output folder in bin/data
+  }
 
   txt_dir = base+"/outputs/temp.txt";
   statusThread.setup(txt_dir, &status, &finished);
 
-  gan_dir = base+"/saved_networks/ckpt/-"+ofToString(mm->getEpochsTrained())+"_generator";
 
   setupPythonThread();
 }
