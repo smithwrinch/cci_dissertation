@@ -13,7 +13,7 @@ void ArchitectureBasicBuilderScene::refresh(){
 
 
   learningRateSlider->setValue(model->getLearningRateX());
-  learningRateSlider2->setValue(-(model->getLearningRateY()));
+  learningRateSlider2->setValue((model->getLearningRateY()));
   maxEpochsSlider->setValue(model->getMaxEpochs());
   batchSizeSlider->setValue(model->getBatchSize());
   numLayersSlider->setValue(model->getNumLayers());

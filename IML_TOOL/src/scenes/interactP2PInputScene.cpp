@@ -263,6 +263,8 @@ void InteractP2PInputScene::onButtonEvent(ofxDatGuiButtonEvent e){
   }
   else if(e.target == exportPictureButton){
     ofSaveImage(imgOut,exportDir+"/"+ofGetTimestampString()+".png");
+    ofSaveImage(webcamOut,exportDir+"/"+ofGetTimestampString()+"_webcam.png");
+    ofSaveImage(imgIn,exportDir+"/"+ofGetTimestampString()+"_input.png");
   }
   else if(e.target == exportPictureButton2){
     ofSaveImage(imgIn,exportDir+"/"+ofGetTimestampString()+"_input.png");
@@ -336,8 +338,8 @@ void InteractP2PInputScene::setupGui(){
   exportPictureButton->onButtonEvent(this, &InteractP2PInputScene::onButtonEvent);
 
 
-  exportPictureButton2 = new ofxDatGuiButton("EXPORT PICTURE");
-  exportPictureButton2->setPosition(525 + 3 *drawWidth / 8, drawHeight + 125);
+  exportPictureButton2 = new ofxDatGuiButton("EXPORT");
+  exportPictureButton2->setPosition(525 + 3 *drawWidth / 8, drawHeight + 200);
   exportPictureButton2->setWidth(drawWidth/4);
   exportPictureButton2->onButtonEvent(this, &InteractP2PInputScene::onButtonEvent);
 

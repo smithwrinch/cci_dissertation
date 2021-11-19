@@ -231,6 +231,7 @@ void ExploreLatentSpaceScene::onButtonEvent(ofxDatGuiButtonEvent e){
     if(ModelManager::getInstance()->getStatus() != -10){
       SceneManager::getInstance()->setShowNavBar(true);
     }
+    
     SceneManager::getInstance()->changeSceneTo(SCENE_TYPE::INTERACT_MENU);
   }
   else if(e.target == randomiseButton){

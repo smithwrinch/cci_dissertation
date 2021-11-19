@@ -212,7 +212,7 @@ latentGraphWidget.draw();
 
   	ofPushMatrix();
 
-  		if(!drawImage(imgOut, "imgOut", ofGetWidth()/2, ofGetHeight()/2 - imHeight/2, imWidth, imHeight)) {
+  		if(!drawImage(imgOut, "imgOut", ofGetWidth()/2, ofGetHeight()/2 - imHeight + 125, imWidth, imHeight)) {
   			cout << "imgOut not allocated !!" << endl;
   		}
       if(!drawImage(imgIn, "imgIn", 225 - imHeight / 8, ofGetHeight()/2 - 100 - imWidth/8, imWidth/4, imHeight/4)) {
@@ -403,7 +403,7 @@ void MotionDetectionScene::addGui(){
   recordButton->onButtonEvent(this, &MotionDetectionScene::onButtonEvent);
 
   exportPictureButton = new ofxDatGuiButton("EXPORT IMAGE");
-  exportPictureButton->setPosition(ofGetWidth()/2, ofGetHeight()/2 - imHeight/2 + imHeight);
+  exportPictureButton->setPosition(ofGetWidth()/2, ofGetHeight()/2 + 125);
   exportPictureButton->setWidth(imWidth);
   exportPictureButton->onButtonEvent(this, &MotionDetectionScene::onButtonEvent);
 

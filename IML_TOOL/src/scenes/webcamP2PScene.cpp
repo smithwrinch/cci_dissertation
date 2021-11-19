@@ -440,7 +440,7 @@ void WebcamP2PScene::setupGui(){
   //normal mode
   grayscaleToggle = new ofxDatGuiToggle("GRAYSCALE");
   invertToggle = new ofxDatGuiToggle("INVERT");
-  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 100, 0);
+  blurSlider = new ofxDatGuiSlider("BLUR AMOUNT", 0, 200, 0);
   contrastSlider = new ofxDatGuiSlider("CONTRAST", -1, 1, 0);
   brightnessSlider = new ofxDatGuiSlider("BRIGHTNESS", -1, 1, 0);
 
@@ -572,7 +572,7 @@ void WebcamP2PScene::updateNormalImage(){
   if(int(blurSlider->getValue()) % 2 == 0){
     blurSlider->setValue(blurSlider->getValue()+1);
   }
-  imgInCV.blurGaussian(blurSlider->getValue());
+  imgInCV.blur(blurSlider->getValue());
 
   imgInCV.convertToGrayscalePlanarImages(r, g, b);
 

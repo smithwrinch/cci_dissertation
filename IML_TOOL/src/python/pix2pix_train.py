@@ -214,7 +214,6 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
     log_msg.send("Beginning training...")
     for epoch in range(max_epochs):
 
-        log_msg.send("Epoch " + str(epochs))
         clear_output(wait=True)
         fig = generate_images(gen, example_input, example_target,example_input2, example_target2,example_input3, example_target3, ROOT_IMG_SAVE, 1)
         plt.savefig(ROOT_IMG_SAVE + str(epochs) +".png")
@@ -229,7 +228,6 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
 
         if epoch != 0:
             print(f'Time taken for epoch {epochs}: {time.time()-start:.2f} sec\n')
-            log_msg.send(f'Time taken for epoch {epochs}: {time.time()-start:.2f} sec\n')
             start = time.time()
 
 
@@ -279,6 +277,8 @@ def train(train_ds, max_epochs, learning_rate, beta, gen_loss_, disc_loss_, LAMB
         lm.generate_graphD(ROOT_CHECKPOINT_SAVE)
         lm.generate_graphG(ROOT_CHECKPOINT_SAVE)
 
+        log_msg.send(f'Time taken for epoch {epochs}: {time.time()-start:.2f} sec\n')
+        
 
 
     plt.close()

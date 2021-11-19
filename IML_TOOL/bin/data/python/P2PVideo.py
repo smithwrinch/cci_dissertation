@@ -55,22 +55,26 @@ if __name__ == '__main__':
 
     print(EXPORT_DIR + NAME + ".mov")
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v') # note the lower case
-    video= cv2.VideoWriter(EXPORT_DIR + "/" + NAME + ".mov", fourcc, int(30), (int(width),int(height)), True)
+    video= cv2.VideoWriter(EXPORT_DIR + "/" + NAME.split("/")[-1] + ".mov", fourcc, int(30), (int(width),int(height)), True)
 
 
     print(EXPORT_DIR + "/" + NAME + ".mov")
     print(NAME)
     while success:
         success,image = vidcap.read()
+        # cv2.imshow("", image)
+        # cv2.waitKey(0)
         print(count)
         with open(dir, "w") as f:
             f.write("frame%d.jpg" % count);
 
         if(not success):
             break
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = image.astype('float32')
         image /= 127.5
         image -= 1
+        # print(image)
         image = cv2.resize(image, (width, height));
         image = np.expand_dims(image, axis=0)
         out = model(image)
@@ -78,6 +82,7 @@ if __name__ == '__main__':
         out = out.numpy()[0]
         out +=1
         out *= 127.5
+        out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
 
 
         out = out.astype('uint8')

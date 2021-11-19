@@ -396,12 +396,13 @@ class TrainingThread: public ofThread{
   	}
 		void stopThread(){
       cout << "STOPPING TRAINING THREAD:" << endl;
-			kill(pid, SIGTERM);
-			sleep(3000);
-			kill(pid, SIGKILL);
+      ofThread::stopThread();
+			// kill(pid, SIGTERM);
+			// kill(pid, SIGKILL);
+      sleep(1000);
 			system("killall python"); // hacky workaround for now. just POSIX.
 			system("killall python3");
-			ofThread::stopThread();
+      sleep(1000);
 		}
   private:
 
